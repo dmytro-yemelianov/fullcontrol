@@ -49,11 +49,14 @@ class Point(BasePoint):
                 inv_kin[1,:]= [sin(model_point.c*tau/360), cos(model_point.c*tau/360),0]
                 inv_kin[2,:]= [-sin(model_point.b*tau/360)*cos(model_point.c*tau/360), sin(model_point.b*tau/360)*sin(model_point.c*tau/360), cos(model_point.b*tau/360)]
 
+                # the model point is expressed relative to the rotation centre (bc_intercept),
+                # so rotate it by the bed rotation R(B,C) and translate into the machine frame:
+                #   system = R(B,C) @ model + bc_intercept
                 inv_kin = np.matmul(inv_kin, np.array([model_point.x, model_point.y, model_point.z]))
-                x_system = inv_kin[0]+state.printer.bc_intercept.x - sin(model_point.b*tau/360)*state.printer.bc_intercept.z - cos(model_point.b*tau/360)*state.printer.bc_intercept.x 
-                y_system = inv_kin[1] # +state.printer.bc_intercept.y
-                z_system = inv_kin[2]+state.printer.bc_intercept.z * (-cos(model_point.b*tau/360)+1) + sin(model_point.b*tau/360)*state.printer.bc_intercept.x 
-                
+                x_system = inv_kin[0] + state.printer.bc_intercept.x
+                y_system = inv_kin[1] + state.printer.bc_intercept.y
+                z_system = inv_kin[2] + state.printer.bc_intercept.z
+
             system_point.x = round(x_system, 6)
             system_point.y = round(y_system, 6)
             system_point.z = round(z_system, 6)
