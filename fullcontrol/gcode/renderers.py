@@ -43,15 +43,14 @@ def _xyz_gcode(step, prev) -> str:
 
 @render_gcode.register
 def _(step: Point, state):
-    XYZ_str = _xyz_gcode(step, state.point)
-    if XYZ_str is not None:  # only write a line of gcode if movement occurs
-        G_str = 'G1 ' if state.extruder.on or state.extruder.travel_format == "G1_E0" else 'G0 '
-        F_str = state.printer.f_gcode(state)
-        E_str = state.extruder.e_gcode(step, state)
-        gcode_str = f'{G_str}{F_str}{XYZ_str}{E_str}'
+    axes_str = _xyz_gcode(step, state.point)
+    if axes_str is not None:  # only write a line of gcode if movement occurs
+        f_str = state.printer.f_gcode(state)
+        e_str = state.extruder.e_gcode(step, state)
+        line = state.flavor.linear_move(state.extruder.on, f_str, axes_str, e_str)
         state.printer.speed_changed = False
         state.point.update_from(step)
-        return gcode_str.strip()  # strip the final space
+        return line
 
 
 @render_gcode.register
@@ -61,13 +60,13 @@ def _(step: Arc, state):
     coords = f'X{fmt(step.end.x)} Y{fmt(step.end.y)} '
     if step.end.z is not None and step.end.z != start.z:
         coords += f'Z{fmt(step.end.z)} '
-    G_str = 'G2 ' if geom.clockwise else 'G3 '
-    F_str = state.printer.f_gcode(state)
-    IJ_str = f'I{fmt(geom.cx - start.x)} J{fmt(geom.cy - start.y)} '
-    E_str = _arc_e_gcode(state, geom.arc_length)
+    f_str = state.printer.f_gcode(state)
+    ij_str = f'I{fmt(geom.cx - start.x)} J{fmt(geom.cy - start.y)} '
+    e_str = _arc_e_gcode(state, geom.arc_length)
+    line = state.flavor.arc_move(geom.clockwise, f_str, coords, ij_str, e_str)
     state.printer.speed_changed = False
     state.point.update_from(step.end)
-    return f'{G_str}{F_str}{coords}{IJ_str}{E_str}'.strip()
+    return line
 
 
 def _arc_e_gcode(state, arc_length: float) -> str:
