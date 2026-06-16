@@ -59,6 +59,9 @@ Checks performed:
   an implausibly fast feedrate (`> 60000 mm/min`) is a warning.
 - **first-layer z** — the first extruding move at `z <= 0` (nozzle on/below the bed).
 - **retraction balance** — filament left retracted at the end (more `Retraction` than `Unretraction`).
+- **extrusion geometry** — an extruding move with a zero/undefined cross-section (no material extruded).
+- **stringing** (info) — long travel moves without a preceding retraction, *only* when the design uses
+  retraction elsewhere (so designs that never retract are not nagged).
 
 ---
 
