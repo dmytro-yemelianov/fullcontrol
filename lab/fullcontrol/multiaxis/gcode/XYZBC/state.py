@@ -1,5 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from importlib import import_module
+
+from fullcontrol.gcode.flavor import GcodeFlavor, get_flavor
 
 # from fullcontrol.gcode.point import Point
 # from fullcontrol.gcode.printer import Printer
@@ -17,8 +19,11 @@ class State(BaseModel):
     of various attributes
     '''
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)  # the flavor is a plain class
+
     extruder: Extruder | None = None
     printer: Printer | None = None
+    flavor: GcodeFlavor | None = None
     extrusion_geometry: ExtrusionGeometry | None = None
     steps: list | None = None
     point: Point | None = Point()
@@ -47,6 +52,8 @@ class State(BaseModel):
 
         # the following line was edited from 3-axis gcode since 5-axis gcode is output in a simple form for now
         initialization_data = import_module('fullcontrol.devices.community.singletool.generic').set_up(gcode_controls.initialization_data)
+
+        self.flavor = get_flavor(initialization_data.get('gcode_flavor', 'marlin'))
 
         self.extruder = Extruder(
             units=initialization_data['e_units'],

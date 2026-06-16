@@ -1,15 +1,17 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from importlib import import_module
 
 from fullcontrol.gcode.point import Point
 from fullcontrol.gcode.printer import Printer
 from fullcontrol.gcode.extrusion_classes import ExtrusionGeometry, Extruder
 from fullcontrol.gcode.controls import GcodeControls
+from fullcontrol.gcode.flavor import GcodeFlavor, get_flavor
 from fullcontrol.common import first_point
 from fullcontrol.gcode.import_printer import resolve_initialization_data
 
 
 class State(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)  # the flavor is a plain class
     '''
     This class tracks the state of instances of interest adjusted in the list 
     of steps (points, extruder, etc.). It also includes some relevant shared variables and 
@@ -33,6 +35,7 @@ class State(BaseModel):
     extruder: Extruder | None = None
     printer: Printer | None = None
     extrusion_geometry: ExtrusionGeometry | None = None
+    flavor: GcodeFlavor | None = None
     steps: list | None = None
     point: Point | None = Field(default_factory=Point)
     i: int | None = 0
@@ -56,6 +59,8 @@ class State(BaseModel):
         # the first G1 command, making length calculation for that line impossible.
         initialization_data = resolve_initialization_data(
             gcode_controls.printer_name, gcode_controls.initialization_data)
+
+        self.flavor = get_flavor(initialization_data.get('gcode_flavor', 'marlin'))
 
         self.extruder = Extruder(
             units=initialization_data['e_units'],

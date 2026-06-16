@@ -118,6 +118,17 @@ The experimental multiaxis (4/5-axis) and `lab/` `control_code`/`3d_model`/laser
 follow this same shape (their own State + renderer registrations), which is why they
 reuse the shared step classes.
 
+### Gcode flavors (firmware dialects)
+
+The gcode renderers keep the *logic* of a design (state tracking, motion, extrusion maths)
+but delegate the firmware-specific command vocabulary — hotend/bed temperature, fan,
+extrusion mode, acceleration — to a **`GcodeFlavor`** (`fullcontrol/gcode/flavor.py`). The
+default is Marlin-style and is byte-for-byte identical to the previously hardcoded output.
+`state.flavor` is selected once per run from `initialization_data['gcode_flavor']` (default
+`'marlin'`). To target another firmware, subclass `GcodeFlavor`, override the methods that
+differ, and `register_flavor('name', YourFlavor)`; designs then select it via config. This
+keeps the dialect in one place instead of scattered across the renderer handlers.
+
 ## File map
 
 ```
