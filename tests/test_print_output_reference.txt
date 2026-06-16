@@ -209,7 +209,7 @@ M83 ; relative extrusion
 M140 S80 ; set bed temp and continue
 M104 S280 ; set hotend temp and continue
 M190 S80 ; set bed temp and wait
-M109 S280  ; set hotend temp and wait
+M109 S280 ; set hotend temp and wait
 M106 S102 ; set fan speed
 G0 F4000 X30 Y30 Z0.2
 G1 F2000 X60 E0.997804
@@ -285,7 +285,7 @@ M190 S60 ; set bed temp and wait
 ; allow bed to cool to the correct temp and heat up nozzle
 M104 S220 ; set hotend temp and continue
 M190 S50 ; set bed temp and wait
-M109 S220  ; set hotend temp and wait
+M109 S220 ; set hotend temp and wait
 M106 S255 ; set fan speed
 M83 ; relative extrusion
 G0 F4000 X10 Y10 Z0.4
@@ -386,7 +386,7 @@ tip: set initial `extrusion_width` and `extrusion_height` in the initialization_
 ; info@fullcontrol.xyz or tag FullControlXYZ on Twitter/Instagram/LinkedIn/Reddit/TikTok
 M83 ; relative extrusion
 M104 S250 ; set hotend temp and continue
-M109 S250  ; set hotend temp and wait
+M109 S250 ; set hotend temp and wait
 G0 F8000 X0 Y0 Z0 B0 C0 ; start point (x=0 in the model but x=10 in gcode due to the bc_intercept being at x=10)
 G1 F1000 X1 E0.03326 ; set x=1 - since b=0 and c=0, the model x-axis is oriented the same as the system x-axis
 G1 X3.636039 Z6.363961 B45 E0 ; set b=45 - this causes a change to x and z in system coordinates
@@ -635,17 +635,17 @@ x=60.0 y=60.0 z=0.2 color=None
 x=60.0 y=50.0 z=0.2 color=None
 check 1:
 check results:
-  step types {'Point', 'Extruder', 'Fan'}
+  step types {'Extruder', 'Fan', 'Point'}
 
 check 2 (extended steps with a list):
 check results:
-  step types {'Point', 'Extruder', 'Fan'}
+  step types {'Extruder', 'Fan', 'Point'}
 
 check 3: (appended steps with a list)
 check results:
   warning - the list of steps must be a 1D list of fullcontrol class instances, it currently includes a 'list'
   use fc.flatten() to convert it to 1D or check for accidental use of append() instead of extend()
-  step types {'Point', 'Extruder', 'list', 'Fan'}
+  step types {'Extruder', 'Fan', 'Point', 'list'}
 original steps:
 Point(x=0.0, y=0.0, z=0.0, color=None)
 [Point(x=10.0, y=10.0, z=None, color=None), ManualGcode(text='G4 P2000 ; pause for 2 seconds')]
@@ -656,7 +656,7 @@ original steps 'check':
 check results:
   warning - the list of steps must be a 1D list of fullcontrol class instances, it currently includes a 'list'
   use fc.flatten() to convert it to 1D or check for accidental use of append() instead of extend()
-  step types {'Point', 'list'}
+  step types {'list', 'Point'}
 
 flat steps:
 Point(x=0.0, y=0.0, z=0.0, color=None)
@@ -813,7 +813,7 @@ G1 Y20 E0.332601
 M140 S40 ; set bed temp and continue
 M104 S210 ; set hotend temp and continue
 M190 S40 ; set bed temp and wait
-M109 S210  ; set hotend temp and wait
+M109 S210 ; set hotend temp and wait
 
 
 ########
@@ -994,7 +994,7 @@ tip: set initial `extrusion_width` and `extrusion_height` in the initialization_
 M83 ; relative extrusion
 G0 F8000 X0 Y0 Z0
 G1 F1000 X5 E0.166301
-M109 S280  ; set hotend temp and wait
+M109 S280 ; set hotend temp and wait
 G1 X10 E0.166301
 M104 S170 T3 ; set hotend temp for tool 3 and continue
 warning: printer is not set - defaulting to 'generic', which does not initialize the printer with proper start gcode
