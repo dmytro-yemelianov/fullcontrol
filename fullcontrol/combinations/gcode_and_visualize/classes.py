@@ -2,55 +2,17 @@
 
 import fullcontrol.gcode as gc
 import fullcontrol.visualize as vis
-from fullcontrol.base import BaseModelPlus
 
 
-# inherit attributes to generate both gcode and visualization data
+# The user-facing step classes. A design (list of these) is consumed by the gcode and
+# visualize backends, which dispatch on each step's type via their renderers - so these
+# classes carry only data (+ a few emission helpers), not backend methods.
+#  - dual-backend concepts inherit from both the gcode and visualize subclasses;
+#  - gcode-only / visualize-only concepts just re-expose the relevant backend class.
+# A drift-guard test (tests/unit/test_architecture.py) ensures every backend class is
+# exposed here and has a renderer.
 
-# rather than manually writing all of the objects below, it would be great if this was automated. That
-# would allow a used to add an extra object in the gcode subpackage, but not have to worry about adding
-# it here. this automation would need some consideration to get an appropriate docstring for each class
-
-# 1. classes used to add a visualize or gcode method to class that simply passes
-
-class PassGcode(BaseModelPlus):
-    """A placeholder class that allows for the calling of the gcode() method on all objects in a list, 
-    even if some objects do not have a meaningful implementation of this method.
-    """
-
-    def gcode(self, state):
-        """A placeholder method that allows for the calling of gcode() on all objects in a list.
-
-        Args:
-            state (State): The state object containing the current state information. This argument is ignored in this implementation.
-
-        Returns:
-            None
-        """
-        pass
-
-
-class PassVisualize(BaseModelPlus):
-    """
-    A placeholder class that allows for the calling of the visualize() method on all objects in a list, 
-    even if some objects do not have a meaningful implementation of this method.
-    """
-
-    def visualize(self, state, plot_data, plot_controls):
-        """A placeholder method that allows for the calling of visualize() on all objects in a list.
-
-        Args:
-            state (State): The state object containing the current state information. This argument is ignored in this implementation.
-            plot_data (PlotData): The plot data object containing the data to be plotted.
-            plot_controls (PlotControls): The plot controls object containing the settings for plotting.
-
-        Returns:
-            None
-        """
-        pass
-
-
-# 2. combined classes that are defined in both gcode and visualization subpackages
+# 1. concepts defined in both the gcode and visualize subpackages
 
 class Point(gc.Point, vis.Point):
     '''
@@ -104,10 +66,10 @@ class ExtrusionGeometry(gc.ExtrusionGeometry, vis.ExtrusionGeometry):
     """
     pass
 
-# 3. classes that are defined in the gcode subpackage only
+# 2. concepts defined in the gcode subpackage only
 
 
-class PrinterCommand(gc.PrinterCommand, PassVisualize):
+class PrinterCommand(gc.PrinterCommand):
     """
     Represents a command to be executed by a printer.
 
@@ -120,7 +82,7 @@ class PrinterCommand(gc.PrinterCommand, PassVisualize):
     pass
 
 
-class ManualGcode(gc.ManualGcode, PassVisualize):
+class ManualGcode(gc.ManualGcode):
     """
     Custom Gcode class that allows adding a new line of Gcode defined by the 'text' attribute.
 
@@ -130,7 +92,7 @@ class ManualGcode(gc.ManualGcode, PassVisualize):
     pass
 
 
-class Printer(gc.Printer, PassVisualize):
+class Printer(gc.Printer):
     '''
     A class that represents a 3D printer.
 
@@ -143,7 +105,7 @@ class Printer(gc.Printer, PassVisualize):
     pass
 
 
-class Fan(gc.Fan, PassVisualize):
+class Fan(gc.Fan):
     '''
     This class represents a generic fan component
 
@@ -153,7 +115,7 @@ class Fan(gc.Fan, PassVisualize):
     pass
 
 
-class Hotend(gc.Hotend, PassVisualize):
+class Hotend(gc.Hotend):
     '''
 A class representing a generic hotend.
 
@@ -166,7 +128,7 @@ Attributes:
     pass
 
 
-class Buildplate(gc.Buildplate, PassVisualize):
+class Buildplate(gc.Buildplate):
     '''
     This class represents a build plate used in 3D printing.
 
@@ -178,7 +140,7 @@ class Buildplate(gc.Buildplate, PassVisualize):
     pass
 
 
-class StationaryExtrusion(gc.StationaryExtrusion, PassVisualize):
+class StationaryExtrusion(gc.StationaryExtrusion):
     """
     Represents stationary extrusion in a 3D printer.
 
@@ -191,7 +153,7 @@ class StationaryExtrusion(gc.StationaryExtrusion, PassVisualize):
     pass
 
 
-class GcodeComment(gc.GcodeComment, PassVisualize):
+class GcodeComment(gc.GcodeComment):
     '''
     A class that represents a Gcode comment.
 
@@ -202,7 +164,7 @@ class GcodeComment(gc.GcodeComment, PassVisualize):
     pass
 
 
-class GcodeControls(gc.GcodeControls, PassVisualize):
+class GcodeControls(gc.GcodeControls):
     '''
     Control to adjust the style and initialization of the gcode.
 
@@ -214,10 +176,10 @@ class GcodeControls(gc.GcodeControls, PassVisualize):
     '''
     pass
 
-# 4. classes that are defined in the visualization subpackage only
+# 3. concepts defined in the visualize subpackage only
 
 
-class PlotAnnotation(vis.PlotAnnotation, PassGcode):
+class PlotAnnotation(vis.PlotAnnotation):
     '''
     Represents an annotation for a plot.
 
@@ -229,7 +191,7 @@ class PlotAnnotation(vis.PlotAnnotation, PassGcode):
     pass
 
 
-class PlotControls(vis.PlotControls, PassGcode):
+class PlotControls(vis.PlotControls):
     """
     Control class to adjust the style of the plot.
 
