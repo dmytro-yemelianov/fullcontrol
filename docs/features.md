@@ -115,13 +115,17 @@ Fields left `None` are omitted; an all-`None` object emits nothing.
 ## Gcode flavors (firmware dialects)
 
 The firmware-specific command vocabulary (hotend/bed temperature, fan, extrusion mode,
-acceleration, jerk, pressure advance) lives in a `GcodeFlavor`. The default is Marlin. Select a
-flavor per design via config:
+acceleration, jerk, pressure advance) lives in a `GcodeFlavor`. Built-in flavors are
+`'marlin'` (default) and `'klipper'`. Select one per design via config:
 
 ```python
 fc.transform(steps, 'gcode', fc.GcodeControls(
-    printer_name='generic', initialization_data={'gcode_flavor': 'marlin'}))
+    printer_name='generic', initialization_data={'gcode_flavor': 'klipper'}))
 ```
+
+Klipper accepts the standard M-codes for temperatures/fan/acceleration, but emits
+`SET_PRESSURE_ADVANCE` for `PressureAdvance` and `SET_VELOCITY_LIMIT SQUARE_CORNER_VELOCITY`
+for `Jerk` (its nearest analogue).
 
 Add support for another firmware by subclassing `GcodeFlavor`, overriding the methods that
 differ, and registering it:
