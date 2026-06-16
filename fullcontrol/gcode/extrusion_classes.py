@@ -3,8 +3,15 @@ from fullcontrol.common import Extruder as BaseExtruder
 from fullcontrol.common import StationaryExtrusion as BaseStationaryExtrusion
 from fullcontrol.gcode import Point
 from fullcontrol.gcode.number_format import fmt
-# from fullcontrol.geometry.measure import distance_forgiving
 from math import pi
+
+
+def _distance_forgiving(point1: Point, point2: Point) -> float:
+    'Distance between two points; an axis is ignored unless defined in both points.'
+    dist_x = 0 if point1.x is None or point2.x is None else point1.x - point2.x
+    dist_y = 0 if point1.y is None or point2.y is None else point1.y - point2.y
+    dist_z = 0 if point1.z is None or point2.z is None else point1.z - point2.z
+    return (dist_x**2 + dist_y**2 + dist_z**2)**0.5
 
 
 class ExtrusionGeometry(BaseExtrusionGeometry):
@@ -97,23 +104,8 @@ class Extruder(BaseExtruder):
         Returns:
             str: The gcode component for extrusion.
         '''
-        def distance_forgiving(point1: Point, point2: Point) -> float:
-            '''Calculate the distance between two points. x, y or z components are ignored unless defined in both points
-
-            Args:
-                point1 (Point): The first point.
-                point2 (Point): The second point.
-
-            Returns:
-                float: The distance between the two points.
-            '''
-            dist_x = 0 if point1.x is None or point2.x is None else point1.x - point2.x
-            dist_y = 0 if point1.y is None or point2.y is None else point1.y - point2.y
-            dist_z = 0 if point1.z is None or point2.z is None else point1.z - point2.z
-            return ((dist_x)**2+(dist_y)**2+(dist_z)**2)**0.5
         if self.on:
-            # length = pt1.distance_to_self(pt2)
-            length = distance_forgiving(point1, state.point)
+            length = _distance_forgiving(point1, state.point)
             return f'E{fmt(self.get_and_update_volume(length*state.extrusion_geometry.area)*self.volume_to_e)}'
         else:
             if state.extruder.travel_format == 'G1_E0':
