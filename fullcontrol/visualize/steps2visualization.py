@@ -3,6 +3,7 @@ from fullcontrol.visualize.state import State
 from fullcontrol.visualize.plot_data import PlotData
 from fullcontrol.visualize.controls import PlotControls
 from fullcontrol.visualize.tips import tips
+from fullcontrol.visualize.renderers import render_visualize
 
 
 def visualize(steps: list, plot_controls: PlotControls, show_tips: bool):
@@ -23,7 +24,7 @@ def visualize(steps: list, plot_controls: PlotControls, show_tips: bool):
     plot_data = PlotData(steps, state)
     for i, step in enumerate(steps):
         try:
-            step.visualize(state, plot_data, plot_controls)
+            render_visualize(step, state, plot_data, plot_controls)
         except Exception as e:
             raise type(e)(f'error visualizing step {i} ({type(step).__name__}): {e}') from e
     plot_data.cleanup()

@@ -1,11 +1,5 @@
-from typing import TYPE_CHECKING
 from pydantic import BaseModel
 from fullcontrol.common import Point
-from fullcontrol.visualize.controls import PlotControls
-
-if TYPE_CHECKING:
-    from fullcontrol.visualize.state import State
-    from fullcontrol.visualize.plot_data import PlotData
 
 
 class PlotAnnotation(BaseModel):
@@ -22,19 +16,3 @@ class PlotAnnotation(BaseModel):
     '''
     point: Point | None = None
     label: str | None = None
-
-    def visualize(self, state: 'State', plot_data: 'PlotData', plot_controls: PlotControls) -> None:
-        '''
-        Process a PlotAnnotation in a list of steps supplied by the designer to update plot_data and state.
-
-        Args:
-            state ('State'): The current state of the plot.
-            plot_data ('PlotData'): The data associated with the plot.
-            plot_controls (PlotControls): The controls for the plot.
-
-        Returns:
-            None
-        '''
-        if self.point is None:
-            self.point = Point(x=state.point.x, y=state.point.y, z=state.point.z)
-        plot_data.add_annotation(self)
