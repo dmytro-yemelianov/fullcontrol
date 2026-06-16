@@ -1,0 +1,58 @@
+
+from pydantic import BaseModel, model_validator
+
+
+def check_fields(allowed_fields, defined_attributes, class_name):
+   for attribute in defined_attributes.keys():
+       if attribute not in allowed_fields:
+           raise Exception(f'\nattribute "{attribute}" not allowed for the class {class_name}\nattributes defined: {str(defined_attributes)[1:-1]}\nattributes allowed: {repr(list(allowed_fields))[1:-1]}')
+
+    
+class BaseModelPlus(BaseModel):
+
+    """
+    A subclass of BaseModel with additional functionality.
+
+    This class extends the functionality of the BaseModel class by adding the ability to update its attributes from another object,
+    and a validator to check if certain attributes are allowed.
+
+    Attributes:
+        None
+
+    Methods:
+        __setitem__: Sets the value of an attribute.
+        __getitem__: Retrieves the value of an attribute.
+        update_from: Updates the attributes of the object from another object.
+        reject_extra_fields (classmethod): Validator to check if certain attributes are allowed.
+
+    """
+
+    def __setitem__(self, name, value): setattr(self, name, value)
+
+    def __getitem__(self, name): return getattr(self, name)
+
+    def update_from(self, source):
+            """
+            Updates the attributes of the current object from the attributes of another object.
+
+            Args:
+                source: The object from which to update the attributes.
+
+            Returns:
+                None
+            """
+            self_vars = vars(self)  # cache, for multiple checks
+            for key, value in vars(source).items():
+                if (value is not None) and (key in self_vars):
+                    self[key] = value
+
+    # allow transient state-tracking attributes to be attached at runtime
+    # (used by update_from and the gcode/visualize state machines)
+    model_config = {"extra": "allow"}
+
+    @model_validator(mode="before")
+    @classmethod
+    def reject_extra_fields(cls, values):
+        # reject unknown fields at construction despite extra="allow" above, with a helpful message
+        check_fields(cls.model_fields.keys(), values, cls.__name__)
+        return values  # values must be returned for pydantic v2

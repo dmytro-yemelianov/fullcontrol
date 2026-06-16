@@ -119,9 +119,13 @@ reuse the shared step classes.
 
 ```
 fullcontrol/
-  base.py                       BaseModelPlus (data base)
-  common.py, __init__.py        public API aggregation
-  point.py, *_classes.py        generic step data classes
+  core/                         backend-free foundation: BaseModelPlus (base.py),
+                                generic data classes (point/printer/*_classes/aux),
+                                utilities (check, extra_functions), common aggregator.
+                                Must not import gcode/visualize (enforced by
+                                tests/unit/test_core_boundary.py). The old top-level
+                                module paths (fullcontrol/base.py, point.py, ...) are
+                                thin re-export shims for compatibility.
   geometry/                     pure path generators -> list[Point]
   gcode/                        gcode backend: state, steps2gcode (driver),
                                 renderers (singledispatch), number_format, devices import
