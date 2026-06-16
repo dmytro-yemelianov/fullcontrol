@@ -15,6 +15,8 @@ default_initial_settings = {
     "relative_e": True,
     "manual_e_ratio": None,
     "dia_feed": 1.75,
+    "retraction_distance": 1.0,  # default filament length retracted by fc.Retraction() (mm); tune per printer (bowden needs more)
+    "retraction_speed": 2400,  # default retraction feedrate (mm/min = 40 mm/s)
     "travel_format": "G0",  # options: "G0" / "G1_E0"
     "primer": "front_lines_then_y",
     "printer_command_list": {

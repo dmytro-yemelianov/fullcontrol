@@ -1,6 +1,7 @@
 from fullcontrol.common import ExtrusionGeometry as BaseExtrusionGeometry
 from fullcontrol.common import Extruder as BaseExtruder
 from fullcontrol.common import StationaryExtrusion as BaseStationaryExtrusion
+from fullcontrol.base import BaseModelPlus
 from fullcontrol.gcode import Point
 from fullcontrol.gcode.number_format import fmt
 from math import pi
@@ -20,6 +21,37 @@ class ExtrusionGeometry(BaseExtrusionGeometry):
 
 class StationaryExtrusion(BaseStationaryExtrusion):
     'Stationary extrusion of a set volume (gcode emission handled by the renderer)'
+
+
+class Retraction(BaseModelPlus):
+    '''Retract filament to reduce oozing/stringing during a travel move.
+
+    Emits an explicit 'G1 F<speed> E-<dist>' move. This is the explicit E-based route;
+    for firmware-managed retraction use PrinterCommand(id='retract') -> G10 instead.
+
+    Attributes:
+        distance (float, optional): Filament length to retract, in the gcode E units
+            (mm of filament in 'mm' mode, mm^3 in 'mm3' mode). None inherits the
+            printer's default retraction distance.
+        speed (float, optional): Retraction feedrate in mm/min. None inherits the
+            printer's default retraction speed.
+    '''
+    distance: float | None = None
+    speed: float | None = None
+
+
+class Unretraction(BaseModelPlus):
+    '''Prime filament back after a Retraction (the inverse move).
+
+    Attributes:
+        distance (float, optional): Filament length to prime, in the gcode E units.
+            None primes exactly the amount currently retracted, restoring the
+            cumulative extrusion position (a retract+prime nets to zero material).
+        speed (float, optional): Priming feedrate in mm/min. None inherits the
+            printer's default retraction speed.
+    '''
+    distance: float | None = None
+    speed: float | None = None
 
 
 class Extruder(BaseExtruder):
@@ -53,6 +85,13 @@ class Extruder(BaseExtruder):
     # total extrusion volume reference value - this attribute is set to allow extrusion to be expressed relative to this point (for relative_gcode = True, it is reset for every line)
     total_volume_ref: float | None = None
     travel_format: str | None = None
+    # retraction defaults (filament-length units) and runtime tracking of the currently
+    # retracted amount, used by the Retraction/Unretraction steps:
+    retraction_distance: float | None = None
+    retraction_speed: float | None = None
+    # None on the class (so an Extruder step never copies it onto the running state via
+    # update_from); the State initialises the tracking instance to 0.0:
+    retracted_length: float | None = None
 
     def get_and_update_volume(self, volume):
         '''Calculate the extrusion volume and update the total volume.

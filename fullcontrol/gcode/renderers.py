@@ -10,7 +10,7 @@ from functools import singledispatch
 
 from fullcontrol.common import Printer as CommonPrinter
 from fullcontrol.gcode.point import Point
-from fullcontrol.gcode.extrusion_classes import Extruder, ExtrusionGeometry, StationaryExtrusion
+from fullcontrol.gcode.extrusion_classes import Extruder, ExtrusionGeometry, StationaryExtrusion, Retraction, Unretraction
 from fullcontrol.gcode.auxilliary_components import Fan, Hotend, Buildplate, MAX_FAN_PWM, PERCENT
 from fullcontrol.gcode.commands import PrinterCommand, ManualGcode
 from fullcontrol.gcode.annotations import GcodeComment
@@ -72,6 +72,36 @@ def _(step: ExtrusionGeometry, state):
 def _(step: StationaryExtrusion, state):
     state.printer.speed_changed = True
     return f'G1 F{step.speed} E{fmt(state.extruder.get_and_update_volume(step.volume)*state.extruder.volume_to_e)}'
+
+
+@render_gcode.register
+def _(step: Retraction, state):
+    e = state.extruder
+    distance = step.distance if step.distance is not None else e.retraction_distance
+    speed = step.speed if step.speed is not None else e.retraction_speed
+    if not distance:  # nothing to retract -> emit no line
+        return None
+    # remember as the running default so a later Retraction()/Unretraction() inherits it
+    e.retraction_distance, e.retraction_speed = distance, speed
+    e.retracted_length += distance
+    # distance is filament-length; convert to a volume so the E machinery (relative/absolute,
+    # volume_to_e) emits the matching -E delta. volume * volume_to_e == -distance.
+    volume = -distance / e.volume_to_e
+    state.printer.speed_changed = True
+    return f'G1 F{fmt(speed, dp=1)} E{fmt(e.get_and_update_volume(volume) * e.volume_to_e)} ; retract'
+
+
+@render_gcode.register
+def _(step: Unretraction, state):
+    e = state.extruder
+    distance = step.distance if step.distance is not None else e.retracted_length
+    speed = step.speed if step.speed is not None else e.retraction_speed
+    if not distance:  # nothing primed -> emit no line
+        return None
+    e.retracted_length = max(0.0, e.retracted_length - distance)
+    volume = distance / e.volume_to_e
+    state.printer.speed_changed = True
+    return f'G1 F{fmt(speed, dp=1)} E{fmt(e.get_and_update_volume(volume) * e.volume_to_e)} ; unretract'
 
 
 @render_gcode.register
