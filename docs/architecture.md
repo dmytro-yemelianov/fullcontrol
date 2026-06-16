@@ -24,7 +24,8 @@ The same list can be turned into different outputs:
                          │   'plot'       → visualize driver + render_visualize                  │
                          │   'simulation' → simulate (time/material/flow estimate)               │
                          │   'validate'   → pre-flight checks (bounds, cold extrusion, temps,    │
-                         │                  speeds, first-layer z, retraction balance)           │
+                         │                  speeds, first-layer z, retraction, geometry,         │
+                         │                  stringing)                                           │
                          │   '<your backend>' → register_backend(...)                            │
                          └───────────────────────────────────────────────────────────────────────┘
 ```

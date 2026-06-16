@@ -5,7 +5,7 @@ sub-zero Z, and likely cold extrusion. It reuses the gcode State so it sees the 
 coordinates (including the printer's start/end procedures and primer).
 """
 from fullcontrol.core.point import Point
-from fullcontrol.core.extrusion_classes import Extruder
+from fullcontrol.core.extrusion_classes import Extruder, ExtrusionGeometry
 from fullcontrol.core.auxilliary_components import Hotend, Buildplate
 from fullcontrol.core.printer import Printer
 from fullcontrol.gcode.extrusion_classes import Retraction, Unretraction
@@ -17,6 +17,13 @@ MAX_NOZZLE_TEMP_C = 350       # beyond a typical hotend's safe range
 MAX_BED_TEMP_C = 150          # beyond a typical heated bed's range
 MAX_FEEDRATE_MM_MIN = 60000   # 1000 mm/s - implausibly fast for FDM
 RETRACTION_BALANCE_TOL_MM = 1e-6
+TRAVEL_STRINGING_THRESHOLD_MM = 2.0   # travels longer than this typically warrant a retraction
+
+
+def _xy_distance(a: Point, b: Point) -> float:
+    if None in (a.x, a.y, b.x, b.y):
+        return 0.0
+    return ((a.x - b.x) ** 2 + (a.y - b.y) ** 2) ** 0.5
 
 
 def validate(steps, controls, show_tips=True) -> ValidationResult:
@@ -32,6 +39,8 @@ def validate(steps, controls, show_tips=True) -> ValidationResult:
     _check_speeds(state.steps, init, result)
     _check_first_layer(state.steps, result)
     _check_retraction_balance(state.steps, init, result)
+    _check_extrusion_geometry(state.steps, init, result)
+    _check_stringing(state.steps, result)
     return result
 
 
@@ -120,6 +129,62 @@ def _check_retraction_balance(steps, init, result):
     if retracted > RETRACTION_BALANCE_TOL_MM:
         result.add('warning', f'{retracted:g} mm of filament is left retracted at the end of the print '
                               '(more Retraction than Unretraction) - may ooze or under-extrude on the next print')
+
+
+def _check_extrusion_geometry(steps, init, result):
+    'Warn if the first extruding move happens with a zero/undefined extrusion cross-section.'
+    width, height = init.get('extrusion_width'), init.get('extrusion_height')
+    diameter = None
+    extruder_on = False
+    for step in steps:
+        if isinstance(step, ExtrusionGeometry):
+            if step.width is not None:
+                width = step.width
+            if step.height is not None:
+                height = step.height
+            if step.diameter is not None:
+                diameter = step.diameter
+        elif isinstance(step, Extruder) and step.on is not None:
+            extruder_on = step.on
+        elif isinstance(step, Point) and extruder_on:
+            rect_ok = bool(width) and bool(height) and width > 0 and height > 0
+            circle_ok = bool(diameter) and diameter > 0
+            if not (rect_ok or circle_ok):
+                result.add('warning', 'extruding with a zero/undefined extrusion geometry '
+                                      f'(width={width}, height={height}, diameter={diameter}) - no material will be extruded')
+            return  # only the first extruding move matters
+
+
+def _check_stringing(steps, result):
+    '''Low-noise stringing heuristic: only when a design uses retraction at all, flag long
+    travel moves (after printing has started) that are not preceded by a retraction.'''
+    uses_retraction = any(isinstance(s, Retraction) for s in steps)
+    if not uses_retraction:
+        return
+    extruder_on = False
+    has_printed = False
+    retracted = False
+    tracked = Point()
+    n_unretracted_travels = 0
+    for step in steps:
+        if isinstance(step, Retraction):
+            retracted = True
+        elif isinstance(step, Unretraction):
+            retracted = False
+        elif isinstance(step, Extruder) and step.on is not None:
+            if step.on:
+                retracted = False  # priming/printing resumes
+            extruder_on = step.on
+        elif isinstance(step, Point):
+            prev = Point(x=tracked.x, y=tracked.y, z=tracked.z)
+            tracked.update_from(step)
+            if extruder_on:
+                has_printed = True
+            elif has_printed and not retracted and _xy_distance(prev, tracked) > TRAVEL_STRINGING_THRESHOLD_MM:
+                n_unretracted_travels += 1
+    if n_unretracted_travels:
+        result.add('info', f'{n_unretracted_travels} long travel move(s) (> {TRAVEL_STRINGING_THRESHOLD_MM} mm) '
+                           'without a preceding retraction - possible stringing (the design uses retraction elsewhere)')
 
 
 def _check_cold_extrusion(steps, init, result):
