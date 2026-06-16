@@ -335,12 +335,16 @@ def test_linspace_normal_is_evenly_spaced_and_inclusive():
 # --------------------------------------------------------------------------- #
 
 def test_travel_to_wraps_point_in_extruder_toggle():
+    # geometry is backend-free, so it builds designs from the core data classes (which the
+    # combined backend classes subclass) - check against the core bases
+    from fullcontrol.core.point import Point as CorePoint
+    from fullcontrol.core.extrusion_classes import Extruder as CoreExtruder
     steps = fc.travel_to(fc.Point(x=1, y=2, z=3))
     assert isinstance(steps, list)
     assert len(steps) == 3
-    assert isinstance(steps[0], fc.Extruder)
-    assert isinstance(steps[1], fc.Point)
-    assert isinstance(steps[2], fc.Extruder)
+    assert isinstance(steps[0], CoreExtruder)
+    assert isinstance(steps[1], CorePoint)
+    assert isinstance(steps[2], CoreExtruder)
     # extruder is turned off before the move and back on after it
     assert steps[0].on is False
     assert steps[2].on is True
