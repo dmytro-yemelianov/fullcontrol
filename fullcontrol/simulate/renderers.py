@@ -57,7 +57,8 @@ def _(step: Printer, state, result):
 @render_simulate.register
 def _(step: Extruder, state, result):
     state.extruder.update_from(step)
-    if step.units is not None or step.dia_feed is not None:
+    # units/dia_feed are gcode-Extruder fields; a core Extruder (e.g. from geometry) lacks them
+    if getattr(step, 'units', None) is not None or getattr(step, 'dia_feed', None) is not None:
         state.extruder.update_e_ratio()
 
 

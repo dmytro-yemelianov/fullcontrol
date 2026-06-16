@@ -1,10 +1,10 @@
 
 # import classes
-from fullcontrol.combinations.gcode_and_visualize.classes import Point, Extruder
-# objects are imported here with functionality for both gcode and visualization. this means
-# the modules within the geometry subpackage can simply import from here, with the idea being
-# that only one import command needs to be changed if a different combination of properties is
-# used (i.e. this bit in the line above: fullcontrol.combinations.gcode_and_visualize.classes).
+from fullcontrol.core.point import Point
+from fullcontrol.core.extrusion_classes import Extruder
+# geometry is backend-free: it builds designs from the core data classes, which are directly
+# renderable by every backend (see fullcontrol/gcode/renderers.py). The geometry submodules
+# import these from here, so this is the single place those classes are chosen.
 from fullcontrol.geometry.vector import Vector
 from fullcontrol.geometry.polar import PolarPoint
 
@@ -23,3 +23,9 @@ from fullcontrol.geometry.shapes import rectangleXY, circleXY, circleXY_3pt, ell
 from fullcontrol.geometry.waves import squarewaveXY, squarewaveXYpolar, trianglewaveXYpolar, sinewaveXYpolar
 from fullcontrol.geometry.segmentation import segmented_line, segmented_path
 from fullcontrol.geometry.travel_to import travel_to
+
+# Point and Extruder are imported above only so the geometry submodules build designs from the
+# core data classes; they are deliberately NOT re-exported via `import *` - the public
+# fc.Point / fc.Extruder are the combined backend classes assembled in the combinations layer.
+# (explicit `from fullcontrol.geometry import Point` still works for the submodules.)
+__all__ = [_n for _n in dir() if not _n.startswith('_') and _n not in ('Point', 'Extruder')]

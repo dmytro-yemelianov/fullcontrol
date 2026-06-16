@@ -16,13 +16,9 @@ if TYPE_CHECKING:
 
 class Point(BasePoint):
     '''
-    A generic fullcontrol Point with a color attribute and color/visualization methods added.
-
-    Attributes:
-        color (Optional[list]): The color of the point in RGB format [r, g, b] with values 0-1.
+    A fullcontrol Point with colour/visualization methods added (the color [r, g, b] data
+    field is defined on the core Point base).
     '''
-
-    color: list | None = None  # [r,g,b]
 
     def update_color(self, state: 'State', plot_data: 'PlotData', plot_controls: 'PlotControls'):
         '''

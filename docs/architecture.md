@@ -145,7 +145,9 @@ fullcontrol/
                                 tests/unit/test_core_boundary.py). The old top-level
                                 module paths (fullcontrol/base.py, point.py, ...) are
                                 thin re-export shims for compatibility.
-  geometry/                     pure path generators -> list[Point]
+  geometry/                     backend-free path generators -> list[core Point]
+                                (depends only on fullcontrol.core; enforced by
+                                tests/unit/test_geometry_in_core.py)
   gcode/                        gcode backend: state, steps2gcode (driver),
                                 renderers (singledispatch), number_format, devices import
   visualize/                    plot backend: state, steps2visualization (driver),
