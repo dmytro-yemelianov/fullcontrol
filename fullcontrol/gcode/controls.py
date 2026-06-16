@@ -1,9 +1,10 @@
 
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import Field
+from fullcontrol.base import BaseModelPlus
 
 
-class GcodeControls(BaseModel):
+class GcodeControls(BaseModelPlus):
     """
     Control to adjust the style and initialization of the gcode.
 
@@ -14,7 +15,7 @@ class GcodeControls(BaseModel):
         include_date (Optional[bool]): Whether to include the date in the filename. Defaults to True.
     """
     printer_name: Optional[str] = None
-    initialization_data: Optional[dict] = {} # values passed for initialization_data overwrite the default initialization_data of the printer
+    initialization_data: Optional[dict] = Field(default_factory=dict) # values passed for initialization_data overwrite the default initialization_data of the printer
     save_as: Optional[str] = None
     include_date: Optional[bool] = True
 

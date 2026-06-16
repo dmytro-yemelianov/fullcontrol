@@ -1,9 +1,10 @@
 
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import Field
+from fullcontrol.base import BaseModelPlus
 
 
-class PlotControls(BaseModel):
+class PlotControls(BaseModelPlus):
     """
     Control class to adjust the style of the plot.
 
@@ -35,7 +36,7 @@ class PlotControls(BaseModel):
     raw_data: Optional[bool] = False
     printer_name: Optional[str] = 'generic'
     # initialization_data is information about initial printing conditions, which may be changed by the fullcontrol 'design', whereas the above attributes are never changed by the 'design'
-    initialization_data: Optional[dict] = {}  # values passed for initialization_data overwrite the default initialization_data of the printer
+    initialization_data: Optional[dict] = Field(default_factory=dict)  # values passed for initialization_data overwrite the default initialization_data of the printer
 
     def initialize(self):
         if not self.raw_data: # the follows defaults are only required if plotting the path, not for raw data export

@@ -1,6 +1,5 @@
 
-# from pydantic import model_validator, BaseModel
-from pydantic import BaseModel, __version__
+from pydantic import BaseModel, model_validator
 
 
 def check_fields(allowed_fields, defined_attributes, class_name):
@@ -47,23 +46,13 @@ class BaseModelPlus(BaseModel):
                 if (value is not None) and (key in self_vars):
                     self[key] = value
 
-    if int(__version__.split('.')[0]) >= 2:
-        # Pydantic v2 config
-        model_config = {"extra": "allow"}
-        from pydantic import model_validator
-        @model_validator(mode="before")
-        @classmethod
-        def reject_extra_fields(cls, values):
-            check_fields(cls.model_fields.keys(), values, cls.__name__)
-            # values must be returned for pydantic v2
-            return values
-    else:
-        from pydantic import root_validator
-        # Pydantic v1 config
-        class Config:
-            extra = "allow"
-        @root_validator(pre=True)
-        @classmethod
-        def reject_extra_fields(cls, values):
-            check_fields(cls.__fields__.keys(), values, cls.__name__)
-            return values
+    # allow transient state-tracking attributes to be attached at runtime
+    # (used by update_from and the gcode/visualize state machines)
+    model_config = {"extra": "allow"}
+
+    @model_validator(mode="before")
+    @classmethod
+    def reject_extra_fields(cls, values):
+        # reject unknown fields at construction despite extra="allow" above, with a helpful message
+        check_fields(cls.model_fields.keys(), values, cls.__name__)
+        return values  # values must be returned for pydantic v2
