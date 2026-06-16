@@ -22,12 +22,12 @@ def segmented_line(point1: Point, point2: Point, segments: int) -> list:
     return [Point(x=x_steps[i], y=y_steps[i], z=z_steps[i]) for i in range(segments+1)]
 
 
-def segmented_path(points: list, segments: int) -> int:
+def segmented_path(points: list, segments: int) -> list:
     """
     Calculate a segmented path (equidistant points) based on a list of points and the desired number of segments.
 
     Args:
-        points (list): A list of equidistant points along the path.
+        points (list): A list of points along the path.
         segments (int): The desired number of segments.
 
     Returns:
@@ -45,7 +45,7 @@ def segmented_path(points: list, segments: int) -> int:
     path_section_now = 0
     for seg in range(segments-1):
         path_length_now += seg_length
-        while path_length_now > cumulative_length[path_section_now]:
+        while path_section_now < len(cumulative_length) - 1 and path_length_now > cumulative_length[path_section_now]:
             path_section_now += 1
         interpolation_length = path_length_now - \
             cumulative_length[path_section_now-1]

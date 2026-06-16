@@ -43,7 +43,7 @@ def angleXY_between_3_points(start_point: Point, mid_point: Point, end_point: Po
     end_point (Point): The ending point.
 
     Returns:
-    float: The angle in degrees.
+    float: The angle in radians (the difference of the two polar angles; may be negative).
     '''
     return(point_to_polar(end_point, mid_point).angle - point_to_polar(start_point, mid_point).angle)
 

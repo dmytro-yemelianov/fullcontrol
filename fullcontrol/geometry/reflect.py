@@ -14,6 +14,8 @@ def reflectXY_mc(p: Point, m_reflect: float, c_reflect: float) -> Point:
     Returns:
         Point: A new Point with the x and y values reflected about the line, and the original z value.
     '''
+    if m_reflect == 0:  # horizontal reflection line y=c: reflect y about c, x unchanged
+        return Point(x=p.x, y=2 * c_reflect - p.y, z=p.z)
     m_reflect_normal = -1 / m_reflect  # gradient of the normal of the reflection line
     # intercept of the normal of the reflection line
     c_reflect_normal = p.y - (m_reflect_normal * p.x)

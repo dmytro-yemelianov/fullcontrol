@@ -48,23 +48,26 @@ class BoundingBox(BaseModel):
         Returns:
             None
         '''
-        self.minx = 1e10  # initial high value always overwritten
-        self.miny = 1e10  # initial high value always overwritten
-        self.minz = 1e10  # initial high value always overwritten
-        self.maxx = -1e10  # initial low value always overwritten
-        self.maxy = -1e10  # initial low value always overwritten
-        self.maxz = -1e10  # initial low value always overwritten
+        # track per-axis so a design with no points (or a missing axis) yields a
+        # zero range rather than a sentinel-derived negative one
+        foundx = foundy = foundz = False
         for step in steps:
             if isinstance(step, Point):
                 if (x := step.x) is not None:
-                    self.minx = min(self.minx, x)
-                    self.maxx = max(self.maxx, x)
+                    self.minx, self.maxx = (min(self.minx, x), max(self.maxx, x)) if foundx else (x, x)
+                    foundx = True
                 if (y := step.y) is not None:
-                    self.miny = min(self.miny, y)
-                    self.maxy = max(self.maxy, y)
+                    self.miny, self.maxy = (min(self.miny, y), max(self.maxy, y)) if foundy else (y, y)
+                    foundy = True
                 if (z := step.z) is not None:
-                    self.minz = min(self.minz, z)
-                    self.maxz = max(self.maxz, z)
+                    self.minz, self.maxz = (min(self.minz, z), max(self.maxz, z)) if foundz else (z, z)
+                    foundz = True
+        if not foundx:
+            self.minx = self.maxx = 0
+        if not foundy:
+            self.miny = self.maxy = 0
+        if not foundz:
+            self.minz = self.maxz = 0
         self.midx = (self.minx + self.maxx) / 2
         self.midy = (self.miny + self.maxy) / 2
         self.midz = (self.minz + self.maxz) / 2
