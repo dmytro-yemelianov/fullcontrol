@@ -12,18 +12,3 @@ class GcodeComment(BaseModel):
 
     text: str | None = None
     end_of_previous_line_text: str | None = None
-
-    def gcode(self, state):
-        '''
-        Process this instance in a list of steps supplied by the designer to generate and return a line of Gcode.
-
-        Args:
-            state: The current state of the Gcode generation process.
-
-        Returns:
-            str: The generated line of Gcode.
-        '''
-        if self.end_of_previous_line_text is not None and state.gcode:
-            state.gcode[-1] += ' ; ' + self.end_of_previous_line_text
-        if self.text is not None:
-            return '; ' + self.text

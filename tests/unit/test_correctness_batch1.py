@@ -3,6 +3,7 @@
 import fullcontrol as fc
 from fullcontrol.geometry.reflect import reflectXY_mc
 from fullcontrol.gcode.auxilliary_components import Hotend, Buildplate
+from fullcontrol.gcode.renderers import render_gcode
 from fullcontrol.visualize.bounding_box import BoundingBox
 
 
@@ -16,18 +17,18 @@ def test_reflectXY_mc_horizontal_line_does_not_crash():
 
 # Hotend/Buildplate emitted "SNone" when temp was unset
 def test_hotend_none_temp_emits_nothing():
-    assert Hotend(temp=None, wait=True).gcode(None) is None
-    assert Hotend(temp=None, wait=False).gcode(None) is None
+    assert render_gcode(Hotend(temp=None, wait=True), None) is None
+    assert render_gcode(Hotend(temp=None, wait=False), None) is None
 
 
 def test_buildplate_none_temp_emits_nothing():
-    assert Buildplate(temp=None, wait=True).gcode(None) is None
-    assert Buildplate(temp=None, wait=False).gcode(None) is None
+    assert render_gcode(Buildplate(temp=None, wait=True), None) is None
+    assert render_gcode(Buildplate(temp=None, wait=False), None) is None
 
 
 def test_hotend_with_temp_still_emits():
-    assert 'M109 S210' in Hotend(temp=210, wait=True).gcode(None)
-    assert 'M104 S210' in Hotend(temp=210, wait=False).gcode(None)
+    assert 'M109 S210' in render_gcode(Hotend(temp=210, wait=True), None)
+    assert 'M104 S210' in render_gcode(Hotend(temp=210, wait=False), None)
 
 
 # bounding box over an empty / point-less design produced a negative range from the sentinels

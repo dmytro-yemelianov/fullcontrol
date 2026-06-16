@@ -22,20 +22,19 @@ def test_fmt_matches_legacy_idiom_and_avoids_scientific_notation():
 def test_gcode_comment_empty_output_does_not_crash():
     state = SimpleNamespace(gcode=[])
     from fullcontrol.gcode.annotations import GcodeComment
+    from fullcontrol.gcode.renderers import render_gcode
     # previously raised IndexError on state.gcode[-1]
-    result = GcodeComment(end_of_previous_line_text='note', text='hi').gcode(state)
+    result = render_gcode(GcodeComment(end_of_previous_line_text='note', text='hi'), state)
     assert result == '; hi'
     assert state.gcode == []  # nothing to append to, silently skipped
 
 
-# I10 — the processing loop should report which step failed
+# I10 — the processing loop should report which step failed (a registered step that raises)
 def test_step_loop_error_names_offending_step():
-    class Boom:
-        def gcode(self, state):
-            raise ValueError('kaboom')
+    # PrinterCommand with an unknown id raises KeyError in the renderer
     steps = [fc.Point(x=0, y=0, z=0.2), fc.Extruder(on=True),
-             fc.Point(x=1, y=1, z=0.2), Boom()]
+             fc.Point(x=1, y=1, z=0.2), fc.PrinterCommand(id='no_such_command_xyz')]
     with pytest.raises(Exception) as exc:
         fc.transform(steps, 'gcode',
                      fc.GcodeControls(printer_name='generic'), show_tips=False)
-    assert 'Boom' in str(exc.value)
+    assert 'PrinterCommand' in str(exc.value)

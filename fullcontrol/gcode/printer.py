@@ -31,21 +31,3 @@ class Printer(BasePrinter):
         else:
             return ''
 
-    def gcode(self, state):
-        '''
-        Process this instance in a list of steps supplied by the designer to generate and return a line of gcode.
-
-        Args:
-            state: The state object containing information about the printer's current state.
-
-        Returns:
-            A line of gcode generated based on the supplied steps.
-
-        '''
-        # update all attributes of the tracking instance with the new instance (self)
-        state.printer.update_from(self)
-        if self.print_speed is not None \
-                or self.travel_speed is not None:
-            state.printer.speed_changed = True
-        if self.new_command is not None:
-            state.printer.command_list = {**(state.printer.command_list or {}), **self.new_command}
