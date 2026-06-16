@@ -42,7 +42,7 @@ def convex_from_grid(points_grid: list, travel: bool, zigzag: bool, overextrusio
     for j in range(point_count_j):
         # i runs through the segments of each line
         for i in range(point_count_i):
-            # set i1 and i2 to run through points in reverse if zigzag == True and this is an even line
+            # set i1 and i2 to run through points in reverse if zigzag is True and this is an even line
             i1 = point_count_i - i if zigzag and j % 2 == 1 else i
             i2 = point_count_i - (i+1) if zigzag and j % 2 == 1 else (i+1)
             if travel and i == 0 and j > 0:
@@ -91,7 +91,7 @@ def convex_from_grid_and_speed(points_grid: list, speed_ref: float, width_ref: f
     for j in range(point_count_j):
         # i runs through the segments of each line
         for i in range(len(points_grid)-1):
-            # run through points in reverse if zigzag == True and this is an even line
+            # run through points in reverse if zigzag is True and this is an even line
             i1 = point_count_i - i if zigzag and j % 2 == 1 else i
             i2 = point_count_i - (i+1) if zigzag and j % 2 == 1 else (i+1)
             if travel and i == 0 and j > 0:
@@ -118,12 +118,12 @@ def convex_pathsXY(path1: list, path2: list, lines: int, vary_speed: bool = Fals
     lateral bonding between paths. research study: https://www.researchgate.net/publication/346098541
     '''
     points_grid = make_grid(path1, path2, lines)
-    if vary_speed == False:
+    if vary_speed is False:
         steplist = convex_from_grid(points_grid, travel, zigzag, overextrusion_percent)
     else:
-        if speed_ref == None:
+        if speed_ref is None:
             raise ValueError("parameter speed_ref must be supplied")
-        if width_ref == None:
+        if width_ref is None:
             raise ValueError("parameter width_ref must be supplied")
         steplist = convex_from_grid_and_speed(points_grid, speed_ref, width_ref, travel, zigzag, overextrusion_percent)
     print('yay! CONVEX function used :) please cite our CONVEX research study: https://www.researchgate.net/publication/346098541')

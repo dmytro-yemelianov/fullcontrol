@@ -6,18 +6,18 @@ from copy import deepcopy
 
 class Point(BasePoint):
     'generic gcode Point with 4-axis aspects added/modified'
-    b: Optional[float] = None
+    b: float | None = None
 
     def XYZB_gcode(self, self_systemXYZ, p) -> str:
         'generate XYZBC gcode string to move from a point p to this point. return XYZB string'
         s = ''
-        if self_systemXYZ.x != None and self_systemXYZ.x != p.x:
+        if self_systemXYZ.x is not None and self_systemXYZ.x != p.x:
             s += f'X{fmt(round(self_systemXYZ.x, 6))} '
-        if self_systemXYZ.y != None and self_systemXYZ.y != p.y:
+        if self_systemXYZ.y is not None and self_systemXYZ.y != p.y:
             s += f'Y{fmt(round(self_systemXYZ.y, 6))} '
-        if self_systemXYZ.z != None and self_systemXYZ.z != p.z:
+        if self_systemXYZ.z is not None and self_systemXYZ.z != p.z:
             s += f'Z{fmt(round(self_systemXYZ.z, 6))} '
-        if self_systemXYZ.b != None and self_systemXYZ.b != p.b:
+        if self_systemXYZ.b is not None and self_systemXYZ.b != p.b:
             s += f'B{fmt(round(self_systemXYZ.b, 6))} '
         return s if s != '' else None
 
@@ -102,7 +102,7 @@ class Point(BasePoint):
         'process this instance in a list of steps supplied by the designer to generate and return a line of gcode'
         self_systemXYZ = self.inverse_kinematics(state)
         XYZB_str = self.XYZB_gcode(self_systemXYZ, state.point_systemXYZ)
-        if XYZB_str != None:  # only write a line of gcode if movement occurs
+        if XYZB_str is not None:  # only write a line of gcode if movement occurs
             G_str = 'G1 ' if state.extruder.on else 'G0 '
             F_str = state.printer.f_gcode(state)
             E_str = state.extruder.e_gcode(self, state)

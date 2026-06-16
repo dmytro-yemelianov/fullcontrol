@@ -22,7 +22,7 @@ from datetime import datetime
 
 
 def run_tutorials():
-    with open('combined_tutorials.py', 'r') as file:
+    with open('combined_tutorials.py') as file:
         script = file.readlines()
     # prefix progress updates so a long run shows life on stderr
     script = ['import sys\n'] + [

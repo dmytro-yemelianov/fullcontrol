@@ -81,7 +81,7 @@ def plot(data: PlotData, controls: PlotControls):
     for path in data.paths:
         colors_now = [f'rgb({color[0]*255:.2f}, {color[1]*255:.2f}, {color[2]*255:.2f})' for color in path.colors]
         linewidth_now = controls.line_width * \
-            2 if path.extruder.on == True else controls.line_width*0.5
+            2 if path.extruder.on is True else controls.line_width*0.5
         if path.extruder.on and controls.style == 'tube':
             sides, rounding_strength, flat_sides = controls.tube_sides, 0.4, False
             mesh = generate_mesh(path, linewidth_now, Mesh, sides, rounding_strength, flat_sides, colors_now)
@@ -100,8 +100,8 @@ def plot(data: PlotData, controls: PlotControls):
     # generate annotations
     annotations_pts = []
     annotations = []
-    if controls.hide_annotations == False and not controls.neat_for_publishing:
-    # if controls.hide_annotations == False:  # and not controls.neat_for_publishing:
+    if controls.hide_annotations is False and not controls.neat_for_publishing:
+    # if controls.hide_annotations is False:  # and not controls.neat_for_publishing:
         for annotation in data.annotations:
             x, y, z = (annotation[axis] for axis in 'xyz')
             annotations_pts.append([x, y, z])

@@ -7,7 +7,7 @@ from datetime import datetime
 
 def gcode(steps: list, gcode_controls: GcodeControls = GcodeControls()):
     'return a gcode string generated from a list of steps'
-    if gcode_controls.b_offset_z == None:
+    if gcode_controls.b_offset_z is None:
         raise Exception(
             "gcode generation requires an fc4.GcodeControls object to be supplied with the attribute 'b_offset_z' set correctly")
     state = State(steps, gcode_controls)
@@ -15,12 +15,12 @@ def gcode(steps: list, gcode_controls: GcodeControls = GcodeControls()):
     while state.i < len(state.steps):
         # call the gcode function of each class instance in 'steps'
         gcode_line = state.steps[state.i].gcode(state)
-        if gcode_line != None:
+        if gcode_line is not None:
             state.gcode.append(gcode_line)
         state.i += 1
     gc = '\n'.join(state.gcode)
 
-    if gcode_controls.save_as != None:
+    if gcode_controls.save_as is not None:
         filename = gcode_controls.save_as + \
             datetime.now().strftime("__%d-%m-%Y__%H-%M-%S.gcode")
         open(filename, 'w').write(gc)

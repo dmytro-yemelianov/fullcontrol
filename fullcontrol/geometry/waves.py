@@ -22,7 +22,7 @@ def squarewaveXYpolar(start_point: Point, direction_polar: float, amplitude: flo
     - list of Points: The list of Points representing the squarewave.
     '''
     steps = []
-    steps.append(start_point.copy())
+    steps.append(start_point.model_copy())
     for i in range(periods):
         steps.append(polar_to_point(centre=steps[-1], radius=amplitude, angle=direction_polar + pi/2))
         steps.append(polar_to_point(centre=steps[-1], radius=line_spacing, angle=direction_polar))
@@ -56,9 +56,9 @@ def squarewaveXY(start_point: Point, direction_vector: Vector, amplitude: float,
     Returns:
     - list: A list of Points representing the square wave.
     '''
-    if direction_vector.x == None:
+    if direction_vector.x is None:
         direction_vector.x = 0
-    if direction_vector.y == None:
+    if direction_vector.y is None:
         direction_vector.y = 0
     direction_polar = atan2(direction_vector.y, direction_vector.x)
     return squarewaveXYpolar(start_point, direction_polar, amplitude, line_spacing, periods, extra_half_period=extra_half_period, extra_end_line=extra_end_line)
@@ -83,7 +83,7 @@ def trianglewaveXYpolar(start_point: Point, direction_polar: float, amplitude: f
         list: A list of Points representing the triangle wave.
     '''
     steps = []
-    steps.append(start_point.copy())
+    steps.append(start_point.model_copy())
     for i in range(periods):
         point_temp = polar_to_point(centre=steps[-1], radius=amplitude, angle=direction_polar + pi/2)
         steps.append(polar_to_point(centre=point_temp, radius=tip_separation/2, angle=direction_polar))

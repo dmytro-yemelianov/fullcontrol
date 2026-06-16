@@ -18,11 +18,11 @@ class Point(BasePoint):
 
         '''
         s = ''
-        if self.x != None and self.x != p.x:
+        if self.x is not None and self.x != p.x:
             s += f'X{fmt(self.x)} '
-        if self.y != None and self.y != p.y:
+        if self.y is not None and self.y != p.y:
             s += f'Y{fmt(self.y)} '
-        if self.z != None and self.z != p.z:
+        if self.z is not None and self.z != p.z:
             s += f'Z{fmt(self.z)} '
         return s if s != '' else None
 
@@ -38,7 +38,7 @@ class Point(BasePoint):
 
         '''
         XYZ_str = self.XYZ_gcode(state.point)
-        if XYZ_str != None:  # only write a line of gcode if movement occurs
+        if XYZ_str is not None:  # only write a line of gcode if movement occurs
             G_str = 'G1 ' if state.extruder.on or state.extruder.travel_format == "G1_E0" else 'G0 '
             F_str = state.printer.f_gcode(state)
             E_str = state.extruder.e_gcode(self, state)

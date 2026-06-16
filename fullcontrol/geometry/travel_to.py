@@ -2,7 +2,7 @@ from fullcontrol.geometry import Point, Extruder
 from typing import Union
 from fullcontrol.common import first_point
 
-def travel_to(geometry: Union[Point, list]) -> list:
+def travel_to(geometry: Point | list) -> list:
     '''Returns a list of objects to turn extrusion off, travel to a point, then turn extrusion on.
 
     Args:

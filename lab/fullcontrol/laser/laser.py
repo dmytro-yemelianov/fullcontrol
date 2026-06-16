@@ -7,27 +7,27 @@ class Laser(BaseModelPlus):
     """
     A object to control the state of the laser
     """
-    on: Optional[bool] = None
-    constant_power: Optional[float] = None
-    dynamic_power: Optional[float] = None
-    cutting_speed: Optional[float] = None
-    travel_speed: Optional[float] = None
-    spotsize: Optional[float] = None
+    on: bool | None = None
+    constant_power: float | None = None
+    dynamic_power: float | None = None
+    cutting_speed: float | None = None
+    travel_speed: float | None = None
+    spotsize: float | None = None
 
     def get_dummy_objects(self):
         'create pseudo objects (for desktop 3D printing FullControl) based on laser parameters'
         dummy_objects = []
-        if self.on != None:
+        if self.on is not None:
             dummy_objects.append(Extruder(on=self.on))
-        if self.constant_power != None:
+        if self.constant_power is not None:
             dummy_objects.append(ManualGcode(text=f'M3 S{self.constant_power:.1f}'))
-        if self.dynamic_power != None:
+        if self.dynamic_power is not None:
             dummy_objects.append(ManualGcode(text=f'M4 S{self.dynamic_power:.1f}'))
-        if self.cutting_speed != None:
+        if self.cutting_speed is not None:
             dummy_objects.append(Printer(print_speed=self.cutting_speed))
-        if self.travel_speed != None:
+        if self.travel_speed is not None:
             dummy_objects.append(Printer(travel_speed=self.travel_speed))
-        if self.spotsize != None:
+        if self.spotsize is not None:
             dummy_objects.append(ExtrusionGeometry(width=self.spotsize))
         return dummy_objects
 

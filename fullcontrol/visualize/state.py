@@ -31,12 +31,12 @@ class State(BaseModel):
 
     '''
 
-    point: Optional[Point] = Point()
-    extruder: Optional[Extruder] = Extruder(on=True)
-    path_count_now: Optional[int] = 0
-    point_count_now: Optional[int] = 0
-    point_count_total: Optional[int] = None
-    extrusion_geometry: Optional[ExtrusionGeometry] = None
+    point: Point | None = Point()
+    extruder: Extruder | None = Extruder(on=True)
+    path_count_now: int | None = 0
+    point_count_now: int | None = 0
+    point_count_total: int | None = None
+    extrusion_geometry: ExtrusionGeometry | None = None
 
     def count_points(self, steps: list):
         '''

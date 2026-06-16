@@ -10,6 +10,6 @@ class Vector(BaseModel):
         y (Optional[float]): The y distance of the vector.
         z (Optional[float]): The z distance of the vector.
     """
-    x: Optional[float] = None
-    y: Optional[float] = None
-    z: Optional[float] = None
+    x: float | None = None
+    y: float | None = None
+    z: float | None = None

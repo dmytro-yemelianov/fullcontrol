@@ -2,7 +2,7 @@ from typing import Union
 from .classes import Point
 
 
-def xyz_add_b(xyz_geometry: Union[Point, list]) -> Union[Point, list]:
+def xyz_add_b(xyz_geometry: Point | list) -> Point | list:
     'covert geometry with xyz attributes and methods to include axis-b attributes (=None) and axis-b methods'
     if type(xyz_geometry).__name__ == "Point":
         pt = Point()

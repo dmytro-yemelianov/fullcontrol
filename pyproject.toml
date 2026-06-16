@@ -45,11 +45,11 @@ extend-exclude = [
 ]
 
 [tool.ruff.lint]
-# Start lenient: catch real errors (pyflakes F, syntax/runtime E9) without churning
-# the pervasive existing style (None/bool comparisons, unused-import noise in profiles).
-# Import sorting (I) and stricter style are deferred to a dedicated pass — see IMPROVEMENT_PLAN.md.
-select = ["E9", "F"]
-ignore = ["F401", "F403", "F405", "E711", "E712", "E741"]
+# Real errors (pyflakes F, syntax/runtime E9), None/bool-literal comparisons (E711/E712),
+# and modern-syntax enforcement (pyupgrade UP). Import sorting (I), unused-import noise in
+# the generated device profiles (F401/F403/F405), and ambiguous names (E741) stay off for now.
+select = ["E9", "F", "E711", "E712", "UP"]
+ignore = ["F401", "F403", "F405", "E741"]
 
 [project.urls]
 "Homepage" = "https://fullcontrol.xyz"

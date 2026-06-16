@@ -14,10 +14,10 @@ class GcodeControls(BaseModelPlus):
         save_as (Optional[str]): The file name to save the gcode as. Defaults to None resulting in no file being saved.
         include_date (Optional[bool]): Whether to include the date in the filename. Defaults to True.
     """
-    printer_name: Optional[str] = None
-    initialization_data: Optional[dict] = Field(default_factory=dict) # values passed for initialization_data overwrite the default initialization_data of the printer
-    save_as: Optional[str] = None
-    include_date: Optional[bool] = True
+    printer_name: str | None = None
+    initialization_data: dict | None = Field(default_factory=dict) # values passed for initialization_data overwrite the default initialization_data of the printer
+    save_as: str | None = None
+    include_date: bool | None = True
 
     def initialize(self):
         if self.printer_name is None:

@@ -23,20 +23,20 @@ class BoundingBox(BaseModel):
         rangez (Optional[float]): The range of z-coordinates in the bounding box.
     '''
 
-    minx: Optional[float] = None
-    midx: Optional[float] = None
-    maxx: Optional[float] = None
+    minx: float | None = None
+    midx: float | None = None
+    maxx: float | None = None
     # ranges and mid values are included as attributes, even though they are simple, to avoid them
     # being calculated for every point for the color_type z_gradient
-    rangex: Optional[float] = None
-    miny: Optional[float] = None
-    midy: Optional[float] = None
-    maxy: Optional[float] = None
-    rangey: Optional[float] = None
-    minz: Optional[float] = None
-    midz: Optional[float] = None
-    maxz: Optional[float] = None
-    rangez: Optional[float] = None
+    rangex: float | None = None
+    miny: float | None = None
+    midy: float | None = None
+    maxy: float | None = None
+    rangey: float | None = None
+    minz: float | None = None
+    midz: float | None = None
+    maxz: float | None = None
+    rangez: float | None = None
 
     def calc_bounds(self, steps):
         '''

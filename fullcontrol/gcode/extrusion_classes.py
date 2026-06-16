@@ -22,10 +22,10 @@ class ExtrusionGeometry(BaseExtrusionGeometry):
         '''
         # update all attributes of the tracking instance with the new instance (self)
         state.extrusion_geometry.update_from(self)
-        if self.width != None \
-                or self.height != None \
-                or self.diameter != None \
-                or self.area_model != None:
+        if self.width is not None \
+                or self.height is not None \
+                or self.diameter is not None \
+                or self.area_model is not None:
             try:
                 state.extrusion_geometry.update_area()
             except TypeError:
@@ -60,17 +60,17 @@ class Extruder(BaseExtruder):
 
     # GCode attributes, used to translate the design into gcode:
     # units for E in GCode ... options: 'mm' / 'mm3'
-    units: Optional[str] = None
-    dia_feed: Optional[float] = None  # diameter of the feedstock filament
-    relative_gcode: Optional[bool] = None
+    units: str | None = None
+    dia_feed: float | None = None  # diameter of the feedstock filament
+    relative_gcode: bool | None = None
     # attibutes not set by user ... calculated automatically:
     # factor to convert volume of material into the value of 'E' in gcode
-    volume_to_e: Optional[float] = None
+    volume_to_e: float | None = None
     # current extrusion volume for whole print
-    total_volume: Optional[float] = None
+    total_volume: float | None = None
     # total extrusion volume reference value - this attribute is set to allow extrusion to be expressed relative to this point (for relative_gcode = True, it is reset for every line)
-    total_volume_ref: Optional[float] = None
-    travel_format: Optional[str] = None
+    total_volume_ref: float | None = None
+    travel_format: str | None = None
 
     def get_and_update_volume(self, volume):
         '''Calculate the extrusion volume and update the total volume.
@@ -83,7 +83,7 @@ class Extruder(BaseExtruder):
         '''
         self.total_volume += volume
         ret_val = self.total_volume - self.total_volume_ref
-        if self.relative_gcode == True:
+        if self.relative_gcode is True:
             self.total_volume_ref = self.total_volume
         # to make absolute extrusion work, check self.total_volume_ref and, if above a treshold value, reset extrusion (set extruder_now.e_total_vol_reference_for_gcode = extruder_now.e_total_vol; insert a G92 command next in the steplist)
         return ret_val
@@ -108,9 +108,9 @@ class Extruder(BaseExtruder):
             Returns:
                 float: The distance between the two points.
             '''
-            dist_x = 0 if point1.x == None or point2.x == None else point1.x - point2.x
-            dist_y = 0 if point1.y == None or point2.y == None else point1.y - point2.y
-            dist_z = 0 if point1.z == None or point2.z == None else point1.z - point2.z
+            dist_x = 0 if point1.x is None or point2.x is None else point1.x - point2.x
+            dist_y = 0 if point1.y is None or point2.y is None else point1.y - point2.y
+            dist_z = 0 if point1.z is None or point2.z is None else point1.z - point2.z
             return ((dist_x)**2+(dist_y)**2+(dist_z)**2)**0.5
         if self.on:
             # length = pt1.distance_to_self(pt2)
@@ -146,11 +146,11 @@ class Extruder(BaseExtruder):
         # update all attributes of the tracking instance with the new instance (self)
         state.extruder.update_from(self)
         # do things for each attribute that was changed by the designer. check for changes in the new Extruder (self) but calculations consider the overall current Extruder (extruder_now)
-        if self.on != None:
+        if self.on is not None:
             # change in case strategy changed from printing to moving fast without extrusion
             state.printer.speed_changed = True
-        if self.units != None or self.dia_feed != None:
+        if self.units is not None or self.dia_feed is not None:
             state.extruder.update_e_ratio()
-        if self.relative_gcode != None:
+        if self.relative_gcode is not None:
             state.extruder.total_volume_ref = state.extruder.total_volume
-            return "M83 ; relative extrusion" if state.extruder.relative_gcode == True else "M82 ; absolute extrusion\nG92 E0 ; reset extrusion position to zero"
+            return "M83 ; relative extrusion" if state.extruder.relative_gcode is True else "M82 ; absolute extrusion\nG92 E0 ; reset extrusion position to zero"

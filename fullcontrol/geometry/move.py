@@ -4,7 +4,7 @@ from copy import deepcopy
 from typing import Union
 
 
-def move(geometry: Union[Point, list], vector: Vector, copy: bool = False, copy_quantity: int = 2) -> Union[Point, list]:
+def move(geometry: Point | list, vector: Vector, copy: bool = False, copy_quantity: int = 2) -> Point | list:
     '''
     Move 'geometry' (a Point or list of steps including Points) by 'vector'.
 
@@ -33,7 +33,7 @@ def move(geometry: Union[Point, list], vector: Vector, copy: bool = False, copy_
         return move_geometry(geometry, vector)
 
 
-def move_geometry(geometry: Union[Point, list], vector: Vector) -> Union[Point, list]:
+def move_geometry(geometry: Point | list, vector: Vector) -> Point | list:
     '''
     Function called by move()
     
@@ -83,7 +83,7 @@ def move_geometry(geometry: Union[Point, list], vector: Vector) -> Union[Point, 
 
 
 
-def copy_geometry(geometry: Union[Point, list], vector: Vector, quantity: int) -> list:
+def copy_geometry(geometry: Point | list, vector: Vector, quantity: int) -> list:
     '''
     Function called by move()
     
@@ -103,9 +103,9 @@ def copy_geometry(geometry: Union[Point, list], vector: Vector, quantity: int) -
     steps_new = []
     for i in range(quantity):
         v_now = Vector()
-        v_now.x = vector.x*i if vector.x != None else None
-        v_now.y = vector.y*i if vector.y != None else None
-        v_now.z = vector.z*i if vector.z != None else None
+        v_now.x = vector.x*i if vector.x is not None else None
+        v_now.y = vector.y*i if vector.y is not None else None
+        v_now.z = vector.z*i if vector.z is not None else None
         if isinstance(geometry, Point):
             steps_new.append(move_geometry(geometry, v_now))
         else:

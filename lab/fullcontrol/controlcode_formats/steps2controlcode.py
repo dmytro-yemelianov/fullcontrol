@@ -38,7 +38,7 @@ def gcode_to_bambu_3mf(gcode: str, new_3mf_file: str):
 
     plate_gcode_file = os.path.join(extract_dir, "Metadata", "plate_1.gcode")
     placeholder = "; [FULLCONTROL GCODE HERE]"
-    with open(plate_gcode_file, "r", encoding="utf-8") as f:
+    with open(plate_gcode_file, encoding="utf-8") as f:
         content = f.read()
     new_content = content.replace(placeholder, gcode)
     with open(plate_gcode_file, "w", encoding="utf-8") as f:
@@ -75,7 +75,7 @@ def controlcode(steps: list, model_controls: CodeControls, show_tips: bool):
             raise ValueError("CodeControls.controls must be a fc.GcodeControls instance at present")
         if model_controls.controls.printer_name != 'bambulab_x1':
             raise ValueError("only 'bambulab_x1' is currently supported for CodeControls.controls.printer_name")
-        if model_controls.controls.save_as != None:
+        if model_controls.controls.save_as is not None:
             raise ValueError("for fc.transform to 'control_code', and specifically 3mf, don't use GcodeControl.save_as, use CodeControls.filename instead")
         from fullcontrol.gcode.steps2gcode import gcode
         from fullcontrol.common import fix

@@ -20,8 +20,8 @@ class PlotAnnotation(BaseModel):
         visualize(state: 'State', plot_data: 'PlotData', plot_controls: PlotControls) -> None:
             Process a PlotAnnotation in a list of steps supplied by the designer to update plot_data and state.
     '''
-    point: Optional[Point] = None
-    label: Optional[str] = None
+    point: Point | None = None
+    label: str | None = None
 
     def visualize(self, state: 'State', plot_data: 'PlotData', plot_controls: PlotControls) -> None:
         '''
@@ -35,6 +35,6 @@ class PlotAnnotation(BaseModel):
         Returns:
             None
         '''
-        if self.point == None:
+        if self.point is None:
             self.point = Point(x=state.point.x, y=state.point.y, z=state.point.z)
         plot_data.add_annotation(self)

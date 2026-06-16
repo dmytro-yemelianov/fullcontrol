@@ -101,7 +101,7 @@ class MeshExporter:
         #    'COLOR' should be a 4-byte RGBA value, as a simple full-object color
         #    'MATERIAL' should be diffuse reflection, specular highlight, ambient light
         #      as 4-byte RGBA values - preferred over COLOR
-        header_data = f'STL,{UNITS=},{author}SOFTWARE=FullControlXYZ'.encode('utf-8')
+        header_data = f'STL,{UNITS=},{author}SOFTWARE=FullControlXYZ'.encode()
         header[:len(header_data)] = header_data
         out.write(header[:80]) # ensure header is valid
 

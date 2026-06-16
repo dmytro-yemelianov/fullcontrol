@@ -9,7 +9,7 @@ class Fan(BaseModelPlus):
     Attributes:
         speed_percent (Optional[int]): The speed of the fan as a percentage (0-100).
     '''
-    speed_percent: Optional[int] = None
+    speed_percent: int | None = None
 
 
 class Hotend(BaseModelPlus):
@@ -21,9 +21,9 @@ class Hotend(BaseModelPlus):
         wait (Optional[bool]): If True, the system will wait for the temperature to be reached before continuing.
         tool (Optional[int]): The tool number for multi-tool printers.
     '''
-    temp: Optional[int] = None
-    wait: Optional[bool] = False
-    tool: Optional[int] = None
+    temp: int | None = None
+    wait: bool | None = False
+    tool: int | None = None
 
 
 class Buildplate(BaseModelPlus):
@@ -33,5 +33,5 @@ class Buildplate(BaseModelPlus):
         temp (Optional[int]): The temperature of the buildplate.
         wait (Optional[bool]): If True, the system will wait for the temperature to be reached before continuing.
     """
-    temp: Optional[int] = None
-    wait: Optional[bool] = False
+    temp: int | None = None
+    wait: bool | None = False

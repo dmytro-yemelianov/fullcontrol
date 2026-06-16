@@ -11,7 +11,7 @@ class PrinterCommand(BaseModelPlus):
         id (Optional[str]): The ID of the printer command that should be executed.
     """
 
-    id: Optional[str] = None
+    id: str | None = None
 
     def gcode(self, state):
         """
@@ -34,7 +34,7 @@ class ManualGcode(BaseModelPlus):
     Attributes:
         text (Optional[str]): The custom gcode text to be added as a new line of gcode.
     """
-    text: Optional[str] = None
+    text: str | None = None
 
     def gcode(self, state):
         """
@@ -46,5 +46,5 @@ class ManualGcode(BaseModelPlus):
         Returns:
             str: The generated line of gcode.
         """
-        if self.text != None:
+        if self.text is not None:
             return self.text

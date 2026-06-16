@@ -13,7 +13,7 @@ def offset_path(points: list, offset: float, flip: bool = False, repeats: int = 
     
     closed_path = True if abs(points[0].x - points[-1].x) < 0.00000001 and abs(points[0].y - points[-1].y) < 0.00000001 else False
     points_original = points
-    if closed_path == True: 
+    if closed_path is True: 
         # add imaginary points for the closed paths before and after the first and last points
         points = [points[-2]] + points + [points[1]]
 
@@ -41,7 +41,7 @@ def offset_path(points: list, offset: float, flip: bool = False, repeats: int = 
         point_for_this_repeat = []
         if not closed_path: point_for_this_repeat.append(polar_to_point(points[0], (offset*(repeat+1)), directions[0] + radians(90)))
         for i in range(len(corner_directions)):
-            offset_now = (offset*(repeat+1))/sin((corner_angles_to_left[i]/2))
+            offset_now = (offset*(repeat+1))/sin(corner_angles_to_left[i]/2)
             if arc_outer_corners and corner_angles[i] > tau/2:
                 if not flip:
                     point_for_this_repeat.extend(arcXY(points[i+1], offset*(repeat+1), directions[i]+tau/4, -(corner_angles[i]-tau/2), segments=arc_segments))

@@ -12,15 +12,15 @@ class ExtrusionGeometry(BaseModelPlus):
     automatically calculated unless 'area_model' is set to 'manual'.
     '''
     # area_model options: 'rectangle' / 'stadium' / 'circle' / 'manual':
-    area_model: Optional[str] = None
+    area_model: str | None = None
     # width of printed line for area_model = rectangle or stadium:
-    width: Optional[float] = None
+    width: float | None = None
     # height of printed line for area_model = rectangle or stadium:
-    height: Optional[float] = None
+    height: float | None = None
     # diameter of printed line for area_model = circle:
-    diameter: Optional[float] = None
+    diameter: float | None = None
     # automatically calculated based on area_model and relevant attributes
-    area: Optional[float] = None
+    area: float | None = None
 
     def update_area(self) -> float:
         '''Update the area attribute based on the area_model and relevant attributes.'''
@@ -56,4 +56,4 @@ class Extruder(BaseModelPlus):
     Attributes:
         on (bool, optional): Indicates whether extrusion is on or off.
     """
-    on: Optional[bool] = None
+    on: bool | None = None
