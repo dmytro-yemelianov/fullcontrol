@@ -62,6 +62,9 @@ class State(BaseModel):
             dia_feed=initialization_data['dia_feed'],
             total_volume=0,
             total_volume_ref=0,
+            retraction_distance=initialization_data['retraction_distance'],
+            retraction_speed=initialization_data['retraction_speed'],
+            retracted_length=0,
             travel_format=initialization_data['travel_format'])
         self.extruder.update_e_ratio()
         if initialization_data['manual_e_ratio'] is not None:

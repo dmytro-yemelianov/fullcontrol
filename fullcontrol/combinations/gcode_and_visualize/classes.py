@@ -153,6 +153,31 @@ class StationaryExtrusion(gc.StationaryExtrusion):
     pass
 
 
+class Retraction(gc.Retraction):
+    '''
+    Retract filament to reduce oozing/stringing during a travel move (explicit E-based
+    retraction, emitting 'G1 F<speed> E-<dist>'). For firmware-managed retraction use
+    PrinterCommand(id='retract') -> G10 instead.
+
+    Attributes:
+        distance (float, optional): Filament length to retract, in the gcode E units. None inherits the printer default.
+        speed (float, optional): Retraction feedrate in mm/min. None inherits the printer default.
+    '''
+    pass
+
+
+class Unretraction(gc.Unretraction):
+    '''
+    Prime filament back after a Retraction (the inverse move). A Retraction followed by an
+    Unretraction nets to zero extruded material.
+
+    Attributes:
+        distance (float, optional): Filament length to prime, in the gcode E units. None primes exactly the amount currently retracted.
+        speed (float, optional): Priming feedrate in mm/min. None inherits the printer default.
+    '''
+    pass
+
+
 class GcodeComment(gc.GcodeComment):
     '''
     A class that represents a Gcode comment.
