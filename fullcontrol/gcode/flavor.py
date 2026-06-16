@@ -62,6 +62,30 @@ class GcodeFlavor:
         return f'M900 T{tool} K{fmt(value)} ; set pressure advance'
 
 
+class KlipperFlavor(GcodeFlavor):
+    '''Klipper. Standard M-codes for temps/fan/extrusion-mode/acceleration are accepted by
+    Klipper (inherited from the Marlin default), but pressure advance and jerk use Klipper's
+    own extended commands.'''
+    name = 'klipper'
+
+    def pressure_advance(self, value, tool) -> str | None:
+        'SET_PRESSURE_ADVANCE ADVANCE=<k> [EXTRUDER=<name>] (Klipper extruder names: extruder, extruder1, ...).'
+        if value is None:
+            return None
+        line = f'SET_PRESSURE_ADVANCE ADVANCE={fmt(value)}'
+        if tool is not None:
+            line += f' EXTRUDER=extruder{tool if tool else ""}'
+        return line
+
+    def jerk(self, x, y, z, e) -> str | None:
+        '''Klipper has no jerk; its nearest analogue is square corner velocity. The XY jerk
+        (mm/s) is mapped to SQUARE_CORNER_VELOCITY (an approximation, not a 1:1 conversion).'''
+        scv = x if x is not None else y
+        if scv is None:
+            return None
+        return f'SET_VELOCITY_LIMIT SQUARE_CORNER_VELOCITY={fmt(scv)}'
+
+
 _FLAVORS = {}
 
 
@@ -80,3 +104,4 @@ def get_flavor(name: str) -> GcodeFlavor:
 
 
 register_flavor('marlin', GcodeFlavor)
+register_flavor('klipper', KlipperFlavor)
