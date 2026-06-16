@@ -6,7 +6,7 @@ default_initial_settings = {
     "extrusion_height": 0.2,
     "nozzle_temp": 210,
     "bed_temp": 40,
-    "enclosure_temp": 0,
+    "chamber_temp": 0,  # enclosure/chamber temperature; overridden by e.g. voron_zero
     "tool_number": 0,
     "fan_percent": 100,
     "print_speed_percent": 100,
