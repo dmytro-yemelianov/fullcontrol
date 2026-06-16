@@ -1,10 +1,15 @@
 """Correctness / robustness batch 1: edge-case guards and a pydantic-v2 modernisation."""
 
+from types import SimpleNamespace
+
 import fullcontrol as fc
 from fullcontrol.geometry.reflect import reflectXY_mc
 from fullcontrol.gcode.auxilliary_components import Hotend, Buildplate
+from fullcontrol.gcode.flavor import get_flavor
 from fullcontrol.gcode.renderers import render_gcode
 from fullcontrol.visualize.bounding_box import BoundingBox
+
+_MARLIN = SimpleNamespace(flavor=get_flavor('marlin'))  # minimal state carrying the gcode flavor
 
 
 # reflectXY_mc divided by zero for a horizontal mirror line (slope 0) - it is public API
@@ -27,8 +32,8 @@ def test_buildplate_none_temp_emits_nothing():
 
 
 def test_hotend_with_temp_still_emits():
-    assert 'M109 S210' in render_gcode(Hotend(temp=210, wait=True), None)
-    assert 'M104 S210' in render_gcode(Hotend(temp=210, wait=False), None)
+    assert 'M109 S210' in render_gcode(Hotend(temp=210, wait=True), _MARLIN)
+    assert 'M104 S210' in render_gcode(Hotend(temp=210, wait=False), _MARLIN)
 
 
 # bounding box over an empty / point-less design produced a negative range from the sentinels

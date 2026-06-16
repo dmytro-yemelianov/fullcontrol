@@ -4,8 +4,13 @@ M204 (set max acceleration) is portable across Marlin / Klipper / RepRap-Duet, s
 be a flavor-independent step object. Firmware-specific tuning (jerk M205, pressure advance)
 is deferred to the gcode-flavor abstraction.
 """
+from types import SimpleNamespace
+
 import fullcontrol as fc
+from fullcontrol.gcode.flavor import get_flavor
 from fullcontrol.gcode.renderers import render_gcode
+
+_MARLIN = SimpleNamespace(flavor=get_flavor('marlin'))  # minimal state carrying the gcode flavor
 
 
 def _gcode(steps):
@@ -19,21 +24,21 @@ def test_acceleration_is_exposed():
 
 
 def test_acceleration_emits_m204_with_set_fields_only():
-    line = render_gcode(fc.Acceleration(printing=500, travel=1000), None)
+    line = render_gcode(fc.Acceleration(printing=500, travel=1000), _MARLIN)
     assert line == 'M204 P500 T1000 ; set acceleration'
 
 
 def test_acceleration_field_order_is_p_r_t():
-    line = render_gcode(fc.Acceleration(printing=500, retract=800, travel=1000), None)
+    line = render_gcode(fc.Acceleration(printing=500, retract=800, travel=1000), _MARLIN)
     assert line == 'M204 P500 R800 T1000 ; set acceleration'
 
 
 def test_acceleration_with_no_fields_emits_nothing():
-    assert render_gcode(fc.Acceleration(), None) is None
+    assert render_gcode(fc.Acceleration(), _MARLIN) is None
 
 
 def test_acceleration_formats_without_trailing_zeros():
-    line = render_gcode(fc.Acceleration(printing=500.0), None)
+    line = render_gcode(fc.Acceleration(printing=500.0), _MARLIN)
     assert line == 'M204 P500 ; set acceleration'
 
 

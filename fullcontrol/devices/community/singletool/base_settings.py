@@ -18,6 +18,7 @@ default_initial_settings = {
     "retraction_distance": 1.0,  # default filament length retracted by fc.Retraction() (mm); tune per printer (bowden needs more)
     "retraction_speed": 2400,  # default retraction feedrate (mm/min = 40 mm/s)
     "travel_format": "G0",  # options: "G0" / "G1_E0"
+    "gcode_flavor": "marlin",  # firmware dialect for command vocabulary (see gcode/flavor.py)
     "primer": "front_lines_then_y",
     "printer_command_list": {
         "home": "G28 ; home axes",

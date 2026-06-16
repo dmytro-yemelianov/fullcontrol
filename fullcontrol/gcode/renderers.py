@@ -13,7 +13,7 @@ from fullcontrol.core.arc import arc_geometry
 from fullcontrol.gcode.point import Point
 from fullcontrol.gcode.arc import Arc
 from fullcontrol.gcode.extrusion_classes import Extruder, ExtrusionGeometry, StationaryExtrusion, Retraction, Unretraction
-from fullcontrol.gcode.auxilliary_components import Fan, Hotend, Buildplate, MAX_FAN_PWM, PERCENT
+from fullcontrol.gcode.auxilliary_components import Fan, Hotend, Buildplate
 from fullcontrol.gcode.commands import PrinterCommand, ManualGcode, Acceleration
 from fullcontrol.gcode.annotations import GcodeComment
 from fullcontrol.gcode.number_format import fmt
@@ -82,8 +82,7 @@ def _(step: Extruder, state):
         state.extruder.update_e_ratio()
     if step.relative_gcode is not None:
         state.extruder.total_volume_ref = state.extruder.total_volume
-        return "M83 ; relative extrusion" if state.extruder.relative_gcode is True \
-            else "M82 ; absolute extrusion\nG92 E0 ; reset extrusion position to zero"
+        return state.flavor.extrusion_mode(state.extruder.relative_gcode)
 
 
 @render_gcode.register
@@ -135,26 +134,21 @@ def _(step: Unretraction, state):
 @render_gcode.register
 def _(step: Fan, state):
     if step.speed_percent is not None:
-        return f'M106 S{int(step.speed_percent * MAX_FAN_PWM / PERCENT)} ; set fan speed'
+        return state.flavor.fan(step.speed_percent)
 
 
 @render_gcode.register
 def _(step: Hotend, state):
     if step.temp is None:
         return None  # no temperature to set
-    if step.tool is None:
-        return f'M104 S{step.temp} ; set hotend temp and continue' if step.wait is False \
-            else f'M109 S{step.temp} ; set hotend temp and wait'
-    return f'M104 S{step.temp} T{step.tool} ; set hotend temp for tool {step.tool} and continue' if step.wait is False \
-        else f'M109 S{step.temp} T{step.tool} ; set hotend temp for tool {step.tool} and wait'
+    return state.flavor.hotend_temp(step.temp, step.wait, step.tool)
 
 
 @render_gcode.register
 def _(step: Buildplate, state):
     if step.temp is None:
         return None  # no temperature to set
-    return f'M140 S{step.temp} ; set bed temp and continue' if step.wait is False \
-        else f'M190 S{step.temp} ; set bed temp and wait'
+    return state.flavor.bed_temp(step.temp, step.wait)
 
 
 @render_gcode.register
@@ -171,11 +165,7 @@ def _(step: ManualGcode, state):
 
 @render_gcode.register
 def _(step: Acceleration, state):
-    # M204 P<print> R<retract> T<travel>; omit any axis left unset
-    parts = [f'{tag}{fmt(v)}' for tag, v in
-             (('P', step.printing), ('R', step.retract), ('T', step.travel)) if v is not None]
-    if parts:
-        return 'M204 ' + ' '.join(parts) + ' ; set acceleration'
+    return state.flavor.acceleration(step.printing, step.retract, step.travel)
 
 
 @render_gcode.register
