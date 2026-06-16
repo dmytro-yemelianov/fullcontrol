@@ -139,6 +139,12 @@ default is Marlin-style and is byte-for-byte identical to the previously hardcod
 differ, and `register_flavor('name', YourFlavor)`; designs then select it via config. This
 keeps the dialect in one place instead of scattered across the renderer handlers.
 
+The flavor also assembles the **motion** lines — `linear_move(extruding, f, axes, e)` (G0/G1)
+and `arc_move(clockwise, f, coords, ij, e)` (G2/G3). The main and multiaxis backends share
+this one assembly path (the multiaxis renderer just supplies its own `axes` string from the
+inverse kinematics), so the move command and layout are a single overridable place — the seam
+a non-FFF flavor (laser/CNC) would extend.
+
 ## File map
 
 ```

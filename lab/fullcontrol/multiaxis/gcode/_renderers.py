@@ -14,14 +14,14 @@ def _render_multiaxis_point(step, state, axis_gcode_method):
     self_systemXYZ = step.inverse_kinematics(state)
     axis_str = getattr(step, axis_gcode_method)(self_systemXYZ, state.point_systemXYZ)
     if axis_str is not None:  # only write a line of gcode if movement occurs
-        G_str = 'G1 ' if state.extruder.on else 'G0 '
-        F_str = state.printer.f_gcode(state)
-        E_str = state.extruder.e_gcode(step, state)
-        gcode_str = f'{G_str}{F_str}{axis_str}{E_str}'
+        f_str = state.printer.f_gcode(state)
+        e_str = state.extruder.e_gcode(step, state)
+        # the shared flavor assembles the move (same path as the main backend)
+        line = state.flavor.linear_move(state.extruder.on, f_str, axis_str, e_str)
         state.printer.speed_changed = False
         state.point.update_from(step)
         state.point_systemXYZ.update_from(self_systemXYZ)
-        return gcode_str.strip()
+        return line
 
 
 @render_gcode.register

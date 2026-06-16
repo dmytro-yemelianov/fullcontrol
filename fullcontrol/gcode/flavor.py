@@ -17,6 +17,18 @@ class GcodeFlavor:
     'Marlin-style gcode dialect (the default). Override individual methods for other firmwares.'
     name = 'marlin'
 
+    def linear_move(self, extruding: bool, f_str: str, axes_str: str, e_str: str) -> str:
+        '''Assemble a linear move from its parts: G1 for an extruding move (or a travel that
+        still carries an E word, e.g. the G1_E0 travel format), else G0. Shared by the main
+        and multiaxis backends; override to change the move command or layout.'''
+        g = 'G1 ' if extruding or e_str else 'G0 '
+        return f'{g}{f_str}{axes_str}{e_str}'.strip()
+
+    def arc_move(self, clockwise: bool, f_str: str, coords_str: str, ij_str: str, e_str: str) -> str:
+        'Assemble an arc move: G2 (clockwise) / G3 (anticlockwise) with I/J centre offsets.'
+        g = 'G2 ' if clockwise else 'G3 '
+        return f'{g}{f_str}{coords_str}{ij_str}{e_str}'.strip()
+
     def extrusion_mode(self, relative: bool) -> str:
         'M82/M83 (absolute/relative extrusion); absolute also zeroes the extrusion position.'
         return "M83 ; relative extrusion" if relative is True \
