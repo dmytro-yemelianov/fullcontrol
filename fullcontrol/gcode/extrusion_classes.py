@@ -55,42 +55,40 @@ class Unretraction(BaseModelPlus):
 
 
 class Extruder(BaseExtruder):
-    '''
-    Extend generic class with gcode methods and attributes to convert the object to gcode.
-
-    This class is used to manage the state of the extruder and translate the design into GCode.
+    '''The extruder design step: gcode-relevant design choices only (no runtime accumulators).
 
     Attributes:
-        units (str, optional): The units for E in GCode. Options include 'mm' and 'mm3'. If not specified, a default unit is used.
-        dia_feed (float, optional): The diameter of the feedstock filament.
-        relative_gcode (bool, optional): A flag indicating whether to use relative GCode. If not specified, a default value is used.
-        volume_to_e (float, optional): A factor to convert the volume of material into the value of 'E' in GCode. Calculated automatically.
-        total_volume (float, optional): The current extrusion volume for the whole print. Calculated automatically.
-        total_volume_ref (float, optional): The total extrusion volume reference value. This attribute is set to allow extrusion to be expressed relative to this point. For relative_gcode = True, it is reset for every line. Calculated automatically.
-        travel_format (str, optional): The format for travel moves in the GCode. If not specified, a default format is used.
+        on (bool, optional): whether extrusion is on (inherited from the core Extruder).
+        units (str, optional): the units for E in gcode - 'mm' or 'mm3'.
+        dia_feed (float, optional): the diameter of the feedstock filament.
+        relative_gcode (bool, optional): whether to use relative extrusion (M83) gcode.
     '''
-
-    # gcode additions to generic Extruder class
-
-    # GCode attributes, used to translate the design into gcode:
-    # units for E in GCode ... options: 'mm' / 'mm3'
+    # design choices the user may set; options for units: 'mm' / 'mm3'
     units: str | None = None
     dia_feed: float | None = None  # diameter of the feedstock filament
     relative_gcode: bool | None = None
-    # attibutes not set by user ... calculated automatically:
-    # factor to convert volume of material into the value of 'E' in gcode
+
+
+class ExtruderState(Extruder):
+    '''The gcode backend's running extruder context: the design fields (received from each
+    Extruder step via update_from) plus the emission accumulators and methods. Held by the
+    gcode State (state.extruder); never appears in a design.
+
+    Attributes:
+        volume_to_e (float, optional): factor converting extruded volume (mm3) to the E value.
+        total_volume (float, optional): cumulative extruded volume for the whole print.
+        total_volume_ref (float, optional): reference volume, for expressing E relative to a point.
+        travel_format (str, optional): the format for travel-move E ('G0' / 'G1_E0').
+        retraction_distance / retraction_speed (float, optional): current retraction defaults.
+        retracted_length (float, optional): filament length currently retracted.
+    '''
+    # calculated automatically / tracked during emission:
     volume_to_e: float | None = None
-    # current extrusion volume for whole print
     total_volume: float | None = None
-    # total extrusion volume reference value - this attribute is set to allow extrusion to be expressed relative to this point (for relative_gcode = True, it is reset for every line)
     total_volume_ref: float | None = None
     travel_format: str | None = None
-    # retraction defaults (filament-length units) and runtime tracking of the currently
-    # retracted amount, used by the Retraction/Unretraction steps:
     retraction_distance: float | None = None
     retraction_speed: float | None = None
-    # None on the class (so an Extruder step never copies it onto the running state via
-    # update_from); the State initialises the tracking instance to 0.0:
     retracted_length: float | None = None
 
     def get_and_update_volume(self, volume):

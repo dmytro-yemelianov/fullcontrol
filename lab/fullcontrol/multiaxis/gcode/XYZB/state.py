@@ -5,7 +5,7 @@ from fullcontrol.gcode.flavor import GcodeFlavor, get_flavor
 
 # from fullcontrol.gcode.point import Point
 # from fullcontrol.gcode.printer import Printer
-from fullcontrol.gcode.extrusion_classes import ExtrusionGeometry, Extruder
+from fullcontrol.gcode.extrusion_classes import ExtrusionGeometry, Extruder, ExtruderState
 from lab.fullcontrol.multiaxis.gcode.XYZB.point import Point
 from lab.fullcontrol.multiaxis.gcode.XYZB.printer import Printer
 from lab.fullcontrol.multiaxis.gcode.XYZB.controls import GcodeControls
@@ -21,7 +21,7 @@ class State(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)  # the flavor is a plain class
 
-    extruder: Extruder | None = None
+    extruder: ExtruderState | None = None
     printer: Printer | None = None
     flavor: GcodeFlavor | None = None
     extrusion_geometry: ExtrusionGeometry | None = None
@@ -57,7 +57,7 @@ class State(BaseModel):
 
         self.flavor = get_flavor(initialization_data.get('gcode_flavor', 'marlin'))
 
-        self.extruder = Extruder(
+        self.extruder = ExtruderState(
             units=initialization_data['e_units'],
             dia_feed=initialization_data['dia_feed'],
             total_volume=0,
