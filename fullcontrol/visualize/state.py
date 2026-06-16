@@ -2,8 +2,8 @@ from pydantic import BaseModel
 from importlib import import_module
 
 from fullcontrol.common import Extruder, ExtrusionGeometry
+from fullcontrol.common import Point as CorePoint, Arc as CoreArc
 from fullcontrol.visualize.point import Point
-from fullcontrol.visualize.arc import Arc
 from fullcontrol.visualize.controls import PlotControls
 
 
@@ -48,8 +48,9 @@ class State(BaseModel):
         Returns:
             int: The number of points (an Arc contributes its tessellation segment count).
         '''
-        return sum(step.segments if isinstance(step, Arc) else 1
-                   for step in steps if isinstance(step, (Point, Arc)))
+        # count on the core Point/Arc bases so designs built from core classes are included
+        return sum(step.segments if isinstance(step, CoreArc) else 1
+                   for step in steps if isinstance(step, (CorePoint, CoreArc)))
 
     def __init__(self, steps: list, plot_controls: PlotControls):
         super().__init__()
