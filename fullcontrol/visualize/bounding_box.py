@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
-from fullcontrol.common import Point
+from fullcontrol.common import Point, Arc
+from fullcontrol.core.arc import arc_geometry, arc_points
 
 
 class BoundingBox(BaseModel):
@@ -50,17 +51,39 @@ class BoundingBox(BaseModel):
         # track per-axis so a design with no points (or a missing axis) yields a
         # zero range rather than a sentinel-derived negative one
         foundx = foundy = foundz = False
+        # running position so an Arc (which bulges beyond its end point) can be expanded
+        # into the points it sweeps through from the current position
+        cur_x = cur_y = cur_z = None
+
+        def include(x, y, z):
+            nonlocal foundx, foundy, foundz
+            if x is not None:
+                self.minx, self.maxx = (min(self.minx, x), max(self.maxx, x)) if foundx else (x, x)
+                foundx = True
+            if y is not None:
+                self.miny, self.maxy = (min(self.miny, y), max(self.maxy, y)) if foundy else (y, y)
+                foundy = True
+            if z is not None:
+                self.minz, self.maxz = (min(self.minz, z), max(self.maxz, z)) if foundz else (z, z)
+                foundz = True
+
         for step in steps:
-            if isinstance(step, Point):
-                if (x := step.x) is not None:
-                    self.minx, self.maxx = (min(self.minx, x), max(self.maxx, x)) if foundx else (x, x)
-                    foundx = True
-                if (y := step.y) is not None:
-                    self.miny, self.maxy = (min(self.miny, y), max(self.maxy, y)) if foundy else (y, y)
-                    foundy = True
-                if (z := step.z) is not None:
-                    self.minz, self.maxz = (min(self.minz, z), max(self.maxz, z)) if foundz else (z, z)
-                    foundz = True
+            if isinstance(step, Arc):
+                if cur_x is not None and cur_y is not None:
+                    geom = arc_geometry(step, cur_x, cur_y, cur_z)
+                    for px, py, pz in arc_points(step, cur_x, cur_y, cur_z, geom):
+                        include(px, py, pz)
+                cur_x = step.end.x if step.end.x is not None else cur_x
+                cur_y = step.end.y if step.end.y is not None else cur_y
+                cur_z = step.end.z if step.end.z is not None else cur_z
+            elif isinstance(step, Point):
+                if step.x is not None:
+                    cur_x = step.x
+                if step.y is not None:
+                    cur_y = step.y
+                if step.z is not None:
+                    cur_z = step.z
+                include(step.x, step.y, step.z)
         if not foundx:
             self.minx = self.maxx = 0
         if not foundy:

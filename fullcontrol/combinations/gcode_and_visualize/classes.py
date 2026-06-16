@@ -51,6 +51,24 @@ class Extruder(gc.Extruder, vis.Extruder):
     pass
 
 
+class Arc(gc.Arc, vis.Arc):
+    '''
+    A circular (or helical) arc move from the current point, around `centre`, to `end`.
+
+    Emits a single G2 (clockwise) / G3 (anticlockwise) gcode move instead of the many short
+    line segments produced by the geometry arc helpers, and tessellates into points for
+    visualization. The start of the arc is the current nozzle position; `end` must lie on the
+    circle defined by the start point and `centre`.
+
+    Attributes:
+        centre (Point): centre of the arc - x and y required (z ignored; arcs sweep in XY).
+        end (Point): end position - x and y required; an optional differing z gives a helix.
+        direction (str): 'clockwise'/'cw' (G2) or 'anticlockwise'/'ccw' (G3).
+        segments (int): number of straight segments used to render the arc for visualization.
+    '''
+    pass
+
+
 class ExtrusionGeometry(gc.ExtrusionGeometry, vis.ExtrusionGeometry):
     """
     Represents the geometric description of the printed extrudate.

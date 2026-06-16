@@ -3,6 +3,7 @@ from importlib import import_module
 
 from fullcontrol.common import Extruder, ExtrusionGeometry
 from fullcontrol.visualize.point import Point
+from fullcontrol.visualize.arc import Arc
 from fullcontrol.visualize.controls import PlotControls
 
 
@@ -45,9 +46,10 @@ class State(BaseModel):
             steps (list): The list of steps.
 
         Returns:
-            int: The number of points.
+            int: The number of points (an Arc contributes its tessellation segment count).
         '''
-        return sum(1 for step in steps if isinstance(step, Point))
+        return sum(step.segments if isinstance(step, Arc) else 1
+                   for step in steps if isinstance(step, (Point, Arc)))
 
     def __init__(self, steps: list, plot_controls: PlotControls):
         super().__init__()

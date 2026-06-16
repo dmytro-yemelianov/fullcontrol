@@ -9,7 +9,9 @@ gcode backend here, so the same classes can be rendered by other backends too.
 from functools import singledispatch
 
 from fullcontrol.common import Printer as CommonPrinter
+from fullcontrol.core.arc import arc_geometry
 from fullcontrol.gcode.point import Point
+from fullcontrol.gcode.arc import Arc
 from fullcontrol.gcode.extrusion_classes import Extruder, ExtrusionGeometry, StationaryExtrusion, Retraction, Unretraction
 from fullcontrol.gcode.auxilliary_components import Fan, Hotend, Buildplate, MAX_FAN_PWM, PERCENT
 from fullcontrol.gcode.commands import PrinterCommand, ManualGcode, Acceleration
@@ -34,6 +36,32 @@ def _(step: Point, state):
         state.printer.speed_changed = False
         state.point.update_from(step)
         return gcode_str.strip()  # strip the final space
+
+
+@render_gcode.register
+def _(step: Arc, state):
+    start = state.point
+    geom = arc_geometry(step, start.x, start.y, start.z)
+    coords = f'X{fmt(step.end.x)} Y{fmt(step.end.y)} '
+    if step.end.z is not None and step.end.z != start.z:
+        coords += f'Z{fmt(step.end.z)} '
+    G_str = 'G2 ' if geom.clockwise else 'G3 '
+    F_str = state.printer.f_gcode(state)
+    IJ_str = f'I{fmt(geom.cx - start.x)} J{fmt(geom.cy - start.y)} '
+    E_str = _arc_e_gcode(state, geom.arc_length)
+    state.printer.speed_changed = False
+    state.point.update_from(step.end)
+    return f'{G_str}{F_str}{coords}{IJ_str}{E_str}'.strip()
+
+
+def _arc_e_gcode(state, arc_length: float) -> str:
+    'E word for an arc move of the given length, mirroring Extruder.e_gcode for straight moves'
+    e = state.extruder
+    if e.on:
+        return f'E{fmt(e.get_and_update_volume(arc_length * state.extrusion_geometry.area) * e.volume_to_e)}'
+    if e.travel_format == 'G1_E0':
+        return f'E{fmt(e.get_and_update_volume(0) * e.volume_to_e)}'
+    return ''
 
 
 @render_gcode.register

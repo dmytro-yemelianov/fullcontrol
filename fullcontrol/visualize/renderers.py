@@ -9,9 +9,11 @@ from functools import singledispatch
 from math import pi
 
 from fullcontrol.visualize.point import Point
+from fullcontrol.visualize.arc import Arc
 from fullcontrol.visualize.extrusion_classes import Extruder, ExtrusionGeometry
 from fullcontrol.visualize.annotations import PlotAnnotation
 from fullcontrol.common import Point as BasePoint
+from fullcontrol.core.arc import arc_geometry, arc_points
 
 _PRECISION_XYZ = 3  # decimal places for x/y/z stored in plot_data
 
@@ -41,6 +43,16 @@ def _(step: Point, state, plot_data, plot_controls):
         state.point.update_color(state, plot_data, plot_controls)
         plot_data.paths[-1].add_point(state)
         state.point_count_now += 1
+
+
+@render_visualize.register
+def _(step: Arc, state, plot_data, plot_controls):
+    # tessellate the arc into points from the current position and render each as a Point,
+    # reusing the Point handler's colour / path / bounds logic
+    start = state.point
+    geom = arc_geometry(step, start.x, start.y, start.z)
+    for px, py, pz in arc_points(step, start.x, start.y, start.z, geom):
+        render_visualize(Point(x=px, y=py, z=pz), state, plot_data, plot_controls)
 
 
 @render_visualize.register
