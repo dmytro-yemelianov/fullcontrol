@@ -119,3 +119,24 @@ def import_printer(printer_name: str, user_overrides: dict):
     data['ending_procedure_steps'] = [ManualGcode(text=data['end_gcode'])]
 
     return data
+
+
+def resolve_initialization_data(printer_name: str, user_overrides: dict) -> dict:
+    '''Resolve a printer_name to its initialization data, dispatching across the
+    printer sources: 'Cura/<name>' and 'Community/<name>' use the JSON+template
+    importer; any other name is a singletool python profile. Raises a clear error
+    for an unknown printer rather than a bare ModuleNotFoundError.'''
+    if printer_name[:5] == 'Cura/' or printer_name[:10] == 'Community/':
+        return import_printer(printer_name, user_overrides)
+    module_name = f'fullcontrol.devices.community.singletool.{printer_name}'
+    try:
+        module = import_module(module_name)
+    except ModuleNotFoundError as e:
+        if e.name == module_name:
+            raise ValueError(
+                f"unknown printer_name {printer_name!r}. Use a singletool profile name "
+                f"(e.g. 'generic', 'ender_3', 'prusa_mk4'), or a 'Cura/<name>' / "
+                f"'Community/<name>' name."
+            ) from e
+        raise  # a real import error inside the printer module - don't mask it
+    return module.set_up(user_overrides)
