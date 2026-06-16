@@ -48,6 +48,11 @@ designs.
 - **State propagation** — fields left as `None` inherit the most recent value; a backend
   keeps a running tracking instance (`state.point`, `state.extruder`, ...) updated via
   `update_from`. So a `Point(x=10)` after `Point(x=0, y=0, z=0)` only changes x.
+- **Step data vs runtime state** — step classes stay pure design data; a backend's running
+  accumulators live on a separate state object. e.g. the gcode `Extruder` step carries only
+  `on/units/dia_feed/relative_gcode`, while `ExtruderState` (held by the gcode `State`) adds
+  the E-tracking accumulators (`total_volume`, `volume_to_e`, `retracted_length`, ...) and
+  the emission methods (`e_gcode`, `get_and_update_volume`).
 - **Controls** — `GcodeControls` / `PlotControls` configure a run (printer, style, ...);
   they are config, not steps.
 

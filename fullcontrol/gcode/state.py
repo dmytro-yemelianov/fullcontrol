@@ -3,7 +3,7 @@ from importlib import import_module
 
 from fullcontrol.gcode.point import Point
 from fullcontrol.gcode.printer import Printer
-from fullcontrol.gcode.extrusion_classes import ExtrusionGeometry, Extruder
+from fullcontrol.gcode.extrusion_classes import ExtrusionGeometry, ExtruderState
 from fullcontrol.gcode.controls import GcodeControls
 from fullcontrol.gcode.flavor import GcodeFlavor, get_flavor
 from fullcontrol.common import first_point
@@ -32,7 +32,7 @@ class State(BaseModel):
 
     '''
 
-    extruder: Extruder | None = None
+    extruder: ExtruderState | None = None
     printer: Printer | None = None
     extrusion_geometry: ExtrusionGeometry | None = None
     flavor: GcodeFlavor | None = None
@@ -62,7 +62,7 @@ class State(BaseModel):
 
         self.flavor = get_flavor(initialization_data.get('gcode_flavor', 'marlin'))
 
-        self.extruder = Extruder(
+        self.extruder = ExtruderState(
             units=initialization_data['e_units'],
             dia_feed=initialization_data['dia_feed'],
             total_volume=0,
