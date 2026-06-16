@@ -92,6 +92,20 @@ class ManualGcode(gc.ManualGcode):
     pass
 
 
+class Acceleration(gc.Acceleration):
+    '''
+    Set the printer's maximum acceleration (M204), portable across Marlin / Klipper /
+    RepRap-Duet. Whichever of the print / retract / travel accelerations (mm/s^2) are set
+    are emitted; fields left None are omitted.
+
+    Attributes:
+        printing (float, optional): acceleration for extruding moves (M204 P).
+        retract (float, optional): acceleration for retract/unretract moves (M204 R).
+        travel (float, optional): acceleration for travel moves (M204 T).
+    '''
+    pass
+
+
 class Printer(gc.Printer):
     '''
     A class that represents a 3D printer.

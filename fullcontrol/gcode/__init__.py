@@ -1,6 +1,6 @@
 
 # import classes
-from fullcontrol.gcode.commands import PrinterCommand, ManualGcode
+from fullcontrol.gcode.commands import PrinterCommand, ManualGcode, Acceleration
 from fullcontrol.gcode.controls import GcodeControls
 from fullcontrol.gcode.point import Point
 from fullcontrol.gcode.printer import Printer

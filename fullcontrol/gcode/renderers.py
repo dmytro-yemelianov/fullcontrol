@@ -12,7 +12,7 @@ from fullcontrol.common import Printer as CommonPrinter
 from fullcontrol.gcode.point import Point
 from fullcontrol.gcode.extrusion_classes import Extruder, ExtrusionGeometry, StationaryExtrusion, Retraction, Unretraction
 from fullcontrol.gcode.auxilliary_components import Fan, Hotend, Buildplate, MAX_FAN_PWM, PERCENT
-from fullcontrol.gcode.commands import PrinterCommand, ManualGcode
+from fullcontrol.gcode.commands import PrinterCommand, ManualGcode, Acceleration
 from fullcontrol.gcode.annotations import GcodeComment
 from fullcontrol.gcode.number_format import fmt
 
@@ -139,6 +139,15 @@ def _(step: PrinterCommand, state):
 def _(step: ManualGcode, state):
     if step.text is not None:
         return step.text
+
+
+@render_gcode.register
+def _(step: Acceleration, state):
+    # M204 P<print> R<retract> T<travel>; omit any axis left unset
+    parts = [f'{tag}{fmt(v)}' for tag, v in
+             (('P', step.printing), ('R', step.retract), ('T', step.travel)) if v is not None]
+    if parts:
+        return 'M204 ' + ' '.join(parts) + ' ; set acceleration'
 
 
 @render_gcode.register
