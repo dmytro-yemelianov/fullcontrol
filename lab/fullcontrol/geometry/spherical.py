@@ -1,6 +1,6 @@
 
 from fullcontrol.geometry import Point, Vector
-from math import acos, cos, sin, tau, atan, atan2
+from math import acos, cos, sin, tau, atan2
 
 from pydantic import BaseModel
 

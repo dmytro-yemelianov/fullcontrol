@@ -45,11 +45,16 @@ extend-exclude = [
 ]
 
 [tool.ruff.lint]
-# Real errors (pyflakes F, syntax/runtime E9), None/bool-literal comparisons (E711/E712),
-# and modern-syntax enforcement (pyupgrade UP). Import sorting (I), unused-import noise in
-# the generated device profiles (F401/F403/F405), and ambiguous names (E741) stay off for now.
+# Real errors (pyflakes F incl. unused imports F401), None/bool-literal comparisons
+# (E711/E712), and modern-syntax enforcement (pyupgrade UP). Wildcard imports (F403/F405)
+# and ambiguous names (E741) stay off; import sorting (I) is a separate pass.
 select = ["E9", "F", "E711", "E712", "UP"]
-ignore = ["F401", "F403", "F405", "E741"]
+ignore = ["F403", "F405", "E741"]
+
+[tool.ruff.lint.per-file-ignores]
+# these modules deliberately import names only to re-export them for the public API
+"__init__.py" = ["F401"]
+"**/common.py" = ["F401"]
 
 [project.urls]
 "Homepage" = "https://fullcontrol.xyz"

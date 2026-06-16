@@ -1,4 +1,3 @@
-from typing import Optional
 from fullcontrol.common import Point as BasePoint
 from fullcontrol.gcode.number_format import fmt
 

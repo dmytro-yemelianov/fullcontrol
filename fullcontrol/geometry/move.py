@@ -1,7 +1,6 @@
 
 from fullcontrol.geometry import Point, Vector
 from copy import deepcopy
-from typing import Union
 
 
 def move(geometry: Point | list, vector: Vector, copy: bool = False, copy_quantity: int = 2) -> Point | list:

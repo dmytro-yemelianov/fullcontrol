@@ -1,8 +1,7 @@
 from pydantic import BaseModel
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 # from fullcontrol.vis_OO2.color import PathColors, Color
-from fullcontrol.common import Extruder, ExtrusionGeometry
-from fullcontrol.visualize.point import Point
+from fullcontrol.common import Extruder
 
 if TYPE_CHECKING:
     from fullcontrol.visualize.state import State

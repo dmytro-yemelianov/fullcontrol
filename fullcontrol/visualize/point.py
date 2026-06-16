@@ -1,4 +1,4 @@
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from fullcontrol.point import Point as BasePoint
 from random import random
 from fullcontrol.visualize.bounding_box import BoundingBox

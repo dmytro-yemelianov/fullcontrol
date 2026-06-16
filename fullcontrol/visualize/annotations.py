@@ -1,4 +1,4 @@
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from pydantic import BaseModel
 from fullcontrol.common import Point
 from fullcontrol.visualize.controls import PlotControls

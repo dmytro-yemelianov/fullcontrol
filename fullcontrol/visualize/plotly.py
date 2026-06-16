@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 import os
 from fullcontrol.visualize.plot_data import PlotData
 from fullcontrol.visualize.controls import PlotControls
-from fullcontrol.visualize.tube_mesh import CylindersMesh, FlowTubeMesh, MeshExporter
+from fullcontrol.visualize.tube_mesh import CylindersMesh, FlowTubeMesh
 
 RGB_MAX = 255                      # 8-bit colour channel max for plotly 'rgb(...)' strings
 EXTRUDE_LINE_WIDTH_FACTOR = 2      # line-style preview: extruding moves drawn this much wider...

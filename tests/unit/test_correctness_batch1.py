@@ -1,5 +1,4 @@
 """Correctness / robustness batch 1: edge-case guards and a pydantic-v2 modernisation."""
-import pytest
 
 import fullcontrol as fc
 from fullcontrol.geometry.reflect import reflectXY_mc

@@ -1,4 +1,3 @@
-from typing import Optional
 from fullcontrol.common import ExtrusionGeometry as BaseExtrusionGeometry
 from fullcontrol.common import Extruder as BaseExtruder
 from fullcontrol.common import StationaryExtrusion as BaseStationaryExtrusion
