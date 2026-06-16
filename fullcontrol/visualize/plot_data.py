@@ -30,9 +30,9 @@ class PlotData(BaseModel):
         add_annotation(annotation: 'PlotAnnotation'): Adds an annotation to the PlotData object.
         cleanup(): Removes single-point paths from the PlotData object.
     '''
-    paths: Optional[list] = Field(default_factory=list)  # list of Paths
-    bounding_box: Optional[BoundingBox] = Field(default_factory=BoundingBox)
-    annotations: Optional[list] = Field(default_factory=list)
+    paths: list | None = Field(default_factory=list)  # list of Paths
+    bounding_box: BoundingBox | None = Field(default_factory=BoundingBox)
+    annotations: list | None = Field(default_factory=list)
 
     def __init__(self, steps: list, state: 'State'):
         """

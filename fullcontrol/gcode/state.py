@@ -31,13 +31,13 @@ class State(BaseModel):
 
     '''
 
-    extruder: Optional[Extruder] = None
-    printer: Optional[Printer] = None
-    extrusion_geometry: Optional[ExtrusionGeometry] = None
-    steps: Optional[list] = None
-    point: Optional[Point] = Field(default_factory=Point)
-    i: Optional[int] = 0
-    gcode: Optional[list] = Field(default_factory=list)
+    extruder: Extruder | None = None
+    printer: Printer | None = None
+    extrusion_geometry: ExtrusionGeometry | None = None
+    steps: list | None = None
+    point: Point | None = Field(default_factory=Point)
+    i: int | None = 0
+    gcode: list | None = Field(default_factory=list)
 
     def __init__(self, steps: list, gcode_controls: GcodeControls):
         """
@@ -66,7 +66,7 @@ class State(BaseModel):
             total_volume_ref=0,
             travel_format=initialization_data['travel_format'])
         self.extruder.update_e_ratio()
-        if initialization_data['manual_e_ratio'] != None:
+        if initialization_data['manual_e_ratio'] is not None:
             self.extruder.volume_to_e = initialization_data['manual_e_ratio']
 
         self.printer = Printer(

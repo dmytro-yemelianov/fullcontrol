@@ -18,14 +18,14 @@ class State(BaseModel):
     of various attributes
     '''
 
-    extruder: Optional[Extruder] = None
-    printer: Optional[Printer] = None
-    extrusion_geometry: Optional[ExtrusionGeometry] = None
-    steps: Optional[list] = None
-    point: Optional[Point] = Point()
-    point_systemXYZ: Optional[Point] = Point()
-    i: Optional[int] = 0
-    gcode: Optional[list] = []
+    extruder: Extruder | None = None
+    printer: Printer | None = None
+    extrusion_geometry: ExtrusionGeometry | None = None
+    steps: list | None = None
+    point: Point | None = Point()
+    point_systemXYZ: Point | None = Point()
+    i: int | None = 0
+    gcode: list | None = []
 
     def __init__(self, steps: list, gcode_controls: GcodeControls):
         super().__init__()
@@ -37,7 +37,7 @@ class State(BaseModel):
                 for i in range(len(steps)):
                     if type(steps[i]).__name__ == 'Point':
                         if fully_defined:
-                            if steps[i].x != None and steps[i].y != None and steps[i].z != None and steps[i].b != None:
+                            if steps[i].x is not None and steps[i].y is not None and steps[i].z is not None and steps[i].b is not None:
                                 return steps[i]
                         else:
                             return steps[i]

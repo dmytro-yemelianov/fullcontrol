@@ -11,8 +11,8 @@ class GcodeComment(BaseModel):
         end_of_previous_line_text (Optional[str]): The comment to be added at the end of the previous line of Gcode.
     '''
 
-    text: Optional[str] = None
-    end_of_previous_line_text: Optional[str] = None
+    text: str | None = None
+    end_of_previous_line_text: str | None = None
 
     def gcode(self, state):
         '''
@@ -24,7 +24,7 @@ class GcodeComment(BaseModel):
         Returns:
             str: The generated line of Gcode.
         '''
-        if self.end_of_previous_line_text != None and state.gcode:
+        if self.end_of_previous_line_text is not None and state.gcode:
             state.gcode[-1] += ' ; ' + self.end_of_previous_line_text
-        if self.text != None:
+        if self.text is not None:
             return '; ' + self.text

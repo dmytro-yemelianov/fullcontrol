@@ -23,20 +23,20 @@ class PlotControls(BaseModelPlus):
         printer_name (Optional[str]): The name of the printer. Default is 'generic'.
         initialization_data (Optional[dict]): Information about initial printing conditions. Default is an empty dictionary. Values passed for initialization_data overwrite the default initialization_data of the printer.
     """
-    color_type: Optional[str] = 'z_gradient'
-    line_width: Optional[float] = None
-    style: Optional[str] = None # 'tube'/'line'
-    tube_type: Optional[str] = 'flow'  # 'flow'/'cylinders'
-    tube_sides: Optional[int] = 4
-    zoom: Optional[float] = 1
-    hide_annotations: Optional[bool] = False
-    hide_travel: Optional[bool] = False
-    hide_axes: Optional[bool] = False
-    neat_for_publishing: Optional[bool] = False
-    raw_data: Optional[bool] = False
-    printer_name: Optional[str] = 'generic'
+    color_type: str | None = 'z_gradient'
+    line_width: float | None = None
+    style: str | None = None # 'tube'/'line'
+    tube_type: str | None = 'flow'  # 'flow'/'cylinders'
+    tube_sides: int | None = 4
+    zoom: float | None = 1
+    hide_annotations: bool | None = False
+    hide_travel: bool | None = False
+    hide_axes: bool | None = False
+    neat_for_publishing: bool | None = False
+    raw_data: bool | None = False
+    printer_name: str | None = 'generic'
     # initialization_data is information about initial printing conditions, which may be changed by the fullcontrol 'design', whereas the above attributes are never changed by the 'design'
-    initialization_data: Optional[dict] = Field(default_factory=dict)  # values passed for initialization_data overwrite the default initialization_data of the printer
+    initialization_data: dict | None = Field(default_factory=dict)  # values passed for initialization_data overwrite the default initialization_data of the printer
 
     def initialize(self):
         if not self.raw_data: # the follows defaults are only required if plotting the path, not for raw data export

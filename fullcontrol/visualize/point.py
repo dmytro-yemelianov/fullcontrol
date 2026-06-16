@@ -18,7 +18,7 @@ class Point(BasePoint):
         color (Optional[list]): The color of the point in RGB format [r, g, b] with values 0-1.
     '''
 
-    color: Optional[list] = None  # [r,g,b]
+    color: list | None = None  # [r,g,b]
 
     def visualize(self, state: 'State', plot_data: 'PlotData', plot_controls: PlotControls):
         '''
@@ -35,16 +35,16 @@ class Point(BasePoint):
 
         change_check = False
         precision_xyz = 3  # number of decimal places to use for x y z values in plot_data
-        if self.x != None and self.x != state.point.x:
+        if self.x is not None and self.x != state.point.x:
             state.point.x = round(self.x, precision_xyz)
             change_check = True
-        if self.y != None and self.y != state.point.y:
+        if self.y is not None and self.y != state.point.y:
             state.point.y = round(self.y, precision_xyz)
             change_check = True
-        if self.z != None and self.z != state.point.z:
+        if self.z is not None and self.z != state.point.z:
             state.point.z = round(self.z, precision_xyz)
             change_check = True
-        if self.color != None and self.color != state.point.color:
+        if self.color is not None and self.color != state.point.color:
             state.point.color = self.color
             change_check = True
         if change_check:
@@ -91,7 +91,7 @@ class Point(BasePoint):
         if plot_controls.color_type == 'manual':
             pass
         else:
-            if state.extruder.on == True:
+            if state.extruder.on is True:
                 if plot_controls.color_type == 'random_blue':
                     self.color = random_blue()
                 elif plot_controls.color_type == 'z_gradient':

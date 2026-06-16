@@ -13,7 +13,7 @@ def cross_product(v1, v2):
     return Point(x=v1.y*v2.z - v1.z*v2.y, y=v1.z*v2.x - v1.x*v2.z, z=v1.x*v2.y - v1.y*v2.x)
 
 
-def rotate(geometry: Union[Point, list], axis_start: Point, axis_end_or_direction: Union[Point, str], angle_rad: float, copy: bool = False, copy_quantity: int = 2) -> Union[Point, list]:
+def rotate(geometry: Point | list, axis_start: Point, axis_end_or_direction: Point | str, angle_rad: float, copy: bool = False, copy_quantity: int = 2) -> Point | list:
     '''rotate 'geometry' (a Point or list of steps including Points) about an axis 
     by a defined angle (radians). the axis is defined by two points for the axis_start 
     and axis_end or by one point for axis_start and a direction 'x', 'y' or 'z'.
@@ -38,7 +38,7 @@ def rotate(geometry: Union[Point, list], axis_start: Point, axis_end_or_directio
         return rotate_geometry(geometry, axis_start, axis_end, angle_rad)
 
 
-def rotate_geometry(geometry: Union[Point, list], axis_start: Point, axis_end: Point, angle_rad: float) -> Union[Point, list]:
+def rotate_geometry(geometry: Point | list, axis_start: Point, axis_end: Point, angle_rad: float) -> Point | list:
     '''rotate 'geometry' (a Point or list of steps including Points) 
     about the given axis by the given angle' and return the rotated 
     geometry (original geometry is not edited). elements in a list. 
@@ -88,7 +88,7 @@ def rotate_geometry(geometry: Union[Point, list], axis_start: Point, axis_end: P
         return geometry_new
 
 
-def rotate_copy_geometry(geometry: Union[Point, list], axis_start: Point, axis_end: Point, angle_rad: float, quantity: int) -> list:
+def rotate_copy_geometry(geometry: Point | list, axis_start: Point, axis_end: Point, angle_rad: float, quantity: int) -> list:
     '''creates multiple copies of 'geometry' (a Point or list of steps including
     Points), each rotated about the given axis by the given angle. elements in a list
     that are not Points pass through and are replicated without modification.

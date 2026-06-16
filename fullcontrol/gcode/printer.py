@@ -13,9 +13,9 @@ class Printer(BasePrinter):
         new_command (Optional[dict]): A dictionary containing a new command to be added to the command list.
         speed_changed (Optional[bool]): A flag indicating whether the print speed or travel speed has changed.
     '''
-    command_list: Optional[dict] = None
-    new_command: Optional[dict] = None
-    speed_changed: Optional[bool] = None
+    command_list: dict | None = None
+    new_command: dict | None = None
+    speed_changed: bool | None = None
 
     def f_gcode(self, state):
         """
@@ -27,7 +27,7 @@ class Printer(BasePrinter):
         Returns:
         - The G-code string for the feedrate (F) based on the current state.
         """
-        if self.speed_changed == True:
+        if self.speed_changed is True:
             return f'F{fmt(self.print_speed if state.extruder.on else self.travel_speed, dp=1)} '
         else:
             return ''
@@ -45,8 +45,8 @@ class Printer(BasePrinter):
         '''
         # update all attributes of the tracking instance with the new instance (self)
         state.printer.update_from(self)
-        if self.print_speed != None \
-                or self.travel_speed != None:
+        if self.print_speed is not None \
+                or self.travel_speed is not None:
             state.printer.speed_changed = True
-        if self.new_command != None:
+        if self.new_command is not None:
             state.printer.command_list = {**(state.printer.command_list or {}), **self.new_command}

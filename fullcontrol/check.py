@@ -56,7 +56,7 @@ def fix(steps: list, result_type: str, controls):
 
     return steps
 
-def check_points(geometry: Union[Point, list], check: str):
+def check_points(geometry: Point | list, check: str):
     
     if check == 'polar_xy':
         def check_point(point: Point):

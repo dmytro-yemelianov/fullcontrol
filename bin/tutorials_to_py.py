@@ -25,7 +25,7 @@ def combine_py_files(py_files):
     combined_content = ''
     # Read the content of each .py file and append it to the combined_content string
     for py_file in py_files:
-        with open('../tests/' + py_file, 'r') as infile:
+        with open('../tests/' + py_file) as infile:
             for line in infile:
                 # If the line is 'fig.show()\n', replace it with the new code
                 if line == '    fig.show()\n':

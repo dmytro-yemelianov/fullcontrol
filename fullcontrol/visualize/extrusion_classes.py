@@ -25,7 +25,7 @@ class Extruder(BaseExtruder):
         Returns:
             None
         '''
-        if self.on != None and self.on != state.extruder.on:
+        if self.on is not None and self.on != state.extruder.on:
             state.extruder.on = self.on
             # if path has more than one point in it (so there is at least a single line plotted), add new path, otherwise change state of the current path
             if len(plot_data.paths[-1].xvals) > 1:
@@ -50,14 +50,14 @@ class ExtrusionGeometry(BaseExtrusionGeometry):
             plot_controls (PlotControls): The plot controls object.
         '''
         from math import pi 
-        if self.width != None and self.width != state.extrusion_geometry.width:
+        if self.width is not None and self.width != state.extrusion_geometry.width:
             state.extrusion_geometry.width = round(self.width, 3)
-        if self.height != None and self.height != state.extrusion_geometry.height:
+        if self.height is not None and self.height != state.extrusion_geometry.height:
             state.extrusion_geometry.height = round(self.height, 3)
-        if self.diameter != None:
+        if self.diameter is not None:
             state.extrusion_geometry.width = round(self.diameter, 3)
             state.extrusion_geometry.height = round(self.diameter, 3)
-        if self.area != None:
+        if self.area is not None:
             dia = 2*(self.area/pi)**0.5
             state.extrusion_geometry.width = round(dia, 3)
             state.extrusion_geometry.height = round(dia, 3)

@@ -28,7 +28,7 @@ def visualize(steps: list, plot_controls: PlotControls, show_tips: bool):
             raise type(e)(f'error visualizing step {i} ({type(step).__name__}): {e}') from e
     plot_data.cleanup()
 
-    if plot_controls.raw_data == True:
+    if plot_controls.raw_data is True:
         return plot_data
     else:
         from fullcontrol.visualize.plotly import plot

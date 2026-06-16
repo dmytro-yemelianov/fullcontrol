@@ -6,7 +6,7 @@ from typing import Union
 from lab.fullcontrol.laser.laser import Laser
 
 
-def transform(steps: list, result_type: str, controls: Union[ModelControls, GcodeControls, CodeControls] = None, show_tips: bool = True):
+def transform(steps: list, result_type: str, controls: ModelControls | GcodeControls | CodeControls = None, show_tips: bool = True):
     ''' Transform a fullcontrol design (a list of function class instances) into various output formats.
     Optionally, Controls can be passed to control how the output is generated.
     '''
@@ -34,7 +34,7 @@ def transform(steps: list, result_type: str, controls: Union[ModelControls, Gcod
         if controls is None: controls = GcodeControls()
 
         # don't allow the gcode function to save gcode since we will modify it after generation
-        if controls.save_as == True:
+        if controls.save_as is True:
             raise Exception("please set GcodeControl.save_as = False for 'laser_cutter_gcode'")
         # force initialization data as first object in design
         if not isinstance(steps[0], Laser):
@@ -43,7 +43,7 @@ def transform(steps: list, result_type: str, controls: Union[ModelControls, Gcod
             for attribute in ['cutting_speed', 'travel_speed', 'spotsize', 'on']:
                 if getattr(steps[0], attribute) is None:
                     raise Exception(f"first object in design (fclab.Laser) must have all attributes set - attribute '{attribute}' is missing")
-            if steps[0].constant_power == None and steps[0].dynamic_power == None:
+            if steps[0].constant_power is None and steps[0].dynamic_power is None:
                 raise Exception("first object in design (fclab.Laser) must have either 'constant_power' or 'dynamic_power' set")
         gcode = transform_original(steps, 'gcode', controls, show_tips)
         gcode = remove_terms_from_gcode(gcode, ['Z', 'E'])

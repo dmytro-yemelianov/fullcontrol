@@ -5,7 +5,7 @@ from copy import deepcopy
 from typing import Union
 
 
-def move_polar(geometry: Union[Point, list], centre: Point, radius: float, angle: float, copy: bool = False, copy_quantity: int = 2) -> Union[Point, list]:
+def move_polar(geometry: Point | list, centre: Point, radius: float, angle: float, copy: bool = False, copy_quantity: int = 2) -> Point | list:
     '''
     Move 'geometry' (a Point or list of steps including Points) about a 
     centre point by the given radius and angle (in radians) relative to the 
@@ -30,13 +30,13 @@ def move_polar(geometry: Union[Point, list], centre: Point, radius: float, angle
         Union[Point, list]: The new geometry as a list (original geometry is not edited).
     '''
     check_points(geometry, check='polar_xy')
-    if copy == False:
+    if copy is False:
         return move_geometry_polar(geometry, centre, radius, angle)
     else:
         return copy_geometry_polar(geometry, centre, radius, angle, copy_quantity)
 
 
-def move_geometry_polar(geometry: Union[Point, list], centre: Point, radius: float, angle: float) -> Union[Point, list]:
+def move_geometry_polar(geometry: Point | list, centre: Point, radius: float, angle: float) -> Point | list:
     '''
     Function called by move_polar()
     
@@ -90,7 +90,7 @@ def move_geometry_polar(geometry: Union[Point, list], centre: Point, radius: flo
         return geometry_new
 
 
-def copy_geometry_polar(geometry: Union[Point, list], centre: Point, radius: float, angle: float, quantity: int) -> list:
+def copy_geometry_polar(geometry: Point | list, centre: Point, radius: float, angle: float, quantity: int) -> list:
     '''
     Function called by move_polar()
     

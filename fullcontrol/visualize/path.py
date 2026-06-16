@@ -22,13 +22,13 @@ class Path(BaseModel):
         heights (Optional[list]): List of heights for the line.
     """
 
-    xvals: Optional[list] = []
-    yvals: Optional[list] = []
-    zvals: Optional[list] = []
-    colors: Optional[list] = []  # [r,g,b]
-    extruder: Optional[Extruder] = None
-    widths: Optional[list] = []
-    heights: Optional[list] = []
+    xvals: list | None = []
+    yvals: list | None = []
+    zvals: list | None = []
+    colors: list | None = []  # [r,g,b]
+    extruder: Extruder | None = None
+    widths: list | None = []
+    heights: list | None = []
 
     def add_point(self, state: 'State'):
         """

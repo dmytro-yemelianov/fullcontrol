@@ -1,7 +1,6 @@
 from fullcontrol.common import Point
 from itertools import chain
 from copy import deepcopy
-from typing import Union
 
 
 def points_only(steps: list, track_xyz: bool = True) -> list:
@@ -33,12 +32,12 @@ def points_only(steps: list, track_xyz: bool = True) -> list:
             next_point.update_from(new_steps[i+1])
             new_steps[i+1] = next_point
         # delete initial elements prior to all of x y and z have values != None:
-        while new_steps and (new_steps[0].x == None or new_steps[0].y == None or new_steps[0].z == None):
+        while new_steps and (new_steps[0].x is None or new_steps[0].y is None or new_steps[0].z is None):
             del new_steps[0]
     return new_steps
 
 
-def relative_point(reference: Union[Point, list], x_offset: float, y_offset: float, z_offset: float):
+def relative_point(reference: Point | list, x_offset: float, y_offset: float, z_offset: float):
     '''
     Returns an fc.Point object with x, y, z positions relative to a reference point.
     
@@ -65,7 +64,7 @@ def relative_point(reference: Union[Point, list], x_offset: float, y_offset: flo
             if isinstance(reference[-(i+1)], Point):
                 pt = reference[-(i+1)]
                 break
-    if pt == None:
+    if pt is None:
         raise Exception('The reference object must be a Point or a list containing at least one point')
     if None in [pt.x, pt.y, pt.z]:
         raise Exception(f'The reference point must have all of x, y, z attributes defined (x={pt.x}, y={pt.y}, z={pt.z})')
