@@ -1,5 +1,6 @@
 from fullcontrol.gcode import Point, Printer, Extruder, ManualGcode, PrinterCommand, GcodeComment, Buildplate, Hotend, Fan, StationaryExtrusion
 import fullcontrol.devices.community.singletool.base_settings as base_settings
+from fullcontrol.devices.community.singletool._procedure import remove_step, insert_before, printer_command
 
 
 def set_up(user_overrides: dict):
@@ -38,10 +39,13 @@ def set_up(user_overrides: dict):
     starting_procedure_steps.append(Extruder(on=True))
     starting_procedure_steps.append(ManualGcode(text=';-----\n; END OF STARTING PROCEDURE\n;-----\n'))
 
-    # move the home command in the start procedure to be after temperatures (to work with bed levelling)
-    del starting_procedure_steps[1]
-    starting_procedure_steps.insert(5, PrinterCommand(id='home'))
-    starting_procedure_steps.insert(6, GcodeComment(end_of_previous_line_text='; including mesh bed level'))
+    # move the home command in the start procedure to be after temperatures (to work with bed levelling),
+    # i.e. just before the coordinate-mode setup that follows the heat-up steps
+    remove_step(starting_procedure_steps, printer_command('home'), description='home command')
+    insert_before(starting_procedure_steps, printer_command('absolute_coords'),
+                  [PrinterCommand(id='home'),
+                   GcodeComment(end_of_previous_line_text='; including mesh bed level')],
+                  description='absolute_coords command')
 
     ending_procedure_steps = []
     ending_procedure_steps.append(ManualGcode(text='\n;-----\n; START OF ENDING PROCEDURE\n;-----'))
