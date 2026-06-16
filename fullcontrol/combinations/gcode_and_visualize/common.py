@@ -22,7 +22,13 @@ def _run_plot(steps, controls, show_tips):
     return visualize(steps, controls, show_tips)
 
 
+def _run_simulation(steps, controls, show_tips):
+    from fullcontrol.simulate.run import simulate
+    return simulate(steps, controls, show_tips)
+
+
 register_backend('gcode', GcodeControls, _run_gcode)
+register_backend('simulation', GcodeControls, _run_simulation)
 register_backend('plot', PlotControls, _run_plot)
 
 

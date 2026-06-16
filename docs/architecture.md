@@ -20,8 +20,9 @@ The same list can be turned into different outputs:
 ```
                          ┌────────────────────────── backend registry ──────────────────────────┐
  design (list[step]) ──▶ transform(steps, result_type, controls) ──▶ run the matching backend ──▶ result
-                         │   'gcode' → gcode driver  + render_gcode                              │
-                         │   'plot'  → visualize driver + render_visualize                       │
+                         │   'gcode'      → gcode driver  + render_gcode                         │
+                         │   'plot'       → visualize driver + render_visualize                  │
+                         │   'simulation' → simulate (time/material/flow estimate)               │
                          │   '<your backend>' → register_backend(...)                            │
                          └───────────────────────────────────────────────────────────────────────┘
 ```
