@@ -46,8 +46,10 @@ def test_every_gcode_step_class_has_a_renderer():
         assert render_gcode.dispatch(cls) is not default, f'{name} has no gcode renderer'
 
 
-def test_every_visualize_step_class_answers_visualize():
+def test_every_visualize_step_class_has_a_renderer():
+    from fullcontrol.visualize.renderers import render_visualize
+    default = render_visualize.dispatch(object)
     names = {n for n in _public_step_classes(vis) if not n.endswith('Controls')}
     for name in sorted(names):
-        cls = getattr(combined, name)
-        assert callable(getattr(cls, 'visualize', None)), f'{name}.visualize not callable'
+        cls = getattr(vis, name)
+        assert render_visualize.dispatch(cls) is not default, f'{name} has no visualize renderer'

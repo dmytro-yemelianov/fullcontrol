@@ -24,38 +24,6 @@ class Point(BasePoint):
 
     color: list | None = None  # [r,g,b]
 
-    def visualize(self, state: 'State', plot_data: 'PlotData', plot_controls: PlotControls):
-        '''
-        Process a Point in a list of steps supplied by the designer to update plot_data and state.
-
-        Args:
-            state ('State'): The current state of the plot.
-            plot_data ('PlotData'): The data used for plotting.
-            plot_controls ('PlotControls'): The controls for plotting.
-
-        Returns:
-            None
-        '''
-
-        change_check = False
-        precision_xyz = 3  # number of decimal places to use for x y z values in plot_data
-        if self.x is not None and self.x != state.point.x:
-            state.point.x = round(self.x, precision_xyz)
-            change_check = True
-        if self.y is not None and self.y != state.point.y:
-            state.point.y = round(self.y, precision_xyz)
-            change_check = True
-        if self.z is not None and self.z != state.point.z:
-            state.point.z = round(self.z, precision_xyz)
-            change_check = True
-        if self.color is not None and self.color != state.point.color:
-            state.point.color = self.color
-            change_check = True
-        if change_check:
-            state.point.update_color(state, plot_data, plot_controls)
-            plot_data.paths[-1].add_point(state)
-            state.point_count_now += 1
-
     def update_color(self, state: 'State', plot_data: 'PlotData', plot_controls: 'PlotControls'):
         '''
         Update the color attribute of this point with [R, G, B] based on the color_type specified in plot_controls.
