@@ -23,7 +23,8 @@ The same list can be turned into different outputs:
                          │   'gcode'      → gcode driver  + render_gcode                         │
                          │   'plot'       → visualize driver + render_visualize                  │
                          │   'simulation' → simulate (time/material/flow estimate)               │
-                         │   'validate'   → pre-flight checks (bounds, cold extrusion, ...)       │
+                         │   'validate'   → pre-flight checks (bounds, cold extrusion, temps,    │
+                         │                  speeds, first-layer z, retraction balance)           │
                          │   '<your backend>' → register_backend(...)                            │
                          └───────────────────────────────────────────────────────────────────────┘
 ```
