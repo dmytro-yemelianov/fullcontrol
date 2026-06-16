@@ -1,7 +1,6 @@
 
 from fullcontrol.combinations.gcode_and_visualize.classes import Point, ExtrusionGeometry, Printer, Extruder
 from fullcontrol.geometry import midpoint, distance, point_to_polar, segmented_line
-from fullcontrol.common import flatten
 from math import cos, pi
 
 # these functions allow streamline-slicing - see method images and case study in this journal paper:

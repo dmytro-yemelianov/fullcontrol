@@ -1,5 +1,4 @@
 
-import os
 from lab.fullcontrol.multiaxis.gcode.XYZC0B1.state import State
 from lab.fullcontrol.multiaxis.gcode.XYZC0B1.controls import GcodeControls
 from datetime import datetime

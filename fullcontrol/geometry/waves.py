@@ -1,5 +1,5 @@
 
-from fullcontrol.geometry import Point, Vector, point_to_polar, polar_to_point, move, move_polar
+from fullcontrol.geometry import Point, Vector, polar_to_point, move, move_polar
 from math import pi, atan2
 
 

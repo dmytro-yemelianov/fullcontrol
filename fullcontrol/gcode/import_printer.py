@@ -3,6 +3,8 @@ import ast
 import json
 import operator
 import os
+
+SECONDS_PER_MINUTE = 60  # Cura speeds are mm/s; FullControl uses mm/min
 from copy import deepcopy
 from fullcontrol.gcode import Extruder, ManualGcode, Buildplate, Hotend, Fan
 import fullcontrol.devices.community.singletool.base_settings as base_settings
@@ -92,8 +94,9 @@ def import_printer(printer_name: str, user_overrides: dict):
     library = load_json(library_name, os.path.join('library.json'))
     data = import_module(f'fullcontrol.devices.{library_name}.settings.{library[printer_name]}').default_initial_settings
     if library_name == 'cura':
-        data['print_speed'] = int(data['print_speed']*60)
-        data['travel_speed'] = int(data['travel_speed']*60)
+        # Cura stores speeds in mm/s; FullControl works in mm/min
+        data['print_speed'] = int(data['print_speed'] * SECONDS_PER_MINUTE)
+        data['travel_speed'] = int(data['travel_speed'] * SECONDS_PER_MINUTE)
     data = {**base_settings.default_initial_settings, **data}
     data = {**data, **user_overrides}
     original_start_gcode = deepcopy(data['start_gcode'])

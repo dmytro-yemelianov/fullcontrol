@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from fullcontrol.visualize.extrusion_classes import Extruder
 from fullcontrol.visualize.bounding_box import BoundingBox
 from fullcontrol.visualize.path import Path

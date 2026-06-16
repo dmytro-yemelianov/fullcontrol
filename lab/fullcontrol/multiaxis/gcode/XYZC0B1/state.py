@@ -1,4 +1,3 @@
-from typing import Optional
 from pydantic import BaseModel
 from importlib import import_module
 

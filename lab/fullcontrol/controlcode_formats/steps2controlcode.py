@@ -8,7 +8,7 @@ from fullcontrol import GcodeControls
 
 def gcode_to_bambu_3mf(gcode: str, new_3mf_file: str):
     '''Convert gcode to bambu 3mf'''
-    try: import google.colab; colab = True
+    try: import google.colab; colab = True  # noqa: F401 - availability check for the Colab environment
     except ImportError: colab = False
 
 

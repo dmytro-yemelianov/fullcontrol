@@ -1,7 +1,5 @@
 
-from typing import Optional
 from pydantic import BaseModel
-from fullcontrol.common import Point
 
 
 class GcodeControls(BaseModel):

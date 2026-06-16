@@ -1,6 +1,4 @@
-from typing import Optional
 from fullcontrol.common import Printer as BasePrinter
-from fullcontrol.common import Point
 
 
 class Printer(BasePrinter):

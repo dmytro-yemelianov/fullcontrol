@@ -2,7 +2,6 @@ from lab.fullcontrol.geometry_model.controls import ModelControls
 from fullcontrol import GcodeControls
 from lab.fullcontrol.controlcode_formats.controls import CodeControls
 from fullcontrol import transform as transform_original
-from typing import Union
 from lab.fullcontrol.laser.laser import Laser
 
 

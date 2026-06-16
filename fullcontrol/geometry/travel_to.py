@@ -1,5 +1,4 @@
 from fullcontrol.geometry import Point, Extruder
-from typing import Union
 from fullcontrol.common import first_point
 
 def travel_to(geometry: Point | list) -> list:

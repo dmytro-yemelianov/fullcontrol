@@ -7,6 +7,8 @@ from datetime import datetime
 
 import numpy as np
 
+STL_HEADER_BYTES = 80  # binary STL spec: fixed 80-byte header before the triangle count
+
 
 class MeshExporter:
     def __init__(self, metadata: dict | None = None,
@@ -84,7 +86,7 @@ class MeshExporter:
         AUTHOR = self.metadata.get('author', None)
         author = f'{AUTHOR=},' if AUTHOR is not None else ''
 
-        header = bytearray([0]*80)
+        header = bytearray([0]*STL_HEADER_BYTES)
         # header is arbitrary, but put some meaningful data into it
         #  TODO: support optional COLOR and MATERIAL fields
         #    'COLOR' should be a 4-byte RGBA value, as a simple full-object color
@@ -92,7 +94,7 @@ class MeshExporter:
         #      as 4-byte RGBA values - preferred over COLOR
         header_data = f'STL,{UNITS=},{author}SOFTWARE=FullControlXYZ'.encode()
         header[:len(header_data)] = header_data
-        out.write(header[:80]) # ensure header is valid
+        out.write(header[:STL_HEADER_BYTES]) # ensure header is valid
 
     @staticmethod
     def _write_binary_stl_data(out, mesh_normals, triangle_points, solid_index: int = 0):

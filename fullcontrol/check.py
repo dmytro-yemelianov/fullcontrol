@@ -1,6 +1,5 @@
 from fullcontrol.extra_functions import flatten, first_point
 from fullcontrol.common import Point
-from typing import Union
 
 def stop(message: str):
     from sys import exit

@@ -1,8 +1,6 @@
-import math
 from fullcontrol.geometry import Point
-from typing import Union
 from copy import deepcopy
-from math import sqrt, cos, sin, radians
+from math import sqrt, cos, sin
 
 
 def dot_product(v1, v2):

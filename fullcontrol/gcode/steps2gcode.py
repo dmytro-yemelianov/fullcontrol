@@ -1,8 +1,4 @@
 
-import os
-from fullcontrol.gcode.point import Point
-from fullcontrol.gcode.printer import Printer
-from fullcontrol.gcode.extrusion_classes import ExtrusionGeometry, Extruder
 from fullcontrol.gcode.state import State
 from fullcontrol.gcode.controls import GcodeControls
 from datetime import datetime

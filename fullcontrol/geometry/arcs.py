@@ -2,7 +2,7 @@
 from fullcontrol.common import linspace
 from fullcontrol.geometry import Point, polar_to_point, ramp_xyz, ramp_polar
 from fullcontrol.geometry.midpoint import centreXY_3pt
-from math import tau, sin , cos
+from math import sin , cos
 
 
 def arcXY(centre: Point, radius: float, start_angle: float, arc_angle: float, segments: int = 100) -> list:

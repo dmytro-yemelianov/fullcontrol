@@ -1,6 +1,5 @@
 
-from fullcontrol.gcode import Point, Extruder
-from fullcontrol.gcode import ManualGcode
+from fullcontrol.gcode import Point
 
 
 def primer(end_point: Point) -> list:

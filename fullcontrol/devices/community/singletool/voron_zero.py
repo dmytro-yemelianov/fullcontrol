@@ -1,4 +1,4 @@
-from fullcontrol.gcode import Point, Printer, Extruder, ManualGcode, PrinterCommand, GcodeComment, Buildplate, Hotend, Fan, StationaryExtrusion
+from fullcontrol.gcode import Point, Printer, Extruder, ManualGcode, PrinterCommand, Fan, StationaryExtrusion
 import fullcontrol.devices.community.singletool.base_settings as base_settings
 
 # 'chamber temp' could be incorperated into FullControl as a new state object, since the designer may wish to change this during the printing procedure

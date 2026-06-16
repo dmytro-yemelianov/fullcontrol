@@ -1,4 +1,4 @@
-from fullcontrol.gcode import Point, Printer, Extruder, ManualGcode, PrinterCommand, Buildplate, Hotend, Fan, StationaryExtrusion
+from fullcontrol.gcode import Point, Extruder, ManualGcode, PrinterCommand, Buildplate, Hotend, Fan
 import fullcontrol.devices.community.singletool.base_settings as base_settings
 
 

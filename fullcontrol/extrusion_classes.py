@@ -1,4 +1,3 @@
-from typing import Optional, Any
 from fullcontrol.common import BaseModelPlus
 from math import pi
 

@@ -1,4 +1,3 @@
-from typing import Optional
 from fullcontrol.common import Printer as BasePrinter
 from fullcontrol.gcode.number_format import fmt
 # from fullcontrol.common import MultitoolPrinter as BaseMultitoolPrinter
