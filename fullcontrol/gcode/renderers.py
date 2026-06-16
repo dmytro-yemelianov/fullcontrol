@@ -14,7 +14,7 @@ from fullcontrol.gcode.point import Point
 from fullcontrol.gcode.arc import Arc
 from fullcontrol.gcode.extrusion_classes import Extruder, ExtrusionGeometry, StationaryExtrusion, Retraction, Unretraction
 from fullcontrol.gcode.auxilliary_components import Fan, Hotend, Buildplate
-from fullcontrol.gcode.commands import PrinterCommand, ManualGcode, Acceleration
+from fullcontrol.gcode.commands import PrinterCommand, ManualGcode, Acceleration, Jerk, PressureAdvance
 from fullcontrol.gcode.annotations import GcodeComment
 from fullcontrol.gcode.number_format import fmt
 
@@ -166,6 +166,16 @@ def _(step: ManualGcode, state):
 @render_gcode.register
 def _(step: Acceleration, state):
     return state.flavor.acceleration(step.printing, step.retract, step.travel)
+
+
+@render_gcode.register
+def _(step: Jerk, state):
+    return state.flavor.jerk(step.x, step.y, step.z, step.e)
+
+
+@render_gcode.register
+def _(step: PressureAdvance, state):
+    return state.flavor.pressure_advance(step.value, step.tool)
 
 
 @render_gcode.register

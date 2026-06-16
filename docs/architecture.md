@@ -41,7 +41,8 @@ designs.
 - **Step classes** — `Point` (x, y, z, color), `Arc` (native G2/G3 curved move) plus
   *state* / *action* objects (`Extruder`, `Printer`, `ExtrusionGeometry`, `Fan`, `Hotend`,
   `Buildplate`, `StationaryExtrusion`, `Retraction`, `Unretraction`, `Acceleration`,
-  `ManualGcode`, `PrinterCommand`, `GcodeComment`, `PlotAnnotation`).
+  `Jerk`, `PressureAdvance`, `ManualGcode`, `PrinterCommand`, `GcodeComment`,
+  `PlotAnnotation`).
 - **State propagation** — fields left as `None` inherit the most recent value; a backend
   keeps a running tracking instance (`state.point`, `state.extruder`, ...) updated via
   `update_from`. So a `Point(x=10)` after `Point(x=0, y=0, z=0)` only changes x.

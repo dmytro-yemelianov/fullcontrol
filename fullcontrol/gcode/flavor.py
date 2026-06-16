@@ -46,6 +46,21 @@ class GcodeFlavor:
         if parts:
             return 'M204 ' + ' '.join(parts) + ' ; set acceleration'
 
+    def jerk(self, x, y, z, e) -> str | None:
+        'M205 X<j> Y<j> Z<j> E<j> (classic Marlin jerk), omitting any axis left unset.'
+        parts = [f'{tag}{fmt(v)}' for tag, v in
+                 (('X', x), ('Y', y), ('Z', z), ('E', e)) if v is not None]
+        if parts:
+            return 'M205 ' + ' '.join(parts) + ' ; set jerk'
+
+    def pressure_advance(self, value, tool) -> str | None:
+        'M900 K<factor> (Marlin Linear Advance), optionally for a specific tool.'
+        if value is None:
+            return None
+        if tool is None:
+            return f'M900 K{fmt(value)} ; set pressure advance'
+        return f'M900 T{tool} K{fmt(value)} ; set pressure advance'
+
 
 _FLAVORS = {}
 

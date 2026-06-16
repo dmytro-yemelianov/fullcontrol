@@ -124,6 +124,29 @@ class Acceleration(gc.Acceleration):
     pass
 
 
+class Jerk(gc.Jerk):
+    '''
+    Set the printer's maximum jerk (Marlin M205; firmware-specific, emitted via the gcode
+    flavor). Whichever of the x/y/z/e axis jerks (mm/s) are set are emitted.
+
+    Attributes:
+        x, y, z, e (float, optional): per-axis jerk; axes left None are omitted.
+    '''
+    pass
+
+
+class PressureAdvance(gc.PressureAdvance):
+    '''
+    Set pressure / linear advance (Marlin M900 K; firmware-specific, emitted via the gcode
+    flavor) to compensate for nozzle pressure build-up.
+
+    Attributes:
+        value (float, optional): the advance factor (K). None emits nothing.
+        tool (int, optional): optional tool number.
+    '''
+    pass
+
+
 class Printer(gc.Printer):
     '''
     A class that represents a 3D printer.
