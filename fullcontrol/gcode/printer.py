@@ -49,4 +49,4 @@ class Printer(BasePrinter):
                 or self.travel_speed != None:
             state.printer.speed_changed = True
         if self.new_command != None:
-            state.printer.command_list = {**state.printer.command_list, **self.new_command}
+            state.printer.command_list = {**(state.printer.command_list or {}), **self.new_command}

@@ -189,6 +189,6 @@ def import_design(fc_module_handle, filename: str):
     steps = []
     for step in data:
         class_ = getattr(fc_module_handle, step['type'])
-        step = class_.parse_obj(step['data'])
+        step = class_.model_validate(step['data'])
         steps.append(step)
     return steps
