@@ -1,11 +1,12 @@
 from typing import Optional
 from fullcontrol.common import Point as BasePoint
+from fullcontrol.gcode.number_format import fmt
 
 
 class Point(BasePoint):
     'Extend generic class with gcode methods to convert the object to gcode'
 
-    def XYZ_gcode(self, p) -> float:
+    def XYZ_gcode(self, p) -> str:
         '''
         Generate XYZ gcode string to move from a point p to this point.
 
@@ -18,11 +19,11 @@ class Point(BasePoint):
         '''
         s = ''
         if self.x != None and self.x != p.x:
-            s += f'X{self.x:.6f}'.rstrip('0').rstrip('.') + ' '
+            s += f'X{fmt(self.x)} '
         if self.y != None and self.y != p.y:
-            s += f'Y{self.y:.6f}'.rstrip('0').rstrip('.') + ' '
+            s += f'Y{fmt(self.y)} '
         if self.z != None and self.z != p.z:
-            s += f'Z{self.z:.6f}'.rstrip('0').rstrip('.') + ' '
+            s += f'Z{fmt(self.z)} '
         return s if s != '' else None
 
     def gcode(self, state):

@@ -21,8 +21,11 @@ def visualize(steps: list, plot_controls: PlotControls, show_tips: bool):
 
     state = State(steps, plot_controls)
     plot_data = PlotData(steps, state)
-    for step in steps:
-        step.visualize(state, plot_data, plot_controls)
+    for i, step in enumerate(steps):
+        try:
+            step.visualize(state, plot_data, plot_controls)
+        except Exception as e:
+            raise type(e)(f'error visualizing step {i} ({type(step).__name__}): {e}') from e
     plot_data.cleanup()
 
     if plot_controls.raw_data == True:

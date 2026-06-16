@@ -24,7 +24,7 @@ class GcodeComment(BaseModel):
         Returns:
             str: The generated line of Gcode.
         '''
-        if self.end_of_previous_line_text != None:
+        if self.end_of_previous_line_text != None and state.gcode:
             state.gcode[-1] += ' ; ' + self.end_of_previous_line_text
         if self.text != None:
             return '; ' + self.text

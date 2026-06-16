@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, TYPE_CHECKING
 from fullcontrol.visualize.extrusion_classes import Extruder
 from fullcontrol.visualize.bounding_box import BoundingBox
@@ -30,9 +30,9 @@ class PlotData(BaseModel):
         add_annotation(annotation: 'PlotAnnotation'): Adds an annotation to the PlotData object.
         cleanup(): Removes single-point paths from the PlotData object.
     '''
-    paths: Optional[list] = []  # list of Paths
-    bounding_box: Optional[BoundingBox] = BoundingBox()
-    annotations: Optional[list] = []
+    paths: Optional[list] = Field(default_factory=list)  # list of Paths
+    bounding_box: Optional[BoundingBox] = Field(default_factory=BoundingBox)
+    annotations: Optional[list] = Field(default_factory=list)
 
     def __init__(self, steps: list, state: 'State'):
         """

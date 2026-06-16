@@ -25,17 +25,26 @@ def gcode(steps: list, gcode_controls: GcodeControls, show_tips: bool):
 
     state = State(steps, gcode_controls)
     # need a while loop because some classes may change the length of state.steps
+    # max_iterations is a backstop against a step that endlessly appends to state.steps
+    max_iterations = len(state.steps) * 1000 + 1_000_000
     while state.i < len(state.steps):
+        step = state.steps[state.i]
         # call the gcode function of each class instance in 'steps'
-        gcode_line = state.steps[state.i].gcode(state)
+        try:
+            gcode_line = step.gcode(state)
+        except Exception as e:
+            raise type(e)(f'error generating gcode for step {state.i} ({type(step).__name__}): {e}') from e
         if gcode_line != None:
             state.gcode.append(gcode_line)
         state.i += 1
+        if state.i > max_iterations:
+            raise RuntimeError(f'gcode generation exceeded {max_iterations} steps - a step is likely appending to the step list without terminating')
     gc = '\n'.join(state.gcode)
 
     if gcode_controls.save_as != None:
         filename = gcode_controls.save_as
         filename += datetime.now().strftime("__%d-%m-%Y__%H-%M-%S.gcode") if gcode_controls.include_date == True else '.gcode'
-        open(filename, 'w').write(gc)
+        with open(filename, 'w') as f:
+            f.write(gc)
 
     return gc

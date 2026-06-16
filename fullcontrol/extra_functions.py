@@ -66,7 +66,7 @@ def relative_point(reference: Union[Point, list], x_offset: float, y_offset: flo
                 pt = reference[-(i+1)]
                 break
     if pt == None:
-        raise Exception(f'The reference object must be a Point or a list containing at least one point')
+        raise Exception('The reference object must be a Point or a list containing at least one point')
     if None in [pt.x, pt.y, pt.z]:
         raise Exception(f'The reference point must have all of x, y, z attributes defined (x={pt.x}, y={pt.y}, z={pt.z})')
     new_pt = deepcopy(pt)

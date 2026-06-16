@@ -154,6 +154,10 @@ def plot(data: PlotData, controls: PlotControls):
 
     # cicd_testing is a flag set by the CICD testing script (as a temporary environmental variable) to save the plot as a .png file
     if not cicd_testing:
+        # 'headless' lets the test harness exercise the plot path without opening a
+        # browser or requiring kaleido for image export (text-only CI runs)
+        if os.environ.get('FULLCONTROL_CICD_TESTING') == 'headless':
+            return
         fig.show()
     else:
         import plotly.io as pio
