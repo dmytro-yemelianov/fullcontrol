@@ -8,12 +8,16 @@ gcode backend here, so the same classes can be rendered by other backends too.
 """
 from functools import singledispatch
 
+# handlers are registered on the core (backend-free) data classes so that designs built from
+# core classes - e.g. by the geometry generators - render identically to ones using the
+# combined backend classes (which are subclasses and resolve to the same handlers via the MRO)
 from fullcontrol.common import Printer as CommonPrinter
 from fullcontrol.core.arc import arc_geometry
-from fullcontrol.gcode.point import Point
+from fullcontrol.core.point import Point
 from fullcontrol.gcode.arc import Arc
-from fullcontrol.gcode.extrusion_classes import Extruder, ExtrusionGeometry, StationaryExtrusion, Retraction, Unretraction
-from fullcontrol.gcode.auxilliary_components import Fan, Hotend, Buildplate
+from fullcontrol.core.extrusion_classes import Extruder, ExtrusionGeometry, StationaryExtrusion
+from fullcontrol.gcode.extrusion_classes import Retraction, Unretraction
+from fullcontrol.core.auxilliary_components import Fan, Hotend, Buildplate
 from fullcontrol.gcode.commands import PrinterCommand, ManualGcode, Acceleration, Jerk, PressureAdvance
 from fullcontrol.gcode.annotations import GcodeComment
 from fullcontrol.gcode.number_format import fmt
@@ -25,9 +29,21 @@ def render_gcode(step, state):
     return None
 
 
+def _xyz_gcode(step, prev) -> str:
+    'XYZ words to move from prev to step (only axes that are defined and changed); None if no move.'
+    s = ''
+    if step.x is not None and step.x != prev.x:
+        s += f'X{fmt(step.x)} '
+    if step.y is not None and step.y != prev.y:
+        s += f'Y{fmt(step.y)} '
+    if step.z is not None and step.z != prev.z:
+        s += f'Z{fmt(step.z)} '
+    return s if s != '' else None
+
+
 @render_gcode.register
 def _(step: Point, state):
-    XYZ_str = step.XYZ_gcode(state.point)
+    XYZ_str = _xyz_gcode(step, state.point)
     if XYZ_str is not None:  # only write a line of gcode if movement occurs
         G_str = 'G1 ' if state.extruder.on or state.extruder.travel_format == "G1_E0" else 'G0 '
         F_str = state.printer.f_gcode(state)
@@ -69,7 +85,7 @@ def _(step: CommonPrinter, state):  # covers the gcode Printer and the multiaxis
     state.printer.update_from(step)
     if step.print_speed is not None or step.travel_speed is not None:
         state.printer.speed_changed = True
-    if step.new_command is not None:
+    if getattr(step, 'new_command', None) is not None:  # new_command is a gcode-Printer field
         state.printer.command_list = {**(state.printer.command_list or {}), **step.new_command}
 
 
@@ -78,9 +94,10 @@ def _(step: Extruder, state):
     state.extruder.update_from(step)
     if step.on is not None:  # printing/moving strategy may have changed
         state.printer.speed_changed = True
-    if step.units is not None or step.dia_feed is not None:
+    # units/dia_feed/relative_gcode are gcode-Extruder fields; a core Extruder lacks them
+    if getattr(step, 'units', None) is not None or getattr(step, 'dia_feed', None) is not None:
         state.extruder.update_e_ratio()
-    if step.relative_gcode is not None:
+    if getattr(step, 'relative_gcode', None) is not None:
         state.extruder.total_volume_ref = state.extruder.total_volume
         return state.flavor.extrusion_mode(state.extruder.relative_gcode)
 

@@ -79,8 +79,10 @@ for step in state.steps:
 
 A **renderer** is a `functools.singledispatch` function with one handler per step type.
 A step with no representation for that backend falls through to the default (does
-nothing). Because dispatch is by type via the MRO, the combined user classes and the
-multiaxis subclasses both resolve to the right handler.
+nothing). Handlers are registered on the **core** data classes (`fullcontrol.core.*`), so
+dispatch resolves correctly via the MRO for the combined user classes, the multiaxis
+subclasses, *and* bare core instances — backend-free code (e.g. the geometry generators)
+can build designs from core classes that still render identically.
 
 ## Extension point 1 — a new step type
 

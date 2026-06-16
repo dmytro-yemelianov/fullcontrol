@@ -8,9 +8,11 @@ default handler and does nothing.
 from functools import singledispatch
 from math import pi
 
-from fullcontrol.visualize.point import Point
+# handlers register on the core data classes so designs built from core classes (e.g. by the
+# geometry generators) visualize identically to ones using the combined backend classes
+from fullcontrol.core.point import Point
 from fullcontrol.visualize.arc import Arc
-from fullcontrol.visualize.extrusion_classes import Extruder, ExtrusionGeometry
+from fullcontrol.core.extrusion_classes import Extruder, ExtrusionGeometry
 from fullcontrol.visualize.annotations import PlotAnnotation
 from fullcontrol.common import Point as BasePoint
 from fullcontrol.core.arc import arc_geometry, arc_points
@@ -36,8 +38,9 @@ def _(step: Point, state, plot_data, plot_controls):
     if step.z is not None and step.z != state.point.z:
         state.point.z = round(step.z, _PRECISION_XYZ)
         change_check = True
-    if step.color is not None and step.color != state.point.color:
-        state.point.color = step.color
+    color = getattr(step, 'color', None)  # color is a visualize-Point field; a core Point lacks it
+    if color is not None and color != state.point.color:
+        state.point.color = color
         change_check = True
     if change_check:
         state.point.update_color(state, plot_data, plot_controls)
