@@ -5,6 +5,13 @@ from fullcontrol.visualize.plot_data import PlotData
 from fullcontrol.visualize.controls import PlotControls
 from fullcontrol.visualize.tube_mesh import CylindersMesh, FlowTubeMesh, MeshExporter
 
+RGB_MAX = 255                      # 8-bit colour channel max for plotly 'rgb(...)' strings
+EXTRUDE_LINE_WIDTH_FACTOR = 2      # line-style preview: extruding moves drawn this much wider...
+TRAVEL_LINE_WIDTH_FACTOR = 0.5     # ...and travel moves this much narrower than line_width
+TUBE_ROUNDING_STRENGTH = 0.4       # cross-section rounding for the line-style tube preview
+BBOX_SIZE_PADDING = 0.002          # small padding so the plot's equal-axis cuboid isn't degenerate
+ANNOTATION_BOUNDARY_OFFSET = 0.001  # keep annotations off the exact bounding-box boundary
+
 
 def generate_mesh(path, linewidth_now: float, Mesh: FlowTubeMesh, sides, rounding_strength, flat_sides, colors_now: list = None):
     """
@@ -79,11 +86,11 @@ def plot(data: PlotData, controls: PlotControls):
     # generate line plots
     max_width = 0
     for path in data.paths:
-        colors_now = [f'rgb({color[0]*255:.2f}, {color[1]*255:.2f}, {color[2]*255:.2f})' for color in path.colors]
+        colors_now = [f'rgb({color[0]*RGB_MAX:.2f}, {color[1]*RGB_MAX:.2f}, {color[2]*RGB_MAX:.2f})' for color in path.colors]
         linewidth_now = controls.line_width * \
-            2 if path.extruder.on is True else controls.line_width*0.5
+            EXTRUDE_LINE_WIDTH_FACTOR if path.extruder.on is True else controls.line_width*TRAVEL_LINE_WIDTH_FACTOR
         if path.extruder.on and controls.style == 'tube':
-            sides, rounding_strength, flat_sides = controls.tube_sides, 0.4, False
+            sides, rounding_strength, flat_sides = controls.tube_sides, TUBE_ROUNDING_STRENGTH, False
             mesh = generate_mesh(path, linewidth_now, Mesh, sides, rounding_strength, flat_sides, colors_now)
             fig.add_trace(mesh.to_Mesh3d(colors=colors_now))
             max_width = max(max_width, local_max)
@@ -94,7 +101,7 @@ def plot(data: PlotData, controls: PlotControls):
     # find a bounding box, to create a plot with equally proportioned X Y Z scales (so a cuboid looks like a cuboid, not a cube)
     bounding_box_size = max(data.bounding_box.maxx-data.bounding_box.minx, data.bounding_box.maxy -
                             data.bounding_box.miny, data.bounding_box.maxz-min(0, data.bounding_box.minz))
-    bounding_box_size += 0.002
+    bounding_box_size += BBOX_SIZE_PADDING
     bounding_box_size += max_width
 
     # generate annotations
@@ -116,8 +123,7 @@ def plot(data: PlotData, controls: PlotControls):
         # make sure the bounding box is big enough for the annotations
         # the 0.001 is to make sure the annotations don't lie on the boundary
         midx, midy, midz = (getattr(data.bounding_box, f'mid{axis}') for axis in 'xyz')
-        range
-        offset = 0.001
+        offset = ANNOTATION_BOUNDARY_OFFSET
         offset_both_sides = 2 * offset
         for (x, y, z) in annotations_pts:
             if x < midx - bounding_box_size / 2 + offset:

@@ -5,6 +5,10 @@ from fullcontrol.visualize.bounding_box import BoundingBox
 from math import cos, sin, tau
 from fullcontrol.visualize.controls import PlotControls
 
+TRAVEL_COLOR = [0.75, 0.5, 0.5]      # rgb for non-extruding (travel) moves
+MIN_Z_RANGE = 1e-8                   # floor for z range to avoid divide-by-zero in z_gradient colouring
+PRINT_SEQUENCE_FLUCTUATIONS = 5      # number of colour cycles across the print for the fluctuating mode
+
 if TYPE_CHECKING:
     from fullcontrol.visualize.state import State
     from fullcontrol.visualize.plot_data import PlotData
@@ -68,13 +72,13 @@ class Point(BasePoint):
         precision_color = 3  # number of decimal places to use for colors in plot_data
 
         def travel():
-            return [0.75, 0.5, 0.5]
+            return list(TRAVEL_COLOR)
 
         def random_blue():
             return [0.1, round(random(), precision_color), 2]
 
         def z_gradient(point: Point, bounding_box: BoundingBox):
-            z_range = max(bounding_box.rangez, 0.00000001)
+            z_range = max(bounding_box.rangez, MIN_Z_RANGE)
             # round to the same number of decimal places used for xyz ('precision_xyz') to avoid numerical rounding errors causing negative or very large (not allowbale) values in plot_data
             z_min = round(bounding_box.minz, 3)
             return [0, round((point.z-z_min)/z_range, precision_color), 1]
@@ -99,7 +103,7 @@ class Point(BasePoint):
                 elif plot_controls.color_type == 'print_sequence':
                     self.color = print_sequence(state.point_count_now, state.point_count_total)
                 elif plot_controls.color_type == 'print_sequence_fluctuating':
-                    self.color = print_sequence_fluctuating(state.point_count_now, state.point_count_total, 5)
+                    self.color = print_sequence_fluctuating(state.point_count_now, state.point_count_total, PRINT_SEQUENCE_FLUCTUATIONS)
                 else:
                     raise Exception(f'colour {plot_controls.color_type} not in list of allowable color types')
             else:
