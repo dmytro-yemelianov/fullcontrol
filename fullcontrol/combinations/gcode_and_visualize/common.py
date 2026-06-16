@@ -27,8 +27,14 @@ def _run_simulation(steps, controls, show_tips):
     return simulate(steps, controls, show_tips)
 
 
+def _run_validate(steps, controls, show_tips):
+    from fullcontrol.validate.run import validate
+    return validate(steps, controls, show_tips)
+
+
 register_backend('gcode', GcodeControls, _run_gcode)
 register_backend('simulation', GcodeControls, _run_simulation)
+register_backend('validate', GcodeControls, _run_validate)
 register_backend('plot', PlotControls, _run_plot)
 
 
