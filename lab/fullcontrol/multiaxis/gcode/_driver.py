@@ -1,6 +1,9 @@
 """Shared gcode driver loop for the multiaxis backends."""
 from datetime import datetime
 
+from fullcontrol.gcode.renderers import render_gcode
+import lab.fullcontrol.multiaxis.gcode._renderers  # noqa: F401 - registers the multiaxis Point handlers
+
 
 def run_gcode(state, save_as=None):
     '''Process a pre-built multiaxis State's steps into a gcode string. If save_as is
@@ -9,7 +12,7 @@ def run_gcode(state, save_as=None):
     while state.i < len(state.steps):
         step = state.steps[state.i]
         try:
-            gcode_line = step.gcode(state)
+            gcode_line = render_gcode(step, state)
         except Exception as e:
             raise type(e)(f'error generating gcode for step {state.i} ({type(step).__name__}): {e}') from e
         if gcode_line is not None:

@@ -15,35 +15,11 @@ def _distance_forgiving(point1: Point, point2: Point) -> float:
 
 
 class ExtrusionGeometry(BaseExtrusionGeometry):
-    'Extend generic class with gcode method to convert the object to gcode'
-    def gcode(self, state):
-        '''
-        Process this instance in a list of steps supplied by the designer to generate and return a line of gcode.
-
-        Args:
-            state (State): The state object containing the extrusion geometry.
-
-        Returns:
-            str: The generated line of gcode.
-        '''
-        # update all attributes of the tracking instance with the new instance (self)
-        state.extrusion_geometry.update_from(self)
-        if self.width is not None \
-                or self.height is not None \
-                or self.diameter is not None \
-                or self.area_model is not None:
-            try:
-                state.extrusion_geometry.update_area()
-            except TypeError:
-                pass  # in case not all parameters set yet (None arithmetic)
+    'Extend generic class with the gcode-relevant area calculation'
 
 
 class StationaryExtrusion(BaseStationaryExtrusion):
-    'Extend generic class with gcode method to convert the object to gcode'
-    def gcode(self, state):
-        'process this instance in a list of steps supplied by the designer to generate and return a line of gcode'
-        state.printer.speed_changed = True
-        return f'G1 F{self.speed} E{fmt(state.extruder.get_and_update_volume(self.volume)*state.extruder.volume_to_e)}'
+    'Stationary extrusion of a set volume (gcode emission handled by the renderer)'
 
 
 class Extruder(BaseExtruder):
@@ -125,23 +101,3 @@ class Extruder(BaseExtruder):
         except TypeError:
             pass  # dia_feed not set yet (None arithmetic)
 
-    def gcode(self, state):
-        '''Process this instance in a list of steps supplied by the designer to generate and return a line of gcode.
-
-        Args:
-            state: The current state of the printer.
-
-        Returns:
-            str: The generated line of gcode.
-        '''
-        # update all attributes of the tracking instance with the new instance (self)
-        state.extruder.update_from(self)
-        # do things for each attribute that was changed by the designer. check for changes in the new Extruder (self) but calculations consider the overall current Extruder (extruder_now)
-        if self.on is not None:
-            # change in case strategy changed from printing to moving fast without extrusion
-            state.printer.speed_changed = True
-        if self.units is not None or self.dia_feed is not None:
-            state.extruder.update_e_ratio()
-        if self.relative_gcode is not None:
-            state.extruder.total_volume_ref = state.extruder.total_volume
-            return "M83 ; relative extrusion" if state.extruder.relative_gcode is True else "M82 ; absolute extrusion\nG92 E0 ; reset extrusion position to zero"

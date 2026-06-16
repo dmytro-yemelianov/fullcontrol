@@ -35,13 +35,19 @@ def test_every_visualize_step_class_is_exposed_in_combinations():
     assert not missing, f'visualize classes missing from the combinations layer: {missing}'
 
 
-def test_combined_step_classes_answer_both_gcode_and_visualize():
-    # *Controls are configuration objects, not steps in the design list, so they are
-    # not processed by the gcode/visualize loops and don't carry both render methods.
-    names = {n for n in _public_step_classes(gc) | _public_step_classes(vis)
-             if not n.endswith('Controls')}
-    assert len(names) >= 10  # guard against the discovery silently collecting nothing
+def test_every_gcode_step_class_has_a_renderer():
+    # *Controls are config, not steps; every other gcode class must have a render_gcode handler
+    from fullcontrol.gcode.renderers import render_gcode
+    default = render_gcode.dispatch(object)
+    names = {n for n in _public_step_classes(gc) if not n.endswith('Controls')}
+    assert len(names) >= 8  # guard against the discovery silently collecting nothing
+    for name in sorted(names):
+        cls = getattr(gc, name)
+        assert render_gcode.dispatch(cls) is not default, f'{name} has no gcode renderer'
+
+
+def test_every_visualize_step_class_answers_visualize():
+    names = {n for n in _public_step_classes(vis) if not n.endswith('Controls')}
     for name in sorted(names):
         cls = getattr(combined, name)
-        assert callable(getattr(cls, 'gcode', None)), f'{name}.gcode not callable'
         assert callable(getattr(cls, 'visualize', None)), f'{name}.visualize not callable'

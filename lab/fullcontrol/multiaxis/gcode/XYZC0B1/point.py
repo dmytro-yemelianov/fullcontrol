@@ -63,17 +63,3 @@ class Point(BasePoint):
         # inverse kinematics:
         system_point = model2system(model_point, state, 'b_nozzle_c_bed')
         return system_point
-
-    def gcode(self, state):
-        'process this instance in a list of steps supplied by the designer to generate and return a line of gcode'
-        self_systemXYZ = self.inverse_kinematics(state)
-        XYZBC_str = self.XYZBC_gcode(self_systemXYZ, state.point_systemXYZ)
-        if XYZBC_str is not None:  # only write a line of gcode if movement occurs
-            G_str = 'G1 ' if state.extruder.on else 'G0 '
-            F_str = state.printer.f_gcode(state)
-            E_str = state.extruder.e_gcode(self, state)
-            gcode_str = f'{G_str}{F_str}{XYZBC_str}{E_str}'
-            state.printer.speed_changed = False
-            state.point.update_from(self)
-            state.point_systemXYZ.update_from(self_systemXYZ)
-            return gcode_str.strip()  # strip the final space

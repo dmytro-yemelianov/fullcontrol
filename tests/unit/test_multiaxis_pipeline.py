@@ -40,9 +40,8 @@ def test_all_multiaxis_printers_share_base():
 
 
 def test_step_error_names_offending_step_in_multiaxis_driver():
-    class Boom:
-        def gcode(self, state):
-            raise ValueError('boom')
-    steps = [fc4.Point(x=0, y=0, z=0, b=0), fc4.Extruder(on=True), fc4.Point(x=1, y=0, z=0, b=0), Boom()]
-    with pytest.raises(Exception, match='Boom'):
+    # a registered step that raises (PrinterCommand with an unknown id -> KeyError) gets context
+    steps = [fc4.Point(x=0, y=0, z=0, b=0), fc4.Extruder(on=True),
+             fc4.Point(x=1, y=0, z=0, b=0), fc4.PrinterCommand(id='no_such_command_xyz')]
+    with pytest.raises(Exception, match='PrinterCommand'):
         fc4.transform(steps, 'gcode', fc4.GcodeControls(b_offset_z=5, initialization_data=INIT))

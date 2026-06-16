@@ -7,6 +7,7 @@ consistently, matching the already-correct Extruder.e_gcode.
 from types import SimpleNamespace
 
 from fullcontrol.gcode.extrusion_classes import StationaryExtrusion
+from fullcontrol.gcode.renderers import render_gcode
 from lab.fullcontrol.multiaxis.gcode.XYZB.point import Point as XYZBPoint
 from lab.fullcontrol.multiaxis.gcode.XYZBC.point import Point as XYZBCPoint
 from lab.fullcontrol.multiaxis.gcode.XYZC0B1.point import Point as XYZC0B1Point
@@ -22,7 +23,7 @@ def test_stationary_extrusion_small_value_not_scientific():
         printer=SimpleNamespace(speed_changed=False),
         extruder=SimpleNamespace(get_and_update_volume=lambda v: v, volume_to_e=1),
     )
-    line = StationaryExtrusion(volume=0.00001, speed=1000).gcode(state)
+    line = render_gcode(StationaryExtrusion(volume=0.00001, speed=1000), state)
     e_field = line.split()[-1]  # e.g. 'E0.00001'
     assert e_field.startswith('E')
     _numeric_part_has_no_exponent(e_field)

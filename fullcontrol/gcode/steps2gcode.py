@@ -3,6 +3,7 @@ from fullcontrol.gcode.state import State
 from fullcontrol.gcode.controls import GcodeControls
 from datetime import datetime
 from fullcontrol.gcode.tips import tips
+from fullcontrol.gcode.renderers import render_gcode
 
 
 def gcode(steps: list, gcode_controls: GcodeControls, show_tips: bool):
@@ -25,9 +26,9 @@ def gcode(steps: list, gcode_controls: GcodeControls, show_tips: bool):
     max_iterations = len(state.steps) * 1000 + 1_000_000
     while state.i < len(state.steps):
         step = state.steps[state.i]
-        # call the gcode function of each class instance in 'steps'
+        # render each step instance to a line of gcode (or None) via the gcode backend
         try:
-            gcode_line = step.gcode(state)
+            gcode_line = render_gcode(step, state)
         except Exception as e:
             raise type(e)(f'error generating gcode for step {state.i} ({type(step).__name__}): {e}') from e
         if gcode_line is not None:
