@@ -3,9 +3,9 @@ from fullcontrol.common import ExtrusionGeometry as BaseExtrusionGeometry
 from fullcontrol.common import Extruder as BaseExtruder
 from fullcontrol.common import StationaryExtrusion as BaseStationaryExtrusion
 from fullcontrol.gcode import Point
+from fullcontrol.gcode.number_format import fmt
 # from fullcontrol.geometry.measure import distance_forgiving
 from math import pi
-from pydantic import root_validator
 
 
 class ExtrusionGeometry(BaseExtrusionGeometry):
@@ -28,8 +28,8 @@ class ExtrusionGeometry(BaseExtrusionGeometry):
                 or self.area_model != None:
             try:
                 state.extrusion_geometry.update_area()
-            except:
-                pass  # in case not all parameters set yet
+            except TypeError:
+                pass  # in case not all parameters set yet (None arithmetic)
 
 
 class StationaryExtrusion(BaseStationaryExtrusion):
@@ -37,7 +37,7 @@ class StationaryExtrusion(BaseStationaryExtrusion):
     def gcode(self, state):
         'process this instance in a list of steps supplied by the designer to generate and return a line of gcode'
         state.printer.speed_changed = True
-        return f'G1 F{self.speed} E{state.extruder.get_and_update_volume(self.volume)*state.extruder.volume_to_e:.6f}'.rstrip('0').rstrip('.')
+        return f'G1 F{self.speed} E{fmt(state.extruder.get_and_update_volume(self.volume)*state.extruder.volume_to_e)}'
 
 
 class Extruder(BaseExtruder):
@@ -115,11 +115,11 @@ class Extruder(BaseExtruder):
         if self.on:
             # length = pt1.distance_to_self(pt2)
             length = distance_forgiving(point1, state.point)
-            return f'E{self.get_and_update_volume(length*state.extrusion_geometry.area)*self.volume_to_e:.6f}'.rstrip('0').rstrip('.')
+            return f'E{fmt(self.get_and_update_volume(length*state.extrusion_geometry.area)*self.volume_to_e)}'
         else:
             if state.extruder.travel_format == 'G1_E0':
                 # return 'E0' for relative extrusion or E(previous extrusion) for absolute extrusion
-                return f'E{self.get_and_update_volume(0)*self.volume_to_e:.6f}'.rstrip('0').rstrip('.')
+                return f'E{fmt(self.get_and_update_volume(0)*self.volume_to_e)}'
             else: 
                 # return nothing if travel format does not require am E value
                 return ''
@@ -131,8 +131,8 @@ class Extruder(BaseExtruder):
                 self.volume_to_e = 1
             elif self.units == "mm":
                 self.volume_to_e = 1 / (pi*(self.dia_feed/2)**2)
-        except:
-            pass
+        except TypeError:
+            pass  # dia_feed not set yet (None arithmetic)
 
     def gcode(self, state):
         '''Process this instance in a list of steps supplied by the designer to generate and return a line of gcode.

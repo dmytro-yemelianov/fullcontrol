@@ -1,5 +1,6 @@
 from typing import Optional
 from fullcontrol.common import Printer as BasePrinter
+from fullcontrol.gcode.number_format import fmt
 # from fullcontrol.common import MultitoolPrinter as BaseMultitoolPrinter
 
 
@@ -27,7 +28,7 @@ class Printer(BasePrinter):
         - The G-code string for the feedrate (F) based on the current state.
         """
         if self.speed_changed == True:
-            return f'F{self.print_speed if state.extruder.on else self.travel_speed:.1f}'.rstrip('0').rstrip('.') + ' '
+            return f'F{fmt(self.print_speed if state.extruder.on else self.travel_speed, dp=1)} '
         else:
             return ''
 

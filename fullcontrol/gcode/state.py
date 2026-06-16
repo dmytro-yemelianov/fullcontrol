@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from importlib import import_module
 
 from fullcontrol.gcode.point import Point
@@ -35,9 +35,9 @@ class State(BaseModel):
     printer: Optional[Printer] = None
     extrusion_geometry: Optional[ExtrusionGeometry] = None
     steps: Optional[list] = None
-    point: Optional[Point] = Point()
+    point: Optional[Point] = Field(default_factory=Point)
     i: Optional[int] = 0
-    gcode: Optional[list] = []
+    gcode: Optional[list] = Field(default_factory=list)
 
     def __init__(self, steps: list, gcode_controls: GcodeControls):
         """

@@ -2,7 +2,7 @@ from typing import Optional
 from pydantic import BaseModel
 from importlib import import_module
 
-from fullcontrol.common import Point, Extruder, ExtrusionGeometry
+from fullcontrol.common import Extruder, ExtrusionGeometry
 from fullcontrol.visualize.point import Point
 from fullcontrol.visualize.controls import PlotControls
 

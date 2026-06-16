@@ -1,5 +1,6 @@
 from typing import Optional
 from fullcontrol.common import Point as BasePoint
+from fullcontrol.gcode.number_format import fmt
 from copy import deepcopy
 import numpy as np
 
@@ -8,19 +9,19 @@ class Point(BasePoint):
     b: Optional[float] = None
     c: Optional[float] = None
 
-    def XYZBC_gcode(self, self_systemXYZ, p) -> float:
+    def XYZBC_gcode(self, self_systemXYZ, p) -> str:
         'generate XYZBC gcode string to move from a point p to this point. return XYZBC string'
         s = ''
         if self_systemXYZ.x != None and self_systemXYZ.x != p.x:
-            s += f'X{round(self_systemXYZ.x, 6):.6f}'.rstrip('0').rstrip('.') + ' '
+            s += f'X{fmt(round(self_systemXYZ.x, 6))} '
         if self_systemXYZ.y != None and self_systemXYZ.y != p.y:
-            s += f'Y{round(self_systemXYZ.y, 6):.6f}'.rstrip('0').rstrip('.') + ' '
+            s += f'Y{fmt(round(self_systemXYZ.y, 6))} '
         if self_systemXYZ.z != None and self_systemXYZ.z != p.z:
-            s += f'Z{round(self_systemXYZ.z, 6):.6f}'.rstrip('0').rstrip('.') + ' '
+            s += f'Z{fmt(round(self_systemXYZ.z, 6))} '
         if self_systemXYZ.b != None and self_systemXYZ.b != p.b:
-            s += f'B{round(self_systemXYZ.b, 6):.6f}'.rstrip('0').rstrip('.') + ' '
+            s += f'B{fmt(round(self_systemXYZ.b, 6))} '
         if self_systemXYZ.c != None and self_systemXYZ.c != p.c:
-            s += f'C{round(self_systemXYZ.c, 6):.6f}'.rstrip('0').rstrip('.') + ' '
+            s += f'C{fmt(round(self_systemXYZ.c, 6))} '
         return s if s != '' else None
 
     def inverse_kinematics(self, state):

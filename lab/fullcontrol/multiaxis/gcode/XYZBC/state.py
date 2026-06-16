@@ -5,7 +5,6 @@ from importlib import import_module
 # from fullcontrol.gcode.point import Point
 # from fullcontrol.gcode.printer import Printer
 from fullcontrol.gcode.extrusion_classes import ExtrusionGeometry, Extruder
-from fullcontrol.gcode.controls import GcodeControls
 from lab.fullcontrol.multiaxis.gcode.XYZBC.point import Point
 from lab.fullcontrol.multiaxis.gcode.XYZBC.printer import Printer
 from lab.fullcontrol.multiaxis.gcode.XYZBC.controls import GcodeControls
@@ -43,12 +42,12 @@ class State(BaseModel):
                         else:
                             return steps[i]
             if fully_defined:
-                raise Exception(f'No point found in steps with all of x y z b c defined')
+                raise Exception('No point found in steps with all of x y z b c defined')
             if not fully_defined:
-                raise Exception(f'No point found in steps')
+                raise Exception('No point found in steps')
 
         # the following line was edited from 3-axis gcode since 5-axis gcode is output in a simple form for now
-        initialization_data = import_module(f'fullcontrol.devices.community.singletool.generic').set_up(gcode_controls.initialization_data)
+        initialization_data = import_module('fullcontrol.devices.community.singletool.generic').set_up(gcode_controls.initialization_data)
 
         self.extruder = Extruder(
             units=initialization_data['e_units'],
