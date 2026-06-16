@@ -273,6 +273,8 @@ tip: set initial `extrusion_width` and `extrusion_height` in the initialization_
 ; Time to print!!!!!
 ; GCode created with FullControl - tell us what you're printing!
 ; info@fullcontrol.xyz or tag FullControlXYZ on Twitter/Instagram/LinkedIn/Reddit/TikTok
+M82 ; absolute extrusion
+G92 E0 ; reset extrusion position to zero
 
 ; #####
 ; ##### beginning of start procedure
@@ -319,13 +321,13 @@ x=-50.0 y=50.0 z=0.0 color=None
 ; GCode created with FullControl - tell us what you're printing!
 ; info@fullcontrol.xyz or tag FullControlXYZ on Twitter/Instagram/LinkedIn/Reddit/TikTok
 M83 ; relative extrusion
-G0 F8000 X0.0 Y0.0 Z0.0 B0.0 C0.0 ; start point
-G1 F1000 X1.0 E0.03326 ; set x=1 - since b=0 and c=0, the model x-axis is oriented the same as the system x-axis
-G1 X0.707107 Z-0.707107 B45.0 E0 ; set b=45 - this causes a change to x and z in system coordinates
-G1 X0.0 Z-1.0 B90.0 E0 ; set b=90 - although x and z change, E=0 because the nozzle stays in the same point on the model
-G1 X1.0 Z0.0 B0.0 E0 ; set b=0
-G1 X0.0 Y1.0 C90.0 E0 ; set c=90 - this causes a change to x and y in system coordinates
-G1 X-1.0 E0.03326 ; set y=1 - this causes a change to x in system coordinates since the model is rotated 90 degrees
+G0 F8000 X0 Y0 Z0 B0 C0 ; start point
+G1 F1000 X1 E0.03326 ; set x=1 - since b=0 and c=0, the model x-axis is oriented the same as the system x-axis
+G1 X0.707107 Z-0.707107 B45 E0 ; set b=45 - this causes a change to x and z in system coordinates
+G1 X0 Z-1 B90 E0 ; set b=90 - although x and z change, E=0 because the nozzle stays in the same point on the model
+G1 X1 Z0 B0 E0 ; set b=0
+G1 X0 Y1 C90 E0 ; set c=90 - this causes a change to x and y in system coordinates
+G1 X-1 E0.03326 ; set y=1 - this causes a change to x in system coordinates since the model is rotated 90 degrees
 warning: plot style is not set - defaulting to 'tube', which shows simulated printed line width and height
     - use fc.transform(..., controls=fc.PlotControls(style='tube') to disable this message or style='line' for a simpler line preview
 
@@ -334,16 +336,16 @@ tip: set initial `extrusion_width` and `extrusion_height` in the initialization_
    - `fc.transform(..., controls=fc.PlotControls(initialization_data={'extrusion_width': EW, 'extrusion_height': EH}))`
 
 final ten gcode lines:
-G1 X-0.333145 Y5.81234 Z5.07841 B-3.75323 C17983.8 E0.011812
-G1 X0.162418 Y6.09403 Z4.94632 B1.8807 C17985.6 E0.012176
-G1 X0.623722 Y6.37251 Z4.76964 B7.45026 C17987.4 E0.012226
-G1 X1.03307 Y6.6379 Z4.56255 B12.7581 C17989.2 E0.011976
-G1 X1.37914 Y6.8808 Z4.3434 B17.6159 C17991.0 E0.011459
-G1 X1.65694 Y7.09258 Z4.13186 B21.8516 C17992.8 E0.010732
-G1 X1.8667 Y7.26573 Z3.94642 B25.3146 C17994.6 E0.00988
-G1 X2.01182 Y7.39411 Z3.80254 B27.8821 C17996.4 E0.00902
-G1 X2.09675 Y7.47314 Z3.71163 B29.4627 C17998.2 E0.008302
-G1 X2.125 Y7.5 Z3.68061 B30.0 C18000.0 E0.007885
+G1 X-0.333145 Y5.812338 Z5.078415 B-3.753232 C17983.8 E0.011812
+G1 X0.162418 Y6.094035 Z4.946317 B1.880703 C17985.6 E0.012176
+G1 X0.623722 Y6.372513 Z4.769635 B7.450255 C17987.4 E0.012226
+G1 X1.033075 Y6.637903 Z4.562554 B12.758055 C17989.2 E0.011976
+G1 X1.379138 Y6.880796 Z4.343404 B17.615928 C17991 E0.011459
+G1 X1.656942 Y7.092578 Z4.131861 B21.851567 C17992.8 E0.010732
+G1 X1.866697 Y7.265732 Z3.946417 B25.314642 C17994.6 E0.00988
+G1 X2.011824 Y7.394107 Z3.80254 B27.882138 C17996.4 E0.00902
+G1 X2.096754 Y7.473136 Z3.711632 B29.462724 C17998.2 E0.008302
+G1 X2.125 Y7.5 Z3.680608 B30 C18000 E0.007885
 warning: plot style is not set - defaulting to 'tube', which shows simulated printed line width and height
     - use fc.transform(..., controls=fc.PlotControls(style='tube') to disable this message or style='line' for a simpler line preview
 
@@ -355,23 +357,23 @@ tip: set initial `extrusion_width` and `extrusion_height` in the initialization_
 ; GCode created with FullControl - tell us what you're printing!
 ; info@fullcontrol.xyz or tag FullControlXYZ on Twitter/Instagram/LinkedIn/Reddit/TikTok
 M83 ; relative extrusion
-G0 F8000 X0.0 Y0.0 Z-10.0 B90.0 C0.0
-G1 F1000 Y3.82683 Z-9.23879 E0.129775
-G1 Y7.07107 Z-7.07107 E0.129775
-G1 Y9.23879 Z-3.82683 E0.129775
-G1 Y10.0 Z-0.0 E0.129775
-G1 Y9.23879 Z3.82683 E0.129775
-G1 Y7.07107 Z7.07107 E0.129775
-G1 Y3.82683 Z9.23879 E0.129775
-G1 Y0.0 Z10.0 E0.129775
-G1 Y-3.82683 Z9.23879 E0.129775
-G1 Y-7.07107 Z7.07107 E0.129775
-G1 Y-9.23879 Z3.82683 E0.129775
-G1 Y-10.0 Z0.0 E0.129775
-G1 Y-9.23879 Z-3.82683 E0.129775
-G1 Y-7.07107 Z-7.07107 E0.129775
-G1 Y-3.82683 Z-9.23879 E0.129775
-G1 Y-0.0 Z-10.0 E0.129775
+G0 F8000 X0 Y0 Z-10 B90 C0
+G1 F1000 Y3.826834 Z-9.238795 E0.129775
+G1 Y7.071068 Z-7.071068 E0.129775
+G1 Y9.238795 Z-3.826834 E0.129775
+G1 Y10 Z-0 E0.129775
+G1 Y9.238795 Z3.826834 E0.129775
+G1 Y7.071068 Z7.071068 E0.129775
+G1 Y3.826834 Z9.238795 E0.129775
+G1 Y0 Z10 E0.129775
+G1 Y-3.826834 Z9.238795 E0.129775
+G1 Y-7.071068 Z7.071068 E0.129775
+G1 Y-9.238795 Z3.826834 E0.129775
+G1 Y-10 Z0 E0.129775
+G1 Y-9.238795 Z-3.826834 E0.129775
+G1 Y-7.071068 Z-7.071068 E0.129775
+G1 Y-3.826834 Z-9.238795 E0.129775
+G1 Y-0 Z-10 E0.129775
 warning: plot style is not set - defaulting to 'tube', which shows simulated printed line width and height
     - use fc.transform(..., controls=fc.PlotControls(style='tube') to disable this message or style='line' for a simpler line preview
 
@@ -385,24 +387,24 @@ tip: set initial `extrusion_width` and `extrusion_height` in the initialization_
 M83 ; relative extrusion
 M104 S250 ; set hotend temp and continue
 M109 S250  ; set hotend temp and wait
-G0 F8000 X10.0 Y0.0 Z0.0 B0.0 C0.0 ; start point (x=0 in the model but x=10 in gcode due to the bc_intercept being at x=10)
-G1 F1000 X11.0 E0.03326 ; set x=1 - since b=0 and c=0, the model x-axis is oriented the same as the system x-axis
-G1 X10.7071 Z-0.707107 B45.0 E0 ; set b=45 - this causes a change to x and z in system coordinates
+G0 F8000 X0 Y0 Z0 B0 C0 ; start point (x=0 in the model but x=10 in gcode due to the bc_intercept being at x=10)
+G1 F1000 X1 E0.03326 ; set x=1 - since b=0 and c=0, the model x-axis is oriented the same as the system x-axis
+G1 X3.636039 Z6.363961 B45 E0 ; set b=45 - this causes a change to x and z in system coordinates
 ; Time to print!!!!!
 ; GCode created with FullControl - tell us what you're printing!
 ; info@fullcontrol.xyz or tag FullControlXYZ on Twitter/Instagram/LinkedIn/Reddit/TikTok
 M83 ; relative extrusion
-G0 F8000 X0.0 Y0.0 Z0.0 B0.0 C0.0 ; start point
-G1 F1000 X1.0 E0.03326 ; x=1
-G1 X0.0 Y1.0 C90.0 E0 ; c=90
-G1 X-1.0 Y0.0 C180.0 E0 ; c=180
-G1 X-0.0 Y-1.0 C270.0 E0 ; c=270
-G1 Y1.0 C0.0 E0.047037 ; x=0, y=1, c=0
-G1 X-1.0 Y0.0 C90.0 E0 ; c=90
-G1 X-0.0 Y-1.0 C180.0 E0 ; c=180
-G1 X1.0 Y-0.0 C270.0 E0 ; c=270
-G1 X41.0 Z-40.0 B90.0 E0 ; b=90
-G1 X-39.0 B-90.0 E0 ; b=-90
+G0 F8000 X0 Y0 Z0 B0 C0 ; start point
+G1 F1000 X1 E0.03326 ; x=1
+G1 X0 Y1 C90 E0 ; c=90
+G1 X-1 Y0 C180 E0 ; c=180
+G1 X-0 Y-1 C270 E0 ; c=270
+G1 Y1 C0 E0.047037 ; x=0, y=1, c=0
+G1 X-1 Y0 C90 E0 ; c=90
+G1 X-0 Y-1 C180 E0 ; c=180
+G1 X1 Y-0 C270 E0 ; c=270
+G1 X41 Z-40 B90 E0 ; b=90
+G1 X-39 B-90 E0 ; b=-90
 warning: plot style is not set - defaulting to 'tube', which shows simulated printed line width and height
     - use fc.transform(..., controls=fc.PlotControls(style='tube') to disable this message or style='line' for a simpler line preview
 
@@ -414,23 +416,23 @@ tip: set initial `extrusion_width` and `extrusion_height` in the initialization_
 ; GCode created with FullControl - tell us what you're printing!
 ; info@fullcontrol.xyz or tag FullControlXYZ on Twitter/Instagram/LinkedIn/Reddit/TikTok
 M83 ; relative extrusion
-G0 F8000 X10.0 Y0.0 Z0.0 B0.0 C0.0
-G1 F1000 X9.23879 Y3.82683 E0.129775
-G1 X7.07107 Y7.07107 E0.129775
-G1 X3.82683 Y9.23879 E0.129775
-G1 X0.0 Y10.0 E0.129775
-G1 X-3.82683 Y9.23879 E0.129775
-G1 X-7.07107 Y7.07107 E0.129775
-G1 X-9.23879 Y3.82683 E0.129775
-G1 X-10.0 Y0.0 E0.129775
-G1 X-9.23879 Y-3.82683 E0.129775
-G1 X-7.07107 Y-7.07107 E0.129775
-G1 X-3.82683 Y-9.23879 E0.129775
-G1 X-0.0 Y-10.0 E0.129775
-G1 X3.82683 Y-9.23879 E0.129775
-G1 X7.07107 Y-7.07107 E0.129775
-G1 X9.23879 Y-3.82683 E0.129775
-G1 X10.0 Y-0.0 E0.129775
+G0 F8000 X10 Y0 Z0 B0 C0
+G1 F1000 X9.238795 Y3.826834 E0.129775
+G1 X7.071068 Y7.071068 E0.129775
+G1 X3.826834 Y9.238795 E0.129775
+G1 X0 Y10 E0.129775
+G1 X-3.826834 Y9.238795 E0.129775
+G1 X-7.071068 Y7.071068 E0.129775
+G1 X-9.238795 Y3.826834 E0.129775
+G1 X-10 Y0 E0.129775
+G1 X-9.238795 Y-3.826834 E0.129775
+G1 X-7.071068 Y-7.071068 E0.129775
+G1 X-3.826834 Y-9.238795 E0.129775
+G1 X-0 Y-10 E0.129775
+G1 X3.826834 Y-9.238795 E0.129775
+G1 X7.071068 Y-7.071068 E0.129775
+G1 X9.238795 Y-3.826834 E0.129775
+G1 X10 Y-0 E0.129775
 
 
 gcode with C rotation to keep nozzle directly in +X direction from bed centre:
@@ -439,33 +441,33 @@ gcode with C rotation to keep nozzle directly in +X direction from bed centre:
 ; GCode created with FullControl - tell us what you're printing!
 ; info@fullcontrol.xyz or tag FullControlXYZ on Twitter/Instagram/LinkedIn/Reddit/TikTok
 M83 ; relative extrusion
-G0 F8000 X10.0 Y0.0 Z0.0 B0.0 C-0.0
+G0 F8000 X10 Y0 Z0 B0 C-0
 G1 F1000 C-22.5 E0.129775
-G1 C-45.0 E0.129775
+G1 C-45 E0.129775
 G1 C-67.5 E0.129775
-G1 C-90.0 E0.129775
+G1 C-90 E0.129775
 G1 C-112.5 E0.129775
-G1 C-135.0 E0.129775
+G1 C-135 E0.129775
 G1 C-157.5 E0.129775
-G1 C-180.0 E0.129775
+G1 C-180 E0.129775
 G1 C-202.5 E0.129775
-G1 C-225.0 E0.129775
+G1 C-225 E0.129775
 G1 C-247.5 E0.129775
-G1 C-270.0 E0.129775
+G1 C-270 E0.129775
 G1 C-292.5 E0.129775
-G1 C-315.0 E0.129775
+G1 C-315 E0.129775
 G1 C-337.5 E0.129775
-G1 C-360.0 E0.129775
+G1 C-360 E0.129775
 ; Time to print!!!!!
 ; GCode created with FullControl - tell us what you're printing!
 ; info@fullcontrol.xyz or tag FullControlXYZ on Twitter/Instagram/LinkedIn/Reddit/TikTok
 M83 ; relative extrusion
-G0 F8000 X0.0 Y0.0 Z0.0 B0.000000 ; start point
-G1 F1000 X1.0 E0.03326 ; set x=1 - gcode for this is simple... just move in x
-G1 X40.8372 Z-23.0 B60.000000 E0 ; set b=45 - this causes a change to x and z in system coordinates
-G1 X47.0 Z-46.0 B90.000000 E0 ; set b=90 - although x and z change, the nozzle tip doesn't move (hence E=0)
-G1 Z-45.0 E0.03326 ; set z=1 - just like the x-movement above, this z-movement is simple. it's only changes to nozzle angle that affect other axes
-G1 X-45.0 B-90.000000 E0 ; set b=-90 - the print head moves to the opposite side when the nozzle rotates 180 degrees to ensure the nozzle stays at x=1
+G0 F8000 X0 Y0 Z0 B0 ; start point
+G1 F1000 X1 E0.03326 ; set x=1 - gcode for this is simple... just move in x
+G1 X40.837169 Z-23 B60 E0 ; set b=45 - this causes a change to x and z in system coordinates
+G1 X47 Z-46 B90 E0 ; set b=90 - although x and z change, the nozzle tip doesn't move (hence E=0)
+G1 Z-45 E0.03326 ; set z=1 - just like the x-movement above, this z-movement is simple. it's only changes to nozzle angle that affect other axes
+G1 X-45 B-90 E0 ; set b=-90 - the print head moves to the opposite side when the nozzle rotates 180 degrees to ensure the nozzle stays at x=1
 warning: plot style is not set - defaulting to 'tube', which shows simulated printed line width and height
     - use fc.transform(..., controls=fc.PlotControls(style='tube') to disable this message or style='line' for a simpler line preview
 
@@ -474,16 +476,16 @@ tip: set initial `extrusion_width` and `extrusion_height` in the initialization_
    - `fc.transform(..., controls=fc.PlotControls(initialization_data={'extrusion_width': EW, 'extrusion_height': EH}))`
 
 final ten gcode lines:
-G1 X126.562 Y68.5704 Z4.01133 B39.777973 E0.151447
-G1 X127.582 Y69.2205 Z3.37264 B40.825180 E0.151339
-G1 X128.49 Y69.8926 Z2.78859 B41.767898 E0.151206
-G1 X129.284 Y70.5844 Z2.26623 B42.599718 E0.151059
-G1 X129.959 Y71.2933 Z1.81199 B43.314957 E0.150911
-G1 X130.516 Y72.0168 Z1.43148 B43.908709 E0.15077
-G1 X130.952 Y72.7521 Z1.12943 B44.376882 E0.150646
-G1 X131.266 Y73.4963 Z0.909649 B44.716242 E0.150547
-G1 X131.458 Y74.2466 Z0.774902 B44.924432 E0.150479
-G1 X131.527 Y75.0 Z0.726912 B45.000000 E0.150445
+G1 X126.562441 Y68.570355 Z4.01133 B39.777973 E0.151447
+G1 X127.582361 Y69.220488 Z3.372642 B40.82518 E0.151339
+G1 X128.490383 Y69.892619 Z2.788586 B41.767898 E0.151206
+G1 X129.2835 Y70.584403 Z2.266235 B42.599718 E0.151059
+G1 X129.959298 Y71.293342 Z1.811992 B43.314957 E0.150911
+G1 X130.515887 Y72.016812 Z1.431477 B43.908709 E0.15077
+G1 X130.951829 Y72.752073 Z1.129432 B44.376882 E0.150646
+G1 X131.266076 Y73.496298 Z0.909649 B44.716242 E0.150547
+G1 X131.457911 Y74.246589 Z0.774902 B44.924432 E0.150479
+G1 X131.526912 Y75 Z0.726912 B45 E0.150445
 warning: plot style is not set - defaulting to 'tube', which shows simulated printed line width and height
     - use fc.transform(..., controls=fc.PlotControls(style='tube') to disable this message or style='line' for a simpler line preview
 
@@ -495,23 +497,23 @@ tip: set initial `extrusion_width` and `extrusion_height` in the initialization_
 ; GCode created with FullControl - tell us what you're printing!
 ; info@fullcontrol.xyz or tag FullControlXYZ on Twitter/Instagram/LinkedIn/Reddit/TikTok
 M83 ; relative extrusion
-G0 F8000 X31.2132 Y0.0 Z-8.7868 B45.000000
-G1 F1000 X30.452 Y3.82683 E0.129775
-G1 X28.2843 Y7.07107 E0.129775
-G1 X25.04 Y9.23879 E0.129775
-G1 X21.2132 Y10.0 E0.129775
-G1 X17.3864 Y9.23879 E0.129775
-G1 X14.1421 Y7.07107 E0.129775
-G1 X11.9744 Y3.82683 E0.129775
-G1 X11.2132 Y0.0 E0.129775
-G1 X11.9744 Y-3.82683 E0.129775
-G1 X14.1421 Y-7.07107 E0.129775
-G1 X17.3864 Y-9.23879 E0.129775
-G1 X21.2132 Y-10.0 E0.129775
-G1 X25.04 Y-9.23879 E0.129775
-G1 X28.2843 Y-7.07107 E0.129775
-G1 X30.452 Y-3.82683 E0.129775
-G1 X31.2132 Y-0.0 E0.129775
+G0 F8000 X31.213203 Y0 Z-8.786797 B45
+G1 F1000 X30.451999 Y3.826834 E0.129775
+G1 X28.284271 Y7.071068 E0.129775
+G1 X25.040038 Y9.238795 E0.129775
+G1 X21.213203 Y10 E0.129775
+G1 X17.386369 Y9.238795 E0.129775
+G1 X14.142136 Y7.071068 E0.129775
+G1 X11.974408 Y3.826834 E0.129775
+G1 X11.213203 Y0 E0.129775
+G1 X11.974408 Y-3.826834 E0.129775
+G1 X14.142136 Y-7.071068 E0.129775
+G1 X17.386369 Y-9.238795 E0.129775
+G1 X21.213203 Y-10 E0.129775
+G1 X25.040038 Y-9.238795 E0.129775
+G1 X28.284271 Y-7.071068 E0.129775
+G1 X30.451999 Y-3.826834 E0.129775
+G1 X31.213203 Y-0 E0.129775
 warning: plot style is not set - defaulting to 'tube', which shows simulated printed line width and height
     - use fc.transform(..., controls=fc.PlotControls(style='tube') to disable this message or style='line' for a simpler line preview
 
@@ -540,7 +542,7 @@ tip: set initial `extrusion_width` and `extrusion_height` in the initialization_
 
 yay! CONVEX function used :) please cite our CONVEX research study: https://www.researchgate.net/publication/346098541
 extrusion width varies from 0.46 to 0.72 mm
-speed varies from 1395 to 2190 mm/min, to maintain constant volumetric flow rate
+speed varies from 1395.699614378985 to 2190.801870502084 mm/min, to maintain constant volumetric flow rate
 fc.transform guidance tips are being written to screen if any potential issues are found - hide tips with fc.transform(..., show_tips=False)
 tip: set initial `extrusion_width` and `extrusion_height` in the initialization_data to ensure the preview is correct:
    - `fc.transform(..., controls=fc.PlotControls(initialization_data={'extrusion_width': EW, 'extrusion_height': EH}))`
@@ -633,17 +635,17 @@ x=60.0 y=60.0 z=0.2 color=None
 x=60.0 y=50.0 z=0.2 color=None
 check 1:
 check results:
-  step types {'Extruder', 'Point', 'Fan'}
+  step types {'Point', 'Extruder', 'Fan'}
 
 check 2 (extended steps with a list):
 check results:
-  step types {'Extruder', 'Point', 'Fan'}
+  step types {'Point', 'Extruder', 'Fan'}
 
 check 3: (appended steps with a list)
 check results:
   warning - the list of steps must be a 1D list of fullcontrol class instances, it currently includes a 'list'
   use fc.flatten() to convert it to 1D or check for accidental use of append() instead of extend()
-  step types {'list', 'Extruder', 'Point', 'Fan'}
+  step types {'Point', 'Extruder', 'list', 'Fan'}
 original steps:
 Point(x=0.0, y=0.0, z=0.0, color=None)
 [Point(x=10.0, y=10.0, z=None, color=None), ManualGcode(text='G4 P2000 ; pause for 2 seconds')]
@@ -654,7 +656,7 @@ original steps 'check':
 check results:
   warning - the list of steps must be a 1D list of fullcontrol class instances, it currently includes a 'list'
   use fc.flatten() to convert it to 1D or check for accidental use of append() instead of extend()
-  step types {'list', 'Point'}
+  step types {'Point', 'list'}
 
 flat steps:
 Point(x=0.0, y=0.0, z=0.0, color=None)
@@ -667,7 +669,7 @@ ManualGcode(text='G4 P2000 ; pause for 2 seconds')
 
 flat steps 'check':
 check results:
-  step types {'ManualGcode', 'Point'}
+  step types {'Point', 'ManualGcode'}
 first step in the design: Fan
 first point in the design (not fully defined): x=1.0 y=None z=None color=None
 first point in the design (fully defined): x=1.0 y=1.0 z=1.0 color=None
@@ -827,16 +829,16 @@ M109 S210  ; set hotend temp and wait
 ; info@fullcontrol.xyz or tag FullControlXYZ on Twitter/Instagram/LinkedIn/Reddit/TikTok 
 paths=[Path(xvals=[10.0, 30.0, 10.0], yvals=[10.0, 10.0, 10.0], zvals=[0.0, 0.5, 1.0], colors=[[0, 0.0, 1], [0, 0.5, 1], [0, 1.0, 1]], extruder=Extruder(on=True), widths=[0.4, 0.4, 0.4], heights=[0.2, 0.2, 0.2])] bounding_box=BoundingBox(minx=10.0, midx=20.0, maxx=30.0, rangex=20.0, miny=10.0, midy=10.0, maxy=10.0, rangey=0.0, minz=0.0, midz=0.5, maxz=1.0, rangez=1.0) annotations=[{'label': 'End', 'x': 10.0, 'y': 10.0, 'z': 1.0}]
 final ten gcode lines:
-G1 X-0.333145 Y5.81234 Z5.07841 B-3.75323 C17983.8 E0.011812
-G1 X0.162418 Y6.09403 Z4.94632 B1.8807 C17985.6 E0.012176
-G1 X0.623722 Y6.37251 Z4.76964 B7.45026 C17987.4 E0.012226
-G1 X1.03307 Y6.6379 Z4.56255 B12.7581 C17989.2 E0.011976
-G1 X1.37914 Y6.8808 Z4.3434 B17.6159 C17991.0 E0.011459
-G1 X1.65694 Y7.09258 Z4.13186 B21.8516 C17992.8 E0.010732
-G1 X1.8667 Y7.26573 Z3.94642 B25.3146 C17994.6 E0.00988
-G1 X2.01182 Y7.39411 Z3.80254 B27.8821 C17996.4 E0.00902
-G1 X2.09675 Y7.47314 Z3.71163 B29.4627 C17998.2 E0.008302
-G1 X2.125 Y7.5 Z3.68061 B30.0 C18000.0 E0.007885
+G1 X-0.333145 Y5.812338 Z5.078415 B-3.753232 C17983.8 E0.011812
+G1 X0.162418 Y6.094035 Z4.946317 B1.880703 C17985.6 E0.012176
+G1 X0.623722 Y6.372513 Z4.769635 B7.450255 C17987.4 E0.012226
+G1 X1.033075 Y6.637903 Z4.562554 B12.758055 C17989.2 E0.011976
+G1 X1.379138 Y6.880796 Z4.343404 B17.615928 C17991 E0.011459
+G1 X1.656942 Y7.092578 Z4.131861 B21.851567 C17992.8 E0.010732
+G1 X1.866697 Y7.265732 Z3.946417 B25.314642 C17994.6 E0.00988
+G1 X2.011824 Y7.394107 Z3.80254 B27.882138 C17996.4 E0.00902
+G1 X2.096754 Y7.473136 Z3.711632 B29.462724 C17998.2 E0.008302
+G1 X2.125 Y7.5 Z3.680608 B30 C18000 E0.007885
 warning: plot style is not set - defaulting to 'tube', which shows simulated printed line width and height
     - use fc.transform(..., controls=fc.PlotControls(style='tube') to disable this message or style='line' for a simpler line preview
 
@@ -1092,9 +1094,9 @@ tip: set initial `extrusion_width` and `extrusion_height` in the initialization_
 ; info@fullcontrol.xyz or tag FullControlXYZ on Twitter/Instagram/LinkedIn/Reddit/TikTok
 M83 ; relative extrusion
 G0 F8000 X10 Y10 Z2
-G1 F50 E5.0
+G1 F50 E5
 G0 F8000 X20
-G1 F100 E5.0
+G1 F100 E5
 warning: printer is not set - defaulting to 'generic', which does not initialize the printer with proper start gcode
    - use fc.transform(..., controls=fc.GcodeControls(printer_name='generic') to disable this message or set it to a real printer name
 
