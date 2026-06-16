@@ -33,12 +33,8 @@ def points_only(steps: list, track_xyz: bool = True) -> list:
             next_point.update_from(new_steps[i+1])
             new_steps[i+1] = next_point
         # delete initial elements prior to all of x y and z have values != None:
-        loop = True
-        while loop:
-            if new_steps[0].x == None or new_steps[0].y == None or new_steps[0].z == None:
-                del new_steps[0]
-            else:
-                loop = False
+        while new_steps and (new_steps[0].x == None or new_steps[0].y == None or new_steps[0].z == None):
+            del new_steps[0]
     return new_steps
 
 
@@ -109,6 +105,10 @@ def linspace(start: float, end: float, number_of_points: int) -> list:
     Returns:
         list: A list of number_of_points floats, including the start and end values.
     '''
+    if number_of_points <= 0:
+        return []
+    if number_of_points == 1:
+        return [start]
     return [start + float(x)/(number_of_points-1)*(end-start) for x in range(number_of_points)]
 
 

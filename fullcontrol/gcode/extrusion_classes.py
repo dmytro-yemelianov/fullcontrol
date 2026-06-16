@@ -37,7 +37,7 @@ class StationaryExtrusion(BaseStationaryExtrusion):
     def gcode(self, state):
         'process this instance in a list of steps supplied by the designer to generate and return a line of gcode'
         state.printer.speed_changed = True
-        return f'G1 F{self.speed} E{state.extruder.get_and_update_volume(self.volume)*state.extruder.volume_to_e:.6}'
+        return f'G1 F{self.speed} E{state.extruder.get_and_update_volume(self.volume)*state.extruder.volume_to_e:.6f}'.rstrip('0').rstrip('.')
 
 
 class Extruder(BaseExtruder):

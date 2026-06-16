@@ -11,6 +11,14 @@ import plotly.graph_objects as go
 import numpy as np
 
 
+def _safe_row_norm(vectors):
+    '''Row-wise L2 norm with zero entries replaced by 1, so dividing by it leaves
+    zero-length vectors as zero instead of producing NaN/inf (e.g. when successive
+    path points coincide and a segment has zero length).'''
+    norm = np.linalg.norm(vectors, axis=1, keepdims=True)
+    return np.where(norm == 0, 1, norm)
+
+
 class MeshExporter:
     def __init__(self, metadata: dict | None = None,
                  bodies: list | None = None):
@@ -206,9 +214,9 @@ class TubeMesh(MeshExporter):
         # Determine path-aligned point offsets from normal vectors
         sway_offsets, heave_offsets = self.calculate_normals(corner_tangents)
         # Normalise, then scale by user-specified dimensions
-        sway_offsets /= np.linalg.norm(sway_offsets, axis=1, keepdims=True)
+        sway_offsets /= _safe_row_norm(sway_offsets)
         sway_offsets *= self.radial_widths
-        heave_offsets /= np.linalg.norm(heave_offsets, axis=1, keepdims=True)
+        heave_offsets /= _safe_row_norm(heave_offsets)
         heave_offsets *= self.radial_heights
 
         point_offsets = self.calculate_point_offsets(sway_offsets, heave_offsets)
@@ -298,7 +306,7 @@ class TubeMesh(MeshExporter):
         # Set the last point to have the same direction as its segment
         corner_tangents[-1] = corner_tangents[-2]
         # Normalise directions to avoid tangents being scaled by segment lengths
-        corner_tangents /= np.linalg.norm(corner_tangents, axis=1, keepdims=True)
+        corner_tangents /= _safe_row_norm(corner_tangents)
         # Convert into path-oriented corner tangent vectors
         corner_tangents[1:-1] += corner_tangents[0:-2]
         return corner_tangents

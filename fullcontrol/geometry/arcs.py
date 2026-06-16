@@ -83,11 +83,10 @@ def arcXY_3pt(pt1: Point, pt2: Point, pt3: Point, segments: int = 100) -> list:
     mid_angle = atan2(pt2.y - centre.y, pt2.x - centre.x)
     end_angle = atan2(pt3.y - centre.y, pt3.x - centre.x)
     
-    # Normalize angles and determine direction
-    for angle in [start_angle, mid_angle, end_angle]:
-        while angle < 0: angle += 2*pi
-        while angle >= 2*pi: angle -= 2*pi
-    
+    # Normalize angles to [0, 2*pi) so the direction/sweep logic below is valid
+    # (atan2 returns [-pi, pi], which breaks the comparisons when points wrap past pi)
+    start_angle, mid_angle, end_angle = (a % (2*pi) for a in (start_angle, mid_angle, end_angle))
+
     # Determine arc direction and angle
     ccw = (mid_angle > start_angle and mid_angle < end_angle) or (start_angle > end_angle and (mid_angle > start_angle or mid_angle < end_angle))
     arc_angle = end_angle - start_angle if ccw else -(2*pi - (end_angle - start_angle))
