@@ -27,6 +27,11 @@ def _xyz(vec):
     return [np.nan if c is None else c for c in vec]
 
 
+def _nan(v):
+    'A scalar, mapping None -> NaN (so an undefined width/height becomes a float column entry).'
+    return np.nan if v is None else v
+
+
 @dataclass
 class ColumnarToolpath:
     '''Struct-of-arrays view of a Toolpath's Segments (one row per Segment, in event order),
@@ -41,6 +46,8 @@ class ColumnarToolpath:
     source_index: np.ndarray     # (N,) int64
     material_volume: float       # total deposited_volume of stationary MaterialEvents
     material_filament: float     # total filament_length of stationary MaterialEvents
+    width: np.ndarray            # (N,) float64 - extrusion width in effect (NaN if undefined)
+    height: np.ndarray           # (N,) float64 - extrusion height in effect (NaN if undefined)
 
     @property
     def n_segments(self) -> int:
@@ -48,7 +55,7 @@ class ColumnarToolpath:
 
     @classmethod
     def from_lists(cls, sx, sy, sz, ex, ey, ez, travel, speed, length, vol, fil, src,
-                   material_volume, material_filament) -> 'ColumnarToolpath':
+                   material_volume, material_filament, width, height) -> 'ColumnarToolpath':
         'Pack per-segment column lists (built during a resolve walk) into a ColumnarToolpath.'
         start = np.column_stack([np.array(sx, dtype=np.float64), np.array(sy, dtype=np.float64),
                                  np.array(sz, dtype=np.float64)]) if sx else np.empty((0, 3))
@@ -57,7 +64,8 @@ class ColumnarToolpath:
         return cls(start, end, np.array(travel, dtype=bool), np.array(speed, dtype=np.float64),
                    np.array(length, dtype=np.float64), np.array(vol, dtype=np.float64),
                    np.array(fil, dtype=np.float64), np.array(src, dtype=np.int64),
-                   float(material_volume), float(material_filament))
+                   float(material_volume), float(material_filament),
+                   np.array(width, dtype=np.float64), np.array(height, dtype=np.float64))
 
     @classmethod
     def from_toolpath(cls, toolpath: Toolpath) -> 'ColumnarToolpath':
@@ -73,6 +81,8 @@ class ColumnarToolpath:
         deposited_volume = np.empty(n, dtype=np.float64)
         filament_length = np.empty(n, dtype=np.float64)
         source_index = np.empty(n, dtype=np.int64)
+        width = np.empty(n, dtype=np.float64)
+        height = np.empty(n, dtype=np.float64)
         for i, s in enumerate(segs):
             start[i] = _xyz(s.start)
             end[i] = _xyz(s.end)
@@ -82,31 +92,44 @@ class ColumnarToolpath:
             deposited_volume[i] = s.deposited_volume
             filament_length[i] = s.filament_length
             source_index[i] = s.source_index
+            width[i] = np.nan if s.width is None else s.width
+            height[i] = np.nan if s.height is None else s.height
         return cls(start, end, travel, speed, length, deposited_volume, filament_length,
-                   source_index, float(material_volume), float(material_filament))
+                   source_index, float(material_volume), float(material_filament), width, height)
 
 
-def resolve_columnar(steps, controls, include_procedures=True, initial_extruder_on=None) -> ColumnarToolpath:
+def resolve_columnar(steps, controls, include_procedures=True, initial_extruder_on=None,
+                     state=None) -> ColumnarToolpath:
     '''A columnar resolve: the same sequential state-walk as `ir.resolve`, but writing each move's
     scalars straight into column lists instead of constructing a frozen `Segment` per move. That
-    skips ~N object allocations, making it ~2x faster to resolve and feeding `simulate_columnar`
-    directly for a ~2.7x faster end-to-end simulate.
+    skips ~N object allocations, making it ~2x faster to resolve and feeding `simulate_columnar` /
+    the vectorised validate checks directly for a ~2.7x faster end-to-end pass.
 
-    It deliberately handles only what an analytic (metrics) fold needs - moves, their resolved
-    speed/length/material, and the totals of stationary extrusion. It does NOT carry arc tessellation,
-    colours, pass-through ordering or optimisation passes, so it is not a drop-in for the gcode/plot
-    backends; those keep the object IR. `test_columnar.py` pins this walk field-by-field to the
-    canonical `resolve` so the two can never silently diverge.
+    It deliberately handles only what an analytic fold needs - moves, their resolved
+    speed/length/material/geometry, and the totals of stationary extrusion. It does NOT carry arc
+    tessellation, colours, pass-through ordering or optimisation passes, so it is not a drop-in for
+    the gcode/plot backends; those keep the object IR. `test_columnar.py` pins this walk
+    field-by-field to the canonical `resolve` so the two can never silently diverge.
+
+    `state` mirrors `resolve`: a caller's already-built gcode `State` to reuse (its resolved step
+    list is shared; the small running context is copied so the caller's State is left untouched).
     '''
     from fullcontrol.gcode.state import State
     controls.initialize()
-    ctx = State(steps, controls, procedures=include_procedures)
+    if state is None:
+        ctx = State(steps, controls, procedures=include_procedures)
+    else:
+        from copy import deepcopy
+        from types import SimpleNamespace
+        ctx = SimpleNamespace(point=deepcopy(state.point), extruder=deepcopy(state.extruder),
+                              printer=deepcopy(state.printer),
+                              extrusion_geometry=deepcopy(state.extrusion_geometry), steps=state.steps)
     if initial_extruder_on is not None:
         ctx.extruder.on = initial_extruder_on
     walk = ctx.steps if include_procedures else steps
 
     sx, sy, sz, ex, ey, ez = [], [], [], [], [], []
-    travel, speed, length, vol, fil, src = [], [], [], [], [], []
+    travel, speed, length, vol, fil, src, wid, hgt = [], [], [], [], [], [], [], []
     mat_vol = mat_fil = 0.0
 
     for i, step in enumerate(walk):
@@ -120,6 +143,7 @@ def resolve_columnar(steps, controls, include_procedures=True, initial_extruder_
             ex.append(ctx.point.x); ey.append(ctx.point.y); ez.append(ctx.point.z)
             travel.append(not on); speed.append(spd); length.append(geom.arc_length)
             vol.append(v); fil.append(v * (ctx.extruder.volume_to_e or 0.0)); src.append(i)
+            wid.append(_nan(ctx.extrusion_geometry.width)); hgt.append(_nan(ctx.extrusion_geometry.height))
         elif isinstance(step, Point):
             x0, y0, z0 = ctx.point.x, ctx.point.y, ctx.point.z
             dx = 0.0 if x0 is None or step.x is None else step.x - x0
@@ -136,6 +160,7 @@ def resolve_columnar(steps, controls, include_procedures=True, initial_extruder_
                 ex.append(x1); ey.append(y1); ez.append(z1)
                 travel.append(not on); speed.append(spd); length.append(ln)
                 vol.append(v); fil.append(v * (ctx.extruder.volume_to_e or 0.0)); src.append(i)
+                wid.append(_nan(ctx.extrusion_geometry.width)); hgt.append(_nan(ctx.extrusion_geometry.height))
         elif isinstance(step, StationaryExtrusion):
             mat_vol += step.volume
             mat_fil += step.volume * (ctx.extruder.volume_to_e or 0.0)
@@ -153,4 +178,4 @@ def resolve_columnar(steps, controls, include_procedures=True, initial_extruder_
             ctx.printer.update_from(step)
 
     return ColumnarToolpath.from_lists(sx, sy, sz, ex, ey, ez, travel, speed, length,
-                                       vol, fil, src, mat_vol, mat_fil)
+                                       vol, fil, src, mat_vol, mat_fil, wid, hgt)

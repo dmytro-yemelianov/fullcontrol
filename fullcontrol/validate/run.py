@@ -4,6 +4,8 @@ A fast, best-effort safety pass over the resolved gcode step list: out-of-bounds
 sub-zero Z, and likely cold extrusion. It reuses the gcode State so it sees the real
 coordinates (including the printer's start/end procedures and primer).
 """
+import numpy as np
+
 from fullcontrol.core.point import Point
 from fullcontrol.core.extrusion_classes import Extruder
 from fullcontrol.core.auxilliary_components import Hotend, Buildplate
@@ -26,20 +28,26 @@ def _xy_distance(a: Point, b: Point) -> float:
     return ((a.x - b.x) ** 2 + (a.y - b.y) ** 2) ** 0.5
 
 
+def _reported(v):
+    'A column scalar for a message: NaN (undefined axis/geometry) -> None, else a plain float.'
+    return None if np.isnan(v) else float(v)
+
+
 def validate(steps, controls, show_tips=True) -> ValidationResult:
     from fullcontrol.gcode.state import State
     from fullcontrol.gcode.import_printer import resolve_initialization_data
-    from fullcontrol.ir import resolve, Segment
+    from fullcontrol.ir.columnar import resolve_columnar
     controls.initialize()
     init = resolve_initialization_data(controls.printer_name, controls.initialization_data)
     state = State(steps, controls)
-    # geometric checks consume the resolved Toolpath IR (one shared resolve pass, reusing the
-    # State just built); config / ordering checks still walk the resolved step list
-    segments = [e for e in resolve(steps, controls, state=state).events if isinstance(e, Segment)]
+    # geometric checks fold over the resolved Toolpath as numpy columns (one shared columnar
+    # resolve, reusing the State just built - no per-Segment objects); config / ordering checks
+    # still walk the resolved step list
+    col = resolve_columnar(steps, controls, state=state)
     result = ValidationResult()
-    _check_bounds(segments, init, result)
-    _check_first_layer(segments, result)
-    _check_extrusion_geometry(segments, result)
+    _check_bounds(col, init, result)
+    _check_first_layer(col, result)
+    _check_extrusion_geometry(col, result)
     _check_cold_extrusion(state.steps, init, result)
     _check_temperatures(state.steps, result)
     _check_speeds(state.steps, init, result)
@@ -48,29 +56,23 @@ def validate(steps, controls, show_tips=True) -> ValidationResult:
     return result
 
 
-def _check_bounds(segments, init, result):
-    'Out-of-bounds and negative-z, over the resolved move endpoints.'
+def _check_bounds(col, init, result):
+    'Out-of-bounds and negative-z, vectorised over the resolved move endpoints.'
     bx, by, bz = init.get('build_volume_x'), init.get('build_volume_y'), init.get('build_volume_z')
     if not (bx and by and bz):
         result.add('info', 'build volume not defined for this printer - out-of-bounds check skipped '
                            "(pass initialization_data={'build_volume_x':.., 'build_volume_y':.., 'build_volume_z':..})")
         return
-    n_out = n_subzero_z = 0
-    first_out = None
-    for seg in segments:
-        x, y, z = seg.end
-        outside = ((x is not None and not (0 <= x <= bx)) or
-                   (y is not None and not (0 <= y <= by)) or
-                   (z is not None and not (0 <= z <= bz)))
-        if outside:
-            n_out += 1
-            if first_out is None:
-                first_out = (x, y, z)
-        if z is not None and z < 0:
-            n_subzero_z += 1
+    x, y, z = col.end[:, 0], col.end[:, 1], col.end[:, 2]  # NaN where an axis is undefined
+    outside = ((~np.isnan(x) & ((x < 0) | (x > bx))) |
+               (~np.isnan(y) & ((y < 0) | (y > by))) |
+               (~np.isnan(z) & ((z < 0) | (z > bz))))
+    n_out = int(outside.sum())
+    n_subzero_z = int((~np.isnan(z) & (z < 0)).sum())
     if n_out:
+        idx = int(np.argmax(outside))  # first offending endpoint, in move order
         result.add('error', f'{n_out} point(s) outside the build volume ({bx}x{by}x{bz}); '
-                            f'first at (x={first_out[0]}, y={first_out[1]}, z={first_out[2]})')
+                            f'first at (x={_reported(x[idx])}, y={_reported(y[idx])}, z={_reported(z[idx])})')
     if n_subzero_z:
         result.add('warning', f'{n_subzero_z} point(s) have negative z (below the bed)')
 
@@ -103,14 +105,15 @@ def _check_speeds(steps, init, result):
             result.add('warning', f'speed {speed} mm/min is implausibly fast (> {MAX_FEEDRATE_MM_MIN} mm/min)')
 
 
-def _check_first_layer(segments, result):
+def _check_first_layer(col, result):
     'Warn if the first extruding move happens at or below z=0 (nozzle on/under the bed).'
-    for seg in segments:
-        if not seg.travel:  # first extruding move
-            z = seg.end[2]
-            if z is not None and z <= 0:
-                result.add('warning', f'first extrusion move is at z={z} (<= 0) - nozzle may be at or below the bed')
-            return
+    extruding = ~col.travel
+    if not extruding.any():
+        return
+    idx = int(np.argmax(extruding))  # first extruding move
+    z = col.end[idx, 2]
+    if not np.isnan(z) and z <= 0:
+        result.add('warning', f'first extrusion move is at z={_reported(z)} (<= 0) - nozzle may be at or below the bed')
 
 
 def _check_retraction_balance(steps, init, result):
@@ -128,15 +131,16 @@ def _check_retraction_balance(steps, init, result):
                               '(more Retraction than Unretraction) - may ooze or under-extrude on the next print')
 
 
-def _check_extrusion_geometry(segments, result):
+def _check_extrusion_geometry(col, result):
     'Warn if the first extruding move happens with a zero/undefined extrusion cross-section.'
-    for seg in segments:
-        if not seg.travel:  # first extruding move
-            w, h = seg.width, seg.height
-            if not (w and h and w > 0 and h > 0):
-                result.add('warning', 'extruding with a zero/undefined extrusion geometry '
-                                      f'(width={w}, height={h}) - no material will be extruded')
-            return
+    extruding = ~col.travel
+    if not extruding.any():
+        return
+    idx = int(np.argmax(extruding))  # first extruding move
+    w, h = _reported(col.width[idx]), _reported(col.height[idx])
+    if not (w and h and w > 0 and h > 0):
+        result.add('warning', 'extruding with a zero/undefined extrusion geometry '
+                              f'(width={w}, height={h}) - no material will be extruded')
 
 
 def _check_stringing(steps, result):
