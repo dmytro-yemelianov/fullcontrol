@@ -28,6 +28,18 @@ real print (time/material > 0), and validates with no errors against a 200³ bui
 | **gyroid_infill** *(new)* | continuous gyroid-TPMS weave | one seamless bead (zero travels/retractions) — per-layer sine serpentine whose phase shears with z and whose direction alternates each layer, interlocking like a gyroid | ~10k segs, ~9 min |
 | **twisted_polygon_vase** *(new)* | rotating / morphing polygon cross-section | a regular n-gon cross-section that twists with height and can morph to a different vertex count (e.g. pentagon → octagon), as one continuous spiral | ~21k segs @40mm |
 
+### Export: self-contained 3D viewer (`result_type='3d_html'`)
+```python
+html = fc.transform(steps, '3d_html', fc.PlotControls(color_type='z_gradient',
+       initialization_data={'save_as': 'design', 'title': 'My Vase'}), show_tips=False)
+```
+Resolves the design to the same `PlotData` the Plotly preview uses, then writes a **single
+self-contained HTML file**: an interactive WebGL viewer (three.js from a pinned CDN via importmap)
+with orbit controls, the toolpath as vertex-coloured lines (travels dimmed), a bed grid and an info
+overlay. The geometry is embedded in the page, so the file opens in any browser and can be shared as
+one document. `save_as` (via `initialization_data`) writes `<name>.html`; the runner also returns the
+HTML string.
+
 ### Analysis tool (not a printable design)
 **`print_time_study.sweep(design_fn, param, values, **fixed)`** simulates a design once per
 parameter value and returns the metrics; `study_table()` formats them and `study_figure()` returns a
