@@ -6,6 +6,7 @@
 //!   - `python` (default): a PyO3 extension module (built by maturin / `pip install ./rust_kernel`),
 //!   - `wasm`: a wasm-bindgen module for the browser (same core, exposed to JavaScript).
 
+mod gcode;
 mod metrics;
 mod walk;
 
