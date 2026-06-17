@@ -27,6 +27,7 @@ real print (time/material > 0), and validates with no errors against a 200³ bui
 | **wave_bowl** *(new)* | curved wall profile + ramped rim wave | combines a flaring `sin` wall profile with a rim ripple whose amplitude grows as height² — clean base, wavy lip | ~13.3k segs, ~10 min |
 | **gyroid_infill** *(new)* | continuous gyroid-TPMS weave | one seamless bead (zero travels/retractions) — per-layer sine serpentine whose phase shears with z and whose direction alternates each layer, interlocking like a gyroid | ~10k segs, ~9 min |
 | **twisted_polygon_vase** *(new)* | rotating / morphing polygon cross-section | a regular n-gon cross-section that twists with height and can morph to a different vertex count (e.g. pentagon → octagon), as one continuous spiral | ~21k segs @40mm |
+| **helical_screw** *(new)* | helical thread / auger | a rod whose wall carries a triangular thread whose phase advances with angle *and* height (`starts` / `pitch` / `thread_depth`, optional tapering core); shallow = screw, deep+coarse = auger — one seamless spiral | ~26k segs @40mm |
 
 ### Export: self-contained 3D viewer (`result_type='3d_html'`)
 ```python
@@ -77,7 +78,8 @@ library gap worth closing first.
   approximating a gyroid surface; the poster-child for "impossible to slice" designs.
 - ✅ **Twisted polygon vase** — *done* (`twisted_polygon_vase`): an n-gon cross-section that twists
   with height and can morph to a different vertex count (pentagon→octagon).
-- **Helical screw / auger** — a flighting surface as a spiral ramp; tests steep-overhang printing.
+- ✅ **Helical screw / auger** — *done* (`helical_screw`): a helical thread (screw → auger via
+  depth/pitch/taper); the steeper the thread, the more overhang it tests.
 - **Möbius strip / trefoil band** — a closed non-planar ribbon (parametric centre-line + width).
 - **Lattice cylinder** — diagonal helices in both directions forming a printable diamond lattice
   (generalises `star_polygon_lattice`).
