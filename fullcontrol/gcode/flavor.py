@@ -98,6 +98,31 @@ class KlipperFlavor(GcodeFlavor):
         return f'SET_VELOCITY_LIMIT SQUARE_CORNER_VELOCITY={fmt(scv)}'
 
 
+MIN_PER_SEC = 60  # RepRapFirmware M566 jerk is in mm/min; FullControl's Jerk step is mm/s
+
+
+class DuetFlavor(GcodeFlavor):
+    '''RepRapFirmware (Duet). The standard M-codes for temps/fan/extrusion-mode/acceleration
+    (M104/M109/M140/M190, M106/M107, M82/M83, M204) are accepted by RRF and inherited from the
+    Marlin default. Only jerk and pressure advance use RRF-specific commands/units.'''
+    name = 'duet'
+
+    def jerk(self, x, y, z, e) -> str | None:
+        '''M566 X<j> Y<j> Z<j> E<j> (maximum instantaneous speed change), omitting any axis left
+        unset. RRF expects mm/min whereas the FullControl Jerk step is mm/s, so multiply by 60.'''
+        parts = [f'{tag}{fmt(v * MIN_PER_SEC)}' for tag, v in
+                 (('X', x), ('Y', y), ('Z', z), ('E', e)) if v is not None]
+        if parts:
+            return 'M566 ' + ' '.join(parts) + ' ; set jerk (max instantaneous speed change)'
+
+    def pressure_advance(self, value, tool) -> str | None:
+        'M572 D<drive> S<value> (pressure advance for a drive); default drive 0 when no tool given.'
+        if value is None:
+            return None
+        drive = tool if tool is not None else 0
+        return f'M572 D{drive} S{fmt(value)} ; set pressure advance'
+
+
 _FLAVORS = {}
 
 
@@ -117,3 +142,5 @@ def get_flavor(name: str) -> GcodeFlavor:
 
 register_flavor('marlin', GcodeFlavor)
 register_flavor('klipper', KlipperFlavor)
+register_flavor('duet', DuetFlavor)
+register_flavor('reprapfirmware', DuetFlavor)
