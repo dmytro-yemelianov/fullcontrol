@@ -28,6 +28,7 @@ real print (time/material > 0), and validates with no errors against a 200³ bui
 | **gyroid_infill** *(new)* | continuous gyroid-TPMS weave | one seamless bead (zero travels/retractions) — per-layer sine serpentine whose phase shears with z and whose direction alternates each layer, interlocking like a gyroid | ~10k segs, ~9 min |
 | **twisted_polygon_vase** *(new)* | rotating / morphing polygon cross-section | a regular n-gon cross-section that twists with height and can morph to a different vertex count (e.g. pentagon → octagon), as one continuous spiral | ~21k segs @40mm |
 | **helical_screw** *(new)* | helical thread / auger | a rod whose wall carries a triangular thread whose phase advances with angle *and* height (`starts` / `pitch` / `thread_depth`, optional tapering core); shallow = screw, deep+coarse = auger — one seamless spiral | ~26k segs @40mm |
+| **textured_cone** *(new)* | flat texture wrapped on a surface of revolution | built on the reusable `revolve(profile, texture, …)` helper — a tapering cone carrying an egg-crate diamond grid; pass your own `profile`/`texture` lambdas to wrap any 2-D pattern onto a cone/cylinder/barrel | ~23k segs @35mm |
 
 ### Export: self-contained 3D viewer (`result_type='3d_html'`)
 ```python
@@ -101,9 +102,9 @@ library gap worth closing first.
   tool-change story than the current `T0`/`T1` manual gcode.)*
 - **Sequenced multi-object plate** — N copies with per-object purge, laid out on a grid. *(uses
   `fc.move(copy=True)`; pairs well with a future travel-reordering pass.)*
-- **Conical / cylindrical non-planar mapping** — wrap a flat pattern onto a cone or cylinder via a
-  reusable coordinate transform. *(needs: a `geometry` transform helper — generalises what
-  `nonplanar_spacer` does by hand.)*
+- ✅ **Conical / cylindrical non-planar mapping** — *done* (`revolve` + `textured_cone`): wrap any
+  2-D `texture(around, up)` onto any `profile(height)` surface of revolution; generalises the
+  hand-rolled radial maths in `nonplanar_spacer`/the vases.
 
 ### D. Backend-showcase designs
 - ✅ **Print-time/material study** — *done* (`print_time_study`): one shape swept over a parameter,
