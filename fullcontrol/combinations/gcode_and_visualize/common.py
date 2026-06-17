@@ -32,10 +32,16 @@ def _run_validate(steps, controls, show_tips):
     return validate(steps, controls, show_tips)
 
 
+def _run_3d_html(steps, controls, show_tips):
+    from fullcontrol.visualize.threejs import export_html
+    return export_html(steps, controls, show_tips)
+
+
 register_backend('gcode', GcodeControls, _run_gcode)
 register_backend('simulation', GcodeControls, _run_simulation)
 register_backend('validate', GcodeControls, _run_validate)
 register_backend('plot', PlotControls, _run_plot)
+register_backend('3d_html', PlotControls, _run_3d_html)
 
 
 def transform(steps: list, result_type: str, controls: GcodeControls | PlotControls = None, show_tips: bool = True):
