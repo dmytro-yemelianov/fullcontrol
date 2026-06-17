@@ -11,7 +11,7 @@ import fullcontrol as fc
 from fullcontrol.core.point import Point  # geometry helpers return core Points (fc.Point subclasses it)
 from examples import (GALLERY, spiral_vase, ripple_vase, nonplanar_spacer, wave_bowl,
                       twisted_polygon_vase, helical_screw, textured_cone, revolve, mobius_band,
-                      trefoil_tube, towers_grid, optimization_report)
+                      trefoil_tube, towers_grid, optimization_report, snake_lattice)
 
 _BUILD = {'nozzle_temp': 210, 'bed_temp': 40, 'primer': 'front_lines_then_y',
           'build_volume_x': 200, 'build_volume_y': 200, 'build_volume_z': 200}
@@ -29,6 +29,7 @@ _SMALL = {
     'mobius_band': lambda: mobius_band(loop_segments=60, strokes_across=6),
     'trefoil_tube': lambda: trefoil_tube(tube_turns=16, cross_points=12),
     'towers_grid': lambda: towers_grid(rows=2, cols=2, layers=3),
+    'snake_lattice': lambda: snake_lattice(height=12, bays=6, points_per_bay=8),
 }
 
 
@@ -64,7 +65,7 @@ def test_design_validates_without_errors(name):
 def test_gallery_registry_matches_callables():
     assert set(GALLERY) == {'spiral_vase', 'ripple_vase', 'nonplanar_spacer', 'wave_bowl',
                             'gyroid_infill', 'twisted_polygon_vase', 'helical_screw', 'textured_cone',
-                            'mobius_band', 'trefoil_tube', 'towers_grid'}
+                            'mobius_band', 'trefoil_tube', 'towers_grid', 'snake_lattice'}
     for fn in GALLERY.values():
         assert callable(fn)
 
@@ -176,6 +177,23 @@ def test_mobius_band_has_a_half_twist_and_forms_a_loop():
     assert z_range(pts[mid:mid + stroke]) > 8.0              # u=pi: band stands vertical (~width 9)
     radii = [math.hypot(p.x - 50, p.y - 50) for p in pts]
     assert min(radii) < 18 and max(radii) > 22              # a loop of radius ~20 (± width/2)
+
+
+def test_snake_lattice_is_an_open_cylinder_mesh():
+    'Every point on the cylinder wall, and each course z zig-zags by ~course_height (the open mesh).'
+    ch, bays, ppb, R = 4.0, 6, 12, 20
+    steps = snake_lattice(radius=R, height=24, bays=bays, course_height=ch, points_per_bay=ppb,
+                          centre=(50, 50))
+    pts = [s for s in steps if isinstance(s, Point)]
+    for p in pts:
+        assert abs(((p.x - 50) ** 2 + (p.y - 50) ** 2) ** 0.5 - R) < 1e-9   # on the cylinder
+    per_course = bays * ppb + 1
+    first = pts[:per_course]
+    assert abs((max(p.z for p in first) - min(p.z for p in first)) - ch) < 1e-6  # in-course zig-zag
+    # the zig-zag has `bays` peaks around one course
+    zs = [p.z for p in first]
+    peaks = sum(1 for i in range(1, len(zs) - 1) if zs[i] > zs[i - 1] and zs[i] >= zs[i + 1])
+    assert peaks == bays
 
 
 def test_optimization_passes_shrink_segments_and_insert_retractions():
