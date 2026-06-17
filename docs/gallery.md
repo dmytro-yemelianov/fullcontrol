@@ -31,6 +31,7 @@ real print (time/material > 0), and validates with no errors against a 200³ bui
 | **textured_cone** *(new)* | flat texture wrapped on a surface of revolution | built on the reusable `revolve(profile, texture, …)` helper — a tapering cone carrying an egg-crate diamond grid; pass your own `profile`/`texture` lambdas to wrap any 2-D pattern onto a cone/cylinder/barrel | ~23k segs @35mm |
 | **mobius_band** *(new)* | parametric non-planar art | the classic Möbius surface (one half-twist, one side, one edge); a boustrophedon rasters the twisting ribbon as one continuous bead. *Needs support to print* — an art / visualisation piece | ~7k segs |
 | **trefoil_tube** *(new)* | swept knot tube | a single-wall tube spiralled along a trefoil-knot centre-line via a Z-up frame (no Frenet twist); one continuous helical bead that closes on itself. *Needs support* — an art piece | ~9.6k segs |
+| **towers_grid** *(new)* | travel-heavy multi-part print | a grid of separate square-wall towers with extruder-off hops between them and subdivided collinear edges — built to exercise the IR→IR **optimization passes** (see below) | varies |
 
 ### Export: self-contained 3D viewer (`result_type='3d_html'`)
 ```python
@@ -51,6 +52,14 @@ Plotly chart of print time and material against the parameter. Built on the `sim
 (now the Rust kernel), so sweeping many large designs is fast — e.g. 8 full ripple vases (151k
 segments total) simulate in ~370 ms. Useful for spotting trade-offs: sweeping `extrusion_width`, for
 instance, shows print time staying flat while filament use climbs.
+
+### Optimization-pass showcase
+**`optimization_report(towers_grid())`** resolves a travel-heavy design with and without the IR→IR
+optimization passes (`fullcontrol/ir/passes.py`) and reports the difference. On the default towers
+grid: `merge_collinear` collapses the subdivided edges (**580 → 120 segments**), `retract_on_travel`
+inserts a retraction around each long inter-tower hop (**0 → 6 retractions**), and the simulation
+time/material is **unchanged** — the passes shrink the g-code without altering the physical print.
+Passes are opt-in via `initialization_data={'optimize': [...]}`, so default output is never changed.
 
 ### Validator showcase (not a printable design)
 **`validation_gauntlet()`** returns a `dict[str, list]` of twelve tiny designs, each crafted to trip
@@ -92,10 +101,10 @@ library gap worth closing first.
   profile (generalises `hex_adapter`).
 
 ### B. Toolpath-quality designs (exercise the optimization passes)
-- **Bridged box** — long travels over openings that `retract_on_travel` should guard; a regression
-  fixture for the anti-stringing pass.
-- **Coasting/z-hop showcase** — a design tuned to make `coasting` and `z_hop` visibly improve seams,
-  with before/after `simulation` peak-flow numbers.
+- ✅ **Travel-heavy / anti-stringing fixture** — *done* (`towers_grid` + `optimization_report`):
+  long inter-part travels that `retract_on_travel` guards; `merge_collinear` collapses the edges.
+- **Coasting/z-hop showcase** — `optimization_report` already exposes the framework; a coasting/
+  z-hop-tuned variant with before/after seam stats is the next step.
 
 ### C. New library capability (design + a feature)
 - **Variable-width line art** — per-segment `ExtrusionGeometry.width` driven by a function, for
