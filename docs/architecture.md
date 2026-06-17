@@ -99,15 +99,22 @@ absolute coordinates, the resolved feedrate, and the *semantic* material deposit
 target maps that to `E`; a laser/CNC target would use it as power). A backend then becomes a
 plain **fold** over the IR with no state machine of its own.
 
-The **simulation backend** is the first consumer (`simulate_from_ir` in
-`simulate/run.py`) — it went from a singledispatch state machine to ~15 lines of arithmetic,
-byte-for-byte equivalent. The **validation backend** is the second: its geometric checks
-(bounds, negative-z, first-layer-z, extrusion-geometry) fold over the IR `Segment`s instead of
-re-walking the steps with their own position/geometry tracking (its config/ordering checks —
-temperatures, speeds, cold-extrusion, retraction balance — still walk the step list). The
-gcode and plot backends can migrate onto the same IR incrementally (each `Segment` already
-carries arc centre/direction so a gcode dialect can emit `I/J` and `G2/G3`, and width/height
-for plot/validate); until they do, they keep their existing `State`-based renderers.
+Consumers, in migration order:
+
+- **simulation** (`simulate_from_ir` in `simulate/run.py`) — went from a singledispatch state
+  machine to ~15 lines of arithmetic, byte-for-byte equivalent.
+- **validation** — its geometric checks (bounds, negative-z, first-layer-z, extrusion-geometry)
+  fold over the IR `Segment`s instead of re-walking the steps; its config/ordering checks
+  (temperatures, speeds, cold-extrusion, retraction balance) still walk the step list.
+- **gcode** (`gcode/dialect.py`) — **motion** (`G0/G1/G2/G3`) is emitted from the resolved
+  `Segment`s; the gcode-specific emission state that can't live in the shared IR (the E
+  accumulator, retraction running state, feedrate-change suppression, command list,
+  comment-append) stays on the running `State`, reused for the non-motion events via the
+  existing `render_gcode` handlers. `render_gcode` now holds only the non-motion handlers
+  (shared with the multiaxis backend). Output is byte-identical (golden-locked).
+
+The **plot** backend can migrate onto the same IR next (each `Segment` already carries
+width/height); until it does it keeps its `State`-based renderer.
 
 ## Extension point 1 — a new step type
 
