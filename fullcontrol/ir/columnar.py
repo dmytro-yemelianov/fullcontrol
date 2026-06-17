@@ -132,26 +132,36 @@ def resolve_columnar(steps, controls, include_procedures=True, initial_extruder_
     travel, speed, length, vol, fil, src, wid, hgt = [], [], [], [], [], [], [], []
     mat_vol = mat_fil = 0.0
 
+    # Running point as plain float locals (avoids per-move pydantic __setattr__ on ctx.point);
+    # px/py/pz replicate Point.update_from's None-inheritance exactly. ctx.point is no longer
+    # read/written in the loop (non-motion steps still update_from their own ctx.* objects).
+    px, py, pz = ctx.point.x, ctx.point.y, ctx.point.z
+
     for i, step in enumerate(walk):
         if isinstance(step, Arc):
-            geom = arc_geometry(step, ctx.point.x, ctx.point.y, ctx.point.z)
+            geom = arc_geometry(step, px, py, pz)
             on = ctx.extruder.on
             spd = ctx.printer.print_speed if on else ctx.printer.travel_speed
             v = geom.arc_length * (ctx.extrusion_geometry.area or 0.0) if on else 0.0
-            sx.append(ctx.point.x); sy.append(ctx.point.y); sz.append(ctx.point.z)
-            ctx.point.update_from(step.end)
-            ex.append(ctx.point.x); ey.append(ctx.point.y); ez.append(ctx.point.z)
+            sx.append(px); sy.append(py); sz.append(pz)
+            end_step = step.end
+            px = px if end_step.x is None else end_step.x
+            py = py if end_step.y is None else end_step.y
+            pz = pz if end_step.z is None else end_step.z
+            ex.append(px); ey.append(py); ez.append(pz)
             travel.append(not on); speed.append(spd); length.append(geom.arc_length)
             vol.append(v); fil.append(v * (ctx.extruder.volume_to_e or 0.0)); src.append(i)
             wid.append(_nan(ctx.extrusion_geometry.width)); hgt.append(_nan(ctx.extrusion_geometry.height))
         elif isinstance(step, Point):
-            x0, y0, z0 = ctx.point.x, ctx.point.y, ctx.point.z
+            x0, y0, z0 = px, py, pz
             dx = 0.0 if x0 is None or step.x is None else step.x - x0
             dy = 0.0 if y0 is None or step.y is None else step.y - y0
             dz = 0.0 if z0 is None or step.z is None else step.z - z0
             on = ctx.extruder.on
-            ctx.point.update_from(step)
-            x1, y1, z1 = ctx.point.x, ctx.point.y, ctx.point.z
+            px = x0 if step.x is None else step.x
+            py = y0 if step.y is None else step.y
+            pz = z0 if step.z is None else step.z
+            x1, y1, z1 = px, py, pz
             if (x1, y1, z1) != (x0, y0, z0):  # any axis changed -> a move
                 ln = (dx * dx + dy * dy + dz * dz) ** 0.5
                 spd = ctx.printer.print_speed if on else ctx.printer.travel_speed
