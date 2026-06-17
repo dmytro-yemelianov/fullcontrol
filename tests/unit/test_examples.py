@@ -53,7 +53,7 @@ def test_design_validates_without_errors(name):
 
 
 def test_gallery_registry_matches_callables():
-    assert set(GALLERY) == {'spiral_vase', 'ripple_vase', 'nonplanar_spacer', 'wave_bowl'}
+    assert set(GALLERY) == {'spiral_vase', 'ripple_vase', 'nonplanar_spacer', 'wave_bowl', 'gyroid_infill'}
     for fn in GALLERY.values():
         assert callable(fn)
 
