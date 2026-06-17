@@ -136,4 +136,10 @@ def resolve(steps, controls, include_procedures=True, initial_extruder_on=None) 
             elif isinstance(step, Printer):
                 ctx.printer.update_from(step)
             events.append(step)
-    return Toolpath(events)
+
+    toolpath = Toolpath(events)
+    optimize = (getattr(controls, 'initialization_data', None) or {}).get('optimize')
+    if optimize:
+        from fullcontrol.ir.passes import apply_passes
+        toolpath = apply_passes(toolpath, optimize)
+    return toolpath
