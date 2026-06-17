@@ -2,7 +2,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from importlib import import_module
 
 from fullcontrol.gcode.point import Point
-from fullcontrol.gcode.printer import Printer
+from fullcontrol.gcode.printer import PrinterState
 from fullcontrol.gcode.extrusion_classes import ExtrusionGeometry, ExtruderState
 from fullcontrol.gcode.controls import GcodeControls
 from fullcontrol.gcode.flavor import GcodeFlavor, get_flavor
@@ -33,7 +33,7 @@ class State(BaseModel):
     '''
 
     extruder: ExtruderState | None = None
-    printer: Printer | None = None
+    printer: PrinterState | None = None
     extrusion_geometry: ExtrusionGeometry | None = None
     flavor: GcodeFlavor | None = None
     steps: list | None = None
@@ -75,7 +75,7 @@ class State(BaseModel):
         if initialization_data['manual_e_ratio'] is not None:
             self.extruder.volume_to_e = initialization_data['manual_e_ratio']
 
-        self.printer = Printer(
+        self.printer = PrinterState(
             command_list=initialization_data['printer_command_list'],
             print_speed=initialization_data['print_speed'],
             travel_speed=initialization_data['travel_speed'],

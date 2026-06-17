@@ -49,10 +49,10 @@ designs.
   keeps a running tracking instance (`state.point`, `state.extruder`, ...) updated via
   `update_from`. So a `Point(x=10)` after `Point(x=0, y=0, z=0)` only changes x.
 - **Step data vs runtime state** — step classes stay pure design data; a backend's running
-  accumulators live on a separate state object. e.g. the gcode `Extruder` step carries only
-  `on/units/dia_feed/relative_gcode`, while `ExtruderState` (held by the gcode `State`) adds
-  the E-tracking accumulators (`total_volume`, `volume_to_e`, `retracted_length`, ...) and
-  the emission methods (`e_gcode`, `get_and_update_volume`).
+  context lives on a separate state object. e.g. the gcode `Extruder`/`Printer` steps carry
+  only design fields, while `ExtruderState` adds the E-tracking accumulators + emission methods
+  and `PrinterState` adds the resolved `command_list`, the `speed_changed` flag and `f_gcode`.
+  The gcode `State` holds these `*State` objects; they never appear in a design.
 - **Controls** — `GcodeControls` / `PlotControls` configure a run (printer, style, ...);
   they are config, not steps.
 
