@@ -59,10 +59,18 @@ def test_motion_classes_are_emitted_by_the_gcode_dialect():
     assert any(ln.startswith('G2 ') or ln.startswith('G3 ') for ln in g.splitlines())
 
 
-def test_every_visualize_step_class_has_a_renderer():
-    from fullcontrol.visualize.renderers import render_visualize
-    default = render_visualize.dispatch(object)
-    names = {n for n in _public_step_classes(vis) if not n.endswith('Controls')}
-    for name in sorted(names):
-        cls = getattr(vis, name)
-        assert render_visualize.dispatch(cls) is not default, f'{name} has no visualize renderer'
+def test_visualize_step_classes_are_handled_by_the_plot_backend():
+    # the plot backend now folds the resolved IR (no render_visualize); a design exercising the
+    # visualize step classes (Point, Arc, Extruder, ExtrusionGeometry, PlotAnnotation) must
+    # produce paths and the annotation
+    import fullcontrol as fc
+    pd = fc.transform(
+        [fc.Point(x=0, y=0, z=0.2), fc.Extruder(on=True), fc.ExtrusionGeometry(width=0.5, height=0.2),
+         fc.Point(x=10, y=0, z=0.2),
+         fc.Arc(centre=fc.Point(x=10, y=5), end=fc.Point(x=10, y=10), direction='clockwise'),
+         fc.Extruder(on=False), fc.Point(x=0, y=10, z=0.2),
+         fc.PlotAnnotation(label='here')],
+        'plot', fc.PlotControls(raw_data=True, printer_name='generic'), show_tips=False)
+    assert len(pd.paths) >= 2                      # extrude path(s) + the travel path
+    assert any(len(p.xvals) > 5 for p in pd.paths)  # the arc tessellated into many vertices
+    assert any(a['label'] == 'here' for a in pd.annotations)
