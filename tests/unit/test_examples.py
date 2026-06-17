@@ -10,7 +10,8 @@ import pytest
 import fullcontrol as fc
 from fullcontrol.core.point import Point  # geometry helpers return core Points (fc.Point subclasses it)
 from examples import (GALLERY, spiral_vase, ripple_vase, nonplanar_spacer, wave_bowl,
-                      twisted_polygon_vase, helical_screw, textured_cone, revolve, mobius_band)
+                      twisted_polygon_vase, helical_screw, textured_cone, revolve, mobius_band,
+                      trefoil_tube)
 
 _BUILD = {'nozzle_temp': 210, 'bed_temp': 40, 'primer': 'front_lines_then_y',
           'build_volume_x': 200, 'build_volume_y': 200, 'build_volume_z': 200}
@@ -26,6 +27,7 @@ _SMALL = {
     'helical_screw': lambda: helical_screw(height=3, segments_per_layer=48, starts=2),
     'textured_cone': lambda: textured_cone(height=3, segments_per_layer=48, cells_up=4),
     'mobius_band': lambda: mobius_band(loop_segments=60, strokes_across=6),
+    'trefoil_tube': lambda: trefoil_tube(tube_turns=16, cross_points=12),
 }
 
 
@@ -61,7 +63,7 @@ def test_design_validates_without_errors(name):
 def test_gallery_registry_matches_callables():
     assert set(GALLERY) == {'spiral_vase', 'ripple_vase', 'nonplanar_spacer', 'wave_bowl',
                             'gyroid_infill', 'twisted_polygon_vase', 'helical_screw', 'textured_cone',
-                            'mobius_band'}
+                            'mobius_band', 'trefoil_tube'}
     for fn in GALLERY.values():
         assert callable(fn)
 
@@ -173,6 +175,25 @@ def test_mobius_band_has_a_half_twist_and_forms_a_loop():
     assert z_range(pts[mid:mid + stroke]) > 8.0              # u=pi: band stands vertical (~width 9)
     radii = [math.hypot(p.x - 50, p.y - 50) for p in pts]
     assert min(radii) < 18 and max(radii) > 22              # a loop of radius ~20 (± width/2)
+
+
+def test_trefoil_tube_is_a_closed_3d_tube():
+    'A closed knot (last point returns to the first), genuinely 3D, swept into a tube_radius tube.'
+    import math
+    cp, tt, tr = 16, 20, 4.0
+    steps = trefoil_tube(scale=6, tube_radius=tr, tube_turns=tt, cross_points=cp, centre=(50, 50))
+    pts = [s for s in steps if isinstance(s, Point)]
+    from examples.trefoil_tube import _knot
+    a, b = pts[0], pts[-1]
+    assert math.dist((a.x, a.y, a.z), (b.x, b.y, b.z)) < 0.05          # closes on itself
+    assert max(p.z for p in pts) - min(p.z for p in pts) > 8.0          # the knot oscillates in z
+    # every point sits exactly tube_radius off the knot centre-line
+    n, z_lift = tt * cp, 6 + tr + 0.8
+    for i in (5, n // 3, n // 2):
+        kx, ky, kz = _knot(i / n * math.tau, 6)
+        centre_line = (50 + kx, 50 + ky, z_lift + kz)
+        p = pts[i]
+        assert abs(math.dist((p.x, p.y, p.z), centre_line) - tr) < 1e-9
 
 
 def test_revolve_smooth_follows_the_profile_exactly():
