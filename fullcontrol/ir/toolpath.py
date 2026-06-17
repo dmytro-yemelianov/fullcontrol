@@ -39,6 +39,8 @@ class Segment:
     kind: str = 'line'         # 'line' | 'arc'
     centre: tuple = None       # (cx, cy) for arcs - lets a gcode dialect emit I/J
     clockwise: bool = False    # arcs: G2 (clockwise) vs G3
+    width: float = None        # extrusion cross-section in effect for this move (for plot / validate)
+    height: float = None
 
 
 @dataclass(frozen=True)
@@ -86,7 +88,8 @@ def resolve(steps, controls) -> Toolpath:
             end = (ctx.point.x, ctx.point.y, ctx.point.z)
             events.append(Segment(start, end, not on, speed, geom.arc_length, vol,
                                   vol * (ctx.extruder.volume_to_e or 0.0), i, kind='arc',
-                                  centre=(geom.cx, geom.cy), clockwise=geom.clockwise))
+                                  centre=(geom.cx, geom.cy), clockwise=geom.clockwise,
+                                  width=ctx.extrusion_geometry.width, height=ctx.extrusion_geometry.height))
         elif isinstance(step, Point):
             length = _distance(ctx.point, step)
             start = (ctx.point.x, ctx.point.y, ctx.point.z)
@@ -97,7 +100,8 @@ def resolve(steps, controls) -> Toolpath:
                 speed = ctx.printer.print_speed if on else ctx.printer.travel_speed
                 vol = length * (ctx.extrusion_geometry.area or 0.0) if on else 0.0
                 events.append(Segment(start, end, not on, speed, length, vol,
-                                      vol * (ctx.extruder.volume_to_e or 0.0), i))
+                                      vol * (ctx.extruder.volume_to_e or 0.0), i,
+                                      width=ctx.extrusion_geometry.width, height=ctx.extrusion_geometry.height))
         elif isinstance(step, Extruder):
             ctx.extruder.update_from(step)
             if getattr(step, 'units', None) is not None or getattr(step, 'dia_feed', None) is not None:
