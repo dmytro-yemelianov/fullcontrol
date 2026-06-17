@@ -7,6 +7,7 @@ accumulates metrics into the SimulationResult. Steps with no effect on time/mate
 from functools import singledispatch
 
 from fullcontrol.core.point import Point
+from fullcontrol.core.arc import Arc, arc_geometry
 from fullcontrol.core.printer import Printer
 from fullcontrol.core.extrusion_classes import Extruder, ExtrusionGeometry, StationaryExtrusion
 
@@ -25,28 +26,41 @@ def render_simulate(step, state, result):
     return None
 
 
+def _accumulate_move(state, result, length):
+    'Accumulate time/material for a move of the given path length (shared by Point and Arc).'
+    if length <= 0:
+        return
+    speed = state.printer.print_speed if state.extruder.on else state.printer.travel_speed
+    if not speed:
+        return
+    t = length / speed * 60.0  # mm / (mm/min) -> minutes -> seconds
+    result.total_time_s += t
+    if state.extruder.on:
+        result.print_time_s += t
+        result.extruding_distance += length
+        vol = length * (state.extrusion_geometry.area or 0.0)
+        result.extruded_volume += vol
+        result.filament_length += vol * (state.extruder.volume_to_e or 0.0)
+        if t > 0:
+            result.max_flow_rate = max(result.max_flow_rate, vol / t)
+    else:
+        result.travel_time_s += t
+        result.travel_distance += length
+    result.segment_count += 1
+
+
 @render_simulate.register
 def _(step: Point, state, result):
-    length = _distance(state.point, step)
-    if length > 0:
-        speed = state.printer.print_speed if state.extruder.on else state.printer.travel_speed
-        if speed:
-            t = length / speed * 60.0  # mm / (mm/min) -> minutes -> seconds
-            result.total_time_s += t
-            if state.extruder.on:
-                result.print_time_s += t
-                result.extruding_distance += length
-                area = state.extrusion_geometry.area or 0.0
-                vol = length * area
-                result.extruded_volume += vol
-                result.filament_length += vol * (state.extruder.volume_to_e or 0.0)
-                if t > 0:
-                    result.max_flow_rate = max(result.max_flow_rate, vol / t)
-            else:
-                result.travel_time_s += t
-                result.travel_distance += length
-            result.segment_count += 1
+    _accumulate_move(state, result, _distance(state.point, step))
     state.point.update_from(step)
+
+
+@render_simulate.register
+def _(step: Arc, state, result):
+    # an arc contributes its true arc length and advances the tracked point to the arc end
+    geom = arc_geometry(step, state.point.x, state.point.y, state.point.z)
+    _accumulate_move(state, result, geom.arc_length)
+    state.point.update_from(step.end)
 
 
 @render_simulate.register
