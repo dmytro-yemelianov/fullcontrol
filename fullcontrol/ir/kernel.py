@@ -24,7 +24,7 @@ from copy import deepcopy
 from math import nan
 
 from fullcontrol.core.point import Point
-from fullcontrol.core.arc import Arc
+from fullcontrol.core.arc import Arc, arc_geometry
 from fullcontrol.core.extrusion_classes import Extruder, ExtrusionGeometry, StationaryExtrusion
 from fullcontrol.core.printer import Printer
 from fullcontrol.ir.columnar import ColumnarToolpath
@@ -46,32 +46,41 @@ def _f(v):
 
 
 def _flatten(walk, ctx):
-    '''Walk the resolved step list, replaying the non-motion state updates exactly as the
-    Python resolve does, and emit the (tag, a, b, c) primitive rows. Returns None if any step is
-    an Arc (signal to fall back to Python); unrecognised non-motion steps are skipped as no-ops,
-    matching the Python reference walk.
+    '''Walk the resolved step list, replaying the non-motion state updates exactly as the Python
+    resolve does, and emit the (tag, a, b, c, d) primitive rows the kernel folds over.
 
-    A scratch copy of the extruder / extrusion_geometry is mutated here purely to resolve the
-    per-step volume_to_e and area/width/height that the kernel needs; the caller's ctx is left
-    untouched (we deep-copy first).
+    Arcs are supported by pre-resolving them here with the tested `arc_geometry`: a running point
+    (px, py, pz) is tracked so the arc's start is known, the arc length is computed, and the row
+    carries the *absolute* resolved end (a, b, c) and arc length (d) - the kernel then treats it as
+    a plain move. Unrecognised non-motion steps (e.g. ManualGcode from the primer) are emitted as
+    no-op rows (tag -1) so the per-step index stays aligned with source_index.
+
+    Scratch copies of extruder / extrusion_geometry are mutated here only to resolve the per-step
+    volume_to_e and area/width/height the kernel needs; the caller's ctx is left untouched.
     '''
     extruder = deepcopy(ctx.extruder)
     geom = deepcopy(ctx.extrusion_geometry)
+    px, py, pz = ctx.point.x, ctx.point.y, ctx.point.z  # running point, for arc start
 
-    tags, av, bv, cv = [], [], [], []
+    tags, av, bv, cv, dv = [], [], [], [], []
     for step in walk:
         if isinstance(step, Arc):
-            return None  # arcs are out of scope for this skeleton -> fall back
-        if isinstance(step, Point):
+            g = arc_geometry(step, px, py, pz)
+            end = step.end
+            px = px if end.x is None else end.x
+            py = py if end.y is None else end.y
+            pz = pz if end.z is None else end.z
+            tags.append(5)
+            av.append(_f(px)); bv.append(_f(py)); cv.append(_f(pz)); dv.append(float(g.arc_length))
+        elif isinstance(step, Point):
+            px = px if step.x is None else step.x
+            py = py if step.y is None else step.y
+            pz = pz if step.z is None else step.z
             tags.append(0)
-            av.append(_f(step.x))
-            bv.append(_f(step.y))
-            cv.append(_f(step.z))
+            av.append(_f(step.x)); bv.append(_f(step.y)); cv.append(_f(step.z)); dv.append(0.0)
         elif isinstance(step, StationaryExtrusion):
             tags.append(4)
-            av.append(float(step.volume))
-            bv.append(nan)
-            cv.append(nan)
+            av.append(float(step.volume)); bv.append(nan); cv.append(nan); dv.append(0.0)
         elif isinstance(step, Extruder):
             # mirror the resolve walk: update_from, then recompute e-ratio if units/dia_feed set
             extruder.update_from(step)
@@ -80,8 +89,7 @@ def _flatten(walk, ctx):
             on = step.on
             tags.append(1)
             av.append(-1.0 if on is None else (1.0 if on else 0.0))
-            bv.append(_f(extruder.volume_to_e))
-            cv.append(nan)
+            bv.append(_f(extruder.volume_to_e)); cv.append(nan); dv.append(0.0)
         elif isinstance(step, ExtrusionGeometry):
             geom.update_from(step)
             try:
@@ -89,35 +97,18 @@ def _flatten(walk, ctx):
             except TypeError:
                 pass  # not all parameters set yet (None arithmetic) - area stays as-is
             tags.append(2)
-            av.append(_f(geom.area))
-            bv.append(_f(geom.width))
-            cv.append(_f(geom.height))
+            av.append(_f(geom.area)); bv.append(_f(geom.width)); cv.append(_f(geom.height)); dv.append(0.0)
         elif isinstance(step, Printer):
             tags.append(3)
-            av.append(_f(step.print_speed))
-            bv.append(_f(step.travel_speed))
-            cv.append(nan)
+            av.append(_f(step.print_speed)); bv.append(_f(step.travel_speed)); cv.append(nan); dv.append(0.0)
         else:
-            # any other step type (e.g. ManualGcode / PrinterCommand injected by the primer and
-            # start/end procedures) is a no-op in resolve_columnar's walk. We still emit a row
-            # (tag -1) so the kernel's per-step index stays aligned with the Python enumerate()
-            # index, which is what becomes a move's source_index. Only an Arc forces a fall-back.
             tags.append(-1)
-            av.append(nan)
-            bv.append(nan)
-            cv.append(nan)
-    return tags, av, bv, cv
+            av.append(nan); bv.append(nan); cv.append(nan); dv.append(0.0)
+    return tags, av, bv, cv, dv
 
 
-def resolve_columnar_rust(steps, controls, include_procedures=True, initial_extruder_on=None,
-                          state=None):
-    '''Rust-backed columnar resolve. Returns a `ColumnarToolpath` identical to the Python
-    `resolve_columnar`, or None if the extension is unavailable or the design contains a step
-    the kernel does not model (Arc / unknown) - in which case the caller should fall back.
-    '''
-    if _kernel is None:
-        return None
-
+def _build_ctx(steps, controls, include_procedures, initial_extruder_on, state):
+    'Build (or reuse) the gcode State context, exactly as resolve_columnar does.'
     from fullcontrol.gcode.state import State
     controls.initialize()
     if state is None:
@@ -129,30 +120,63 @@ def resolve_columnar_rust(steps, controls, include_procedures=True, initial_extr
                               extrusion_geometry=deepcopy(state.extrusion_geometry), steps=state.steps)
     if initial_extruder_on is not None:
         ctx.extruder.on = initial_extruder_on
-    walk = ctx.steps if include_procedures else steps
+    return ctx
 
-    flat = _flatten(walk, ctx)
-    if flat is None:
-        return None
-    tags, av, bv, cv = flat
 
+def _init_args(ctx):
+    '''The ten initial running-context scalars the kernel needs (mirrors the gcode State after
+    init); passed as one list. Order must match walk.rs `Ctx::from_scalars`.'''
     on = ctx.extruder.on
-    init_on = -1.0 if on is None else (1.0 if on else 0.0)
-
-    (start, end, travel, speed, length, vol, fil, src, wid, hgt,
-     material_volume, material_filament) = _kernel.resolve_columnar(
-        tags, av, bv, cv,
-        init_on,
+    return [
+        -1.0 if on is None else (1.0 if on else 0.0),
         _f(ctx.extruder.volume_to_e),
         _f(ctx.printer.print_speed),
         _f(ctx.printer.travel_speed),
         _f(ctx.extrusion_geometry.area),
         _f(ctx.extrusion_geometry.width),
         _f(ctx.extrusion_geometry.height),
-        _f(ctx.point.x),
-        _f(ctx.point.y),
-        _f(ctx.point.z),
-    )
+        _f(ctx.point.x), _f(ctx.point.y), _f(ctx.point.z),
+    ]
+
+
+def resolve_columnar_rust(steps, controls, include_procedures=True, initial_extruder_on=None,
+                          state=None):
+    '''Rust-backed columnar resolve. Returns a `ColumnarToolpath` identical to the Python
+    `resolve_columnar`, or None if the extension is unavailable - in which case the caller should
+    fall back. Arcs are supported (pre-resolved in `_flatten`).
+    '''
+    if _kernel is None:
+        return None
+    ctx = _build_ctx(steps, controls, include_procedures, initial_extruder_on, state)
+    walk = ctx.steps if include_procedures else steps
+    tags, av, bv, cv, dv = _flatten(walk, ctx)
+
+    (start, end, travel, speed, length, vol, fil, src, wid, hgt,
+     material_volume, material_filament) = _kernel.resolve_columnar(
+        tags, (av, bv, cv, dv), _init_args(ctx))
 
     return ColumnarToolpath(start, end, travel, speed, length, vol, fil, src,
                             float(material_volume), float(material_filament), wid, hgt)
+
+
+def simulate_rust(steps, controls, include_procedures=True, initial_extruder_on=None, state=None):
+    '''Rust-backed simulation: one Rust pass walks the design and folds it straight into the nine
+    SimulationResult metrics (no per-move arrays cross back to Python). Returns a SimulationResult,
+    or None if the extension is unavailable so the caller can fall back to `simulate_columnar`.
+    '''
+    if _kernel is None:
+        return None
+    from fullcontrol.simulate.result import SimulationResult
+    ctx = _build_ctx(steps, controls, include_procedures, initial_extruder_on, state)
+    walk = ctx.steps if include_procedures else steps
+    tags, av, bv, cv, dv = _flatten(walk, ctx)
+
+    (total_time_s, print_time_s, travel_time_s, extruding_distance, travel_distance,
+     extruded_volume, filament_length, segment_count, max_flow_rate) = _kernel.simulate(
+        tags, (av, bv, cv, dv), _init_args(ctx))
+
+    return SimulationResult(
+        total_time_s=total_time_s, print_time_s=print_time_s, travel_time_s=travel_time_s,
+        extruding_distance=extruding_distance, travel_distance=travel_distance,
+        extruded_volume=extruded_volume, filament_length=filament_length,
+        segment_count=int(segment_count), max_flow_rate=max_flow_rate)
