@@ -183,19 +183,26 @@ def emit_gcode_moves_rust(toolpath, relative_e=True, travel_g1_e0=False):
     return list(_kernel.emit_gcode_moves(to_json(toolpath), relative_e, travel_g1_e0))
 
 
-def emit_gcode_rust(toolpath, relative_e=True, travel_g1_e0=False):
+def emit_gcode_rust(toolpath, state):
     '''Rust-backed FULL g-code emission: serialize the Toolpath IR (resolved *with* procedures) and
-    let the Rust engine emit the complete line list - motion plus the common non-motion commands
-    (extrusion mode, hotend/bed temperature, fan, ManualGcode) - byte-identical to the Python
-    gcode for designs within scope. Join with '\\n' for the file. None if the extension is absent.
-
-    Not yet emitted (still Python): retraction, acceleration/jerk/pressure-advance, PrinterCommand
-    command-lists, GcodeComment line-append, non-Marlin flavours.
+    let the Rust engine emit the complete line list - byte-identical to the Python gcode. `state` is
+    the gcode `State` the design was resolved against; the emission params (E mode, travel format,
+    flavor, retraction defaults, command list) are read from it. Join with '\\n' for the file. None
+    if the extension is absent.
     '''
     if _kernel is None:
         return None
+    import json
     from fullcontrol.ir.serialize import to_json
-    return list(_kernel.emit_gcode(to_json(toolpath), relative_e, travel_g1_e0))
+    params = {
+        'relative_e': state.extruder.relative_gcode is True,
+        'travel_g1_e0': state.extruder.travel_format == 'G1_E0',
+        'flavor': getattr(state.flavor, 'name', 'marlin'),
+        'retraction_distance': state.extruder.retraction_distance or 0.0,
+        'retraction_speed': state.extruder.retraction_speed or 0.0,
+        'command_list': state.printer.command_list or {},
+    }
+    return list(_kernel.emit_gcode(to_json(toolpath), json.dumps(params)))
 
 
 def simulate_rust(steps, controls, include_procedures=True, initial_extruder_on=None, state=None):

@@ -76,15 +76,13 @@ def test_stationary_extrusion_material_line():
 
 # --- full g-code (motion + procedures + the common non-motion commands) ---
 
-def _assert_full_gcode_matches(steps, init):
+def _assert_full_gcode_matches(steps, init, printer='generic'):
     'The complete Rust file (with procedures) == fc.transform(steps, "gcode"), byte-for-byte.'
-    controls = fc.GcodeControls(printer_name='generic', initialization_data=init)
+    controls = fc.GcodeControls(printer_name=printer, initialization_data=init)
     py = fc.transform(steps, 'gcode', controls, show_tips=False)
     dstate = State(steps, controls)
     toolpath = resolve(steps, controls, state=dstate)
-    rel = dstate.extruder.relative_gcode is True
-    tf = dstate.extruder.travel_format == 'G1_E0'
-    rust = '\n'.join(emit_gcode_rust(toolpath, relative_e=rel, travel_g1_e0=tf))
+    rust = '\n'.join(emit_gcode_rust(toolpath, dstate))
     assert rust == py
 
 
@@ -105,3 +103,37 @@ def test_full_gcode_arcs():
              fc.Arc(centre=fc.Point(x=0, y=0), end=fc.Point(x=0, y=20), direction='anticlockwise'),
              fc.Point(x=0, y=30, z=0.2)]
     _assert_full_gcode_matches(steps, {'nozzle_temp': 215, 'bed_temp': 60})
+
+
+def _tuning_design(extra):
+    'a design exercising retraction, acceleration, jerk and pressure advance'
+    return [fc.ExtrusionGeometry(width=0.6, height=0.2),
+            fc.Acceleration(printing=500, retract=1000, travel=2000),
+            fc.Jerk(x=8, y=8, z=0.4, e=2.5),
+            fc.PressureAdvance(value=0.05),
+            fc.Point(x=0, y=0, z=0.2), fc.Extruder(on=True), fc.Point(x=20, y=0, z=0.2),
+            fc.Retraction(distance=1.5, speed=2100),
+            fc.Extruder(on=False), fc.Point(x=40, y=40, z=0.2),
+            fc.Extruder(on=True), fc.Unretraction(),
+            fc.Point(x=40, y=41, z=0.2), *extra]
+
+
+def test_full_gcode_retraction_and_tuning():
+    _assert_full_gcode_matches(_tuning_design([]), {'nozzle_temp': 210})
+
+
+def test_full_gcode_klipper_flavor():
+    _assert_full_gcode_matches(_tuning_design([]), {'nozzle_temp': 210, 'gcode_flavor': 'klipper'})
+
+
+def test_full_gcode_duet_flavor():
+    _assert_full_gcode_matches(_tuning_design([]), {'nozzle_temp': 210, 'gcode_flavor': 'duet'})
+
+
+def test_full_gcode_printer_command_and_comment_append():
+    steps = [fc.ExtrusionGeometry(width=0.6, height=0.2),
+             fc.Printer(new_command={'my_cmd': 'M117 hello'}),
+             fc.PrinterCommand(id='my_cmd'),
+             fc.Point(x=0, y=0, z=0.2), fc.Extruder(on=True), fc.Point(x=10, y=0, z=0.2),
+             fc.GcodeComment(end_of_previous_line_text='seam start')]
+    _assert_full_gcode_matches(steps, {'nozzle_temp': 210})
