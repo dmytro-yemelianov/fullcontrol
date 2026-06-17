@@ -139,6 +139,25 @@ export class SimMetrics {
 if (Symbol.dispose) SimMetrics.prototype[Symbol.dispose] = SimMetrics.prototype.free;
 
 /**
+ * Emit a full g-code line list (motion + common non-motion commands) from the serialized IR JSON.
+ * @param {string} ir_json
+ * @param {boolean} relative_e
+ * @param {boolean} travel_g1_e0
+ * @returns {string[]}
+ */
+export function emit_gcode(ir_json, relative_e, travel_g1_e0) {
+    const ptr0 = passStringToWasm0(ir_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.emit_gcode(ptr0, len0, relative_e, travel_g1_e0);
+    if (ret[3]) {
+        throw takeFromExternrefTable0(ret[2]);
+    }
+    var v2 = getArrayJsValueFromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 4, 4);
+    return v2;
+}
+
+/**
  * Emit the g-code motion lines from the serialized IR JSON (same engine the Python build uses).
  * @param {string} ir_json
  * @param {boolean} relative_e

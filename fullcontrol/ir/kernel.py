@@ -183,6 +183,21 @@ def emit_gcode_moves_rust(toolpath, relative_e=True, travel_g1_e0=False):
     return list(_kernel.emit_gcode_moves(to_json(toolpath), relative_e, travel_g1_e0))
 
 
+def emit_gcode_rust(toolpath, relative_e=True, travel_g1_e0=False):
+    '''Rust-backed FULL g-code emission: serialize the Toolpath IR (resolved *with* procedures) and
+    let the Rust engine emit the complete line list - motion plus the common non-motion commands
+    (extrusion mode, hotend/bed temperature, fan, ManualGcode) - byte-identical to the Python
+    gcode for designs within scope. Join with '\\n' for the file. None if the extension is absent.
+
+    Not yet emitted (still Python): retraction, acceleration/jerk/pressure-advance, PrinterCommand
+    command-lists, GcodeComment line-append, non-Marlin flavours.
+    '''
+    if _kernel is None:
+        return None
+    from fullcontrol.ir.serialize import to_json
+    return list(_kernel.emit_gcode(to_json(toolpath), relative_e, travel_g1_e0))
+
+
 def simulate_rust(steps, controls, include_procedures=True, initial_extruder_on=None, state=None):
     '''Rust-backed simulation: one Rust pass walks the design and folds it straight into the nine
     SimulationResult metrics (no per-move arrays cross back to Python). Returns a SimulationResult,

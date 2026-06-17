@@ -110,12 +110,29 @@ fn simulate(py: Python<'_>, tag: Vec<i64>, payload: Payload, init: Vec<f64>) -> 
     )
 }
 
+fn parse_ir(ir_json: &str) -> PyResult<serde_json::Value> {
+    serde_json::from_str(ir_json)
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("invalid IR JSON: {e}")))
+}
+
 /// Emit the g-code motion lines from the serialized IR JSON (drop-in for the dialect's motion).
 #[pyfunction]
 fn emit_gcode_moves(ir_json: &str, relative_e: bool, travel_g1_e0: bool) -> PyResult<Vec<String>> {
-    let ir: serde_json::Value = serde_json::from_str(ir_json)
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("invalid IR JSON: {e}")))?;
-    Ok(gcode::emit_moves(&ir, relative_e, travel_g1_e0))
+    Ok(gcode::emit_moves(
+        &parse_ir(ir_json)?,
+        relative_e,
+        travel_g1_e0,
+    ))
+}
+
+/// Emit a full g-code line list (motion + common non-motion commands) from the serialized IR JSON.
+#[pyfunction]
+fn emit_gcode(ir_json: &str, relative_e: bool, travel_g1_e0: bool) -> PyResult<Vec<String>> {
+    Ok(gcode::emit_gcode(
+        &parse_ir(ir_json)?,
+        relative_e,
+        travel_g1_e0,
+    ))
 }
 
 #[pymodule]
@@ -123,5 +140,6 @@ fn fullcontrol_kernel(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(resolve_columnar, m)?)?;
     m.add_function(wrap_pyfunction!(simulate, m)?)?;
     m.add_function(wrap_pyfunction!(emit_gcode_moves, m)?)?;
+    m.add_function(wrap_pyfunction!(emit_gcode, m)?)?;
     Ok(())
 }
