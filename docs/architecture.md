@@ -113,8 +113,14 @@ Consumers, in migration order:
   existing `render_gcode` handlers. `render_gcode` now holds only the non-motion handlers
   (shared with the multiaxis backend). Output is byte-identical (golden-locked).
 
-The **plot** backend can migrate onto the same IR next (each `Segment` already carries
-width/height); until it does it keeps its `State`-based renderer.
+- **plot** (`visualize/from_ir.py`) — folds the IR into `PlotData` paths: line moves add a
+  vertex, arc moves add their tessellated points (carried on the `Segment`), paths break on an
+  extruder on/off transition. Plot resolves the *user* steps only (`resolve(...,
+  include_procedures=False, initial_extruder_on=True)`) since it visualises the design alone;
+  colour (`update_color`), `Path` and annotations are reused.
+
+All four backends now consume the one `resolve()` pass; none keeps its own forward
+state-propagation walk - `resolve()` is the single place that state lives.
 
 ## Extension point 1 — a new step type
 

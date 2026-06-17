@@ -3,12 +3,16 @@ from fullcontrol.visualize.state import State
 from fullcontrol.visualize.plot_data import PlotData
 from fullcontrol.visualize.controls import PlotControls
 from fullcontrol.visualize.tips import tips
-from fullcontrol.visualize.renderers import render_visualize
+from fullcontrol.visualize.from_ir import visualize_from_ir
+from fullcontrol.ir import resolve
 
 
 def visualize(steps: list, plot_controls: PlotControls, show_tips: bool):
     '''
     Visualize the list of steps.
+
+    The design is resolved to the shared Toolpath IR (user steps only, extruder defaulting on),
+    then folded into PlotData paths.
 
     Parameters:
     - steps (list): The list of steps to visualize.
@@ -22,12 +26,8 @@ def visualize(steps: list, plot_controls: PlotControls, show_tips: bool):
 
     state = State(steps, plot_controls)
     plot_data = PlotData(steps, state)
-    for i, step in enumerate(steps):
-        try:
-            render_visualize(step, state, plot_data, plot_controls)
-        except Exception as e:
-            raise type(e)(f'error visualizing step {i} ({type(step).__name__}): {e}') from e
-    plot_data.cleanup()
+    toolpath = resolve(steps, plot_controls, include_procedures=False, initial_extruder_on=True)
+    visualize_from_ir(toolpath, state, plot_data, plot_controls)
 
     if plot_controls.raw_data is True:
         return plot_data

@@ -15,7 +15,7 @@ G2/G3) so further backends can migrate onto it incrementally.
 from dataclasses import dataclass, field
 
 from fullcontrol.core.point import Point
-from fullcontrol.core.arc import Arc, arc_geometry
+from fullcontrol.core.arc import Arc, arc_geometry, arc_points
 from fullcontrol.core.extrusion_classes import Extruder, ExtrusionGeometry, StationaryExtrusion
 from fullcontrol.core.printer import Printer
 
@@ -41,6 +41,8 @@ class Segment:
     clockwise: bool = False    # arcs: G2 (clockwise) vs G3
     width: float = None        # extrusion cross-section in effect for this move (for plot / validate)
     height: float = None
+    color: list = None         # the move's point colour ([r,g,b]) - for the plot backend
+    arc_points: tuple = None   # tessellated (x,y,z) points for an arc - for plot rendering
 
 
 @dataclass(frozen=True)
@@ -66,35 +68,45 @@ def _distance(p1, p2) -> float:
     return (dx * dx + dy * dy + dz * dz) ** 0.5
 
 
-def resolve(steps, controls) -> Toolpath:
+def resolve(steps, controls, include_procedures=True, initial_extruder_on=None) -> Toolpath:
     '''The single state-propagation pass: design -> Toolpath IR.
 
     Reuses the gcode `State` for *initialisation* only (printer-config resolution, the primer,
     and the start/end procedures, plus the initial extruder/printer/geometry context), then
     does one forward walk that emits backend-agnostic IR events.
+
+    include_procedures=False walks only the user `steps` (no primer/start-end procedures) and
+    initial_extruder_on sets the starting extruder state - used by the plot backend, which
+    visualises the design alone and defaults the extruder on.
     '''
     from fullcontrol.gcode.state import State
     controls.initialize()
     ctx = State(steps, controls)   # config + procedures + the single running context
+    if initial_extruder_on is not None:
+        ctx.extruder.on = initial_extruder_on
+    walk = ctx.steps if include_procedures else steps
     events = []
 
-    for i, step in enumerate(ctx.steps):
+    for i, step in enumerate(walk):
         if isinstance(step, Arc):
             geom = arc_geometry(step, ctx.point.x, ctx.point.y, ctx.point.z)
             on = ctx.extruder.on
             speed = ctx.printer.print_speed if on else ctx.printer.travel_speed
             vol = geom.arc_length * (ctx.extrusion_geometry.area or 0.0) if on else 0.0
             start = (ctx.point.x, ctx.point.y, ctx.point.z)
+            pts = tuple(arc_points(step, start[0], start[1], start[2], geom))
             ctx.point.update_from(step.end)
             end = (ctx.point.x, ctx.point.y, ctx.point.z)
             events.append(Segment(start, end, not on, speed, geom.arc_length, vol,
                                   vol * (ctx.extruder.volume_to_e or 0.0), i, kind='arc',
                                   centre=(geom.cx, geom.cy), clockwise=geom.clockwise,
-                                  width=ctx.extrusion_geometry.width, height=ctx.extrusion_geometry.height))
+                                  width=ctx.extrusion_geometry.width, height=ctx.extrusion_geometry.height,
+                                  arc_points=pts))
         elif isinstance(step, Point):
             length = _distance(ctx.point, step)
             start = (ctx.point.x, ctx.point.y, ctx.point.z)
             on = ctx.extruder.on
+            color = getattr(step, 'color', None)
             ctx.point.update_from(step)
             end = (ctx.point.x, ctx.point.y, ctx.point.z)
             if end != start:  # any axis changed -> a move (length may be 0 for first positioning)
@@ -102,7 +114,8 @@ def resolve(steps, controls) -> Toolpath:
                 vol = length * (ctx.extrusion_geometry.area or 0.0) if on else 0.0
                 events.append(Segment(start, end, not on, speed, length, vol,
                                       vol * (ctx.extruder.volume_to_e or 0.0), i,
-                                      width=ctx.extrusion_geometry.width, height=ctx.extrusion_geometry.height))
+                                      width=ctx.extrusion_geometry.width, height=ctx.extrusion_geometry.height,
+                                      color=color))
         elif isinstance(step, StationaryExtrusion):
             events.append(MaterialEvent(step.volume, step.volume * (ctx.extruder.volume_to_e or 0.0), i,
                                         speed=step.speed))
