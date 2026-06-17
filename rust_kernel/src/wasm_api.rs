@@ -7,6 +7,7 @@
 
 use wasm_bindgen::prelude::*;
 
+use crate::gcode;
 use crate::metrics;
 use crate::walk::{walk, Ctx, Steps};
 
@@ -55,4 +56,16 @@ pub fn simulate(
         segment_count: m.segment_count as u32,
         max_flow_rate: m.max_flow_rate,
     }
+}
+
+/// Emit the g-code motion lines from the serialized IR JSON (same engine the Python build uses).
+#[wasm_bindgen]
+pub fn emit_gcode_moves(
+    ir_json: &str,
+    relative_e: bool,
+    travel_g1_e0: bool,
+) -> Result<Vec<String>, JsError> {
+    let ir: serde_json::Value = serde_json::from_str(ir_json)
+        .map_err(|e| JsError::new(&format!("invalid IR JSON: {e}")))?;
+    Ok(gcode::emit_moves(&ir, relative_e, travel_g1_e0))
 }

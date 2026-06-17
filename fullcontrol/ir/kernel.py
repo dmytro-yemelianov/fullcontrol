@@ -169,6 +169,20 @@ def resolve_columnar_rust(steps, controls, include_procedures=True, initial_extr
                             float(material_volume), float(material_filament), wid, hgt)
 
 
+def emit_gcode_moves_rust(toolpath, relative_e=True, travel_g1_e0=False):
+    '''Rust-backed g-code motion emission: serialize the Toolpath IR and let the Rust engine emit
+    the G0/G1/G2/G3 + stationary-extrusion lines (byte-identical to the Python dialect's motion
+    lines). Returns a list of lines, or None if the extension is unavailable.
+
+    This covers motion only - the start/end procedures, retraction/temperature/fan commands and the
+    extrusion-mode line stay in Python for now (see rust_kernel/src/gcode.rs).
+    '''
+    if _kernel is None:
+        return None
+    from fullcontrol.ir.serialize import to_json
+    return list(_kernel.emit_gcode_moves(to_json(toolpath), relative_e, travel_g1_e0))
+
+
 def simulate_rust(steps, controls, include_procedures=True, initial_extruder_on=None, state=None):
     '''Rust-backed simulation: one Rust pass walks the design and folds it straight into the nine
     SimulationResult metrics (no per-move arrays cross back to Python). Returns a SimulationResult,

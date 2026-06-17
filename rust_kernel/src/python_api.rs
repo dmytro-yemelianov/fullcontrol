@@ -12,6 +12,7 @@
 use numpy::{IntoPyArray, PyArray1, PyArray2, PyArrayMethods};
 use pyo3::prelude::*;
 
+use crate::gcode;
 use crate::metrics;
 use crate::walk::{walk, Ctx, ResolveOut, Steps};
 
@@ -109,9 +110,18 @@ fn simulate(py: Python<'_>, tag: Vec<i64>, payload: Payload, init: Vec<f64>) -> 
     )
 }
 
+/// Emit the g-code motion lines from the serialized IR JSON (drop-in for the dialect's motion).
+#[pyfunction]
+fn emit_gcode_moves(ir_json: &str, relative_e: bool, travel_g1_e0: bool) -> PyResult<Vec<String>> {
+    let ir: serde_json::Value = serde_json::from_str(ir_json)
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("invalid IR JSON: {e}")))?;
+    Ok(gcode::emit_moves(&ir, relative_e, travel_g1_e0))
+}
+
 #[pymodule]
 fn fullcontrol_kernel(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(resolve_columnar, m)?)?;
     m.add_function(wrap_pyfunction!(simulate, m)?)?;
+    m.add_function(wrap_pyfunction!(emit_gcode_moves, m)?)?;
     Ok(())
 }
