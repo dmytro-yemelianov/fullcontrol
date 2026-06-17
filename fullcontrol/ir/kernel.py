@@ -63,47 +63,57 @@ def _flatten(walk, ctx):
     px, py, pz = ctx.point.x, ctx.point.y, ctx.point.z  # running point, for arc start
 
     tags, av, bv, cv, dv = [], [], [], [], []
+    # bind the column append methods to locals (the hot loop runs once per resolved step) and
+    # check the dominant `Point` type first
+    ta, aa, ba, ca, da = tags.append, av.append, bv.append, cv.append, dv.append
     for step in walk:
-        if isinstance(step, Arc):
+        if isinstance(step, Point):
+            x, y, z = step.x, step.y, step.z
+            if x is not None:
+                px = x
+            if y is not None:
+                py = y
+            if z is not None:
+                pz = z
+            ta(0)
+            aa(nan if x is None else x)  # None -> NaN inline (avoids a call per coordinate)
+            ba(nan if y is None else y)
+            ca(nan if z is None else z)
+            da(0.0)
+        elif isinstance(step, Arc):
             g = arc_geometry(step, px, py, pz)
             end = step.end
             px = px if end.x is None else end.x
             py = py if end.y is None else end.y
             pz = pz if end.z is None else end.z
-            tags.append(5)
-            av.append(_f(px)); bv.append(_f(py)); cv.append(_f(pz)); dv.append(float(g.arc_length))
-        elif isinstance(step, Point):
-            px = px if step.x is None else step.x
-            py = py if step.y is None else step.y
-            pz = pz if step.z is None else step.z
-            tags.append(0)
-            av.append(_f(step.x)); bv.append(_f(step.y)); cv.append(_f(step.z)); dv.append(0.0)
-        elif isinstance(step, StationaryExtrusion):
-            tags.append(4)
-            av.append(float(step.volume)); bv.append(nan); cv.append(nan); dv.append(0.0)
+            ta(5)
+            aa(_f(px)); ba(_f(py)); ca(_f(pz)); da(float(g.arc_length))
         elif isinstance(step, Extruder):
             # mirror the resolve walk: update_from, then recompute e-ratio if units/dia_feed set
             extruder.update_from(step)
             if getattr(step, 'units', None) is not None or getattr(step, 'dia_feed', None) is not None:
                 extruder.update_e_ratio()
             on = step.on
-            tags.append(1)
-            av.append(-1.0 if on is None else (1.0 if on else 0.0))
-            bv.append(_f(extruder.volume_to_e)); cv.append(nan); dv.append(0.0)
+            ta(1)
+            aa(-1.0 if on is None else (1.0 if on else 0.0))
+            ba(_f(extruder.volume_to_e)); ca(nan); da(0.0)
         elif isinstance(step, ExtrusionGeometry):
             geom.update_from(step)
             try:
                 geom.update_area()
             except TypeError:
                 pass  # not all parameters set yet (None arithmetic) - area stays as-is
-            tags.append(2)
-            av.append(_f(geom.area)); bv.append(_f(geom.width)); cv.append(_f(geom.height)); dv.append(0.0)
+            ta(2)
+            aa(_f(geom.area)); ba(_f(geom.width)); ca(_f(geom.height)); da(0.0)
+        elif isinstance(step, StationaryExtrusion):
+            ta(4)
+            aa(float(step.volume)); ba(nan); ca(nan); da(0.0)
         elif isinstance(step, Printer):
-            tags.append(3)
-            av.append(_f(step.print_speed)); bv.append(_f(step.travel_speed)); cv.append(nan); dv.append(0.0)
+            ta(3)
+            aa(_f(step.print_speed)); ba(_f(step.travel_speed)); ca(nan); da(0.0)
         else:
-            tags.append(-1)
-            av.append(nan); bv.append(nan); cv.append(nan); dv.append(0.0)
+            ta(-1)
+            aa(nan); ba(nan); ca(nan); da(0.0)
     return tags, av, bv, cv, dv
 
 
