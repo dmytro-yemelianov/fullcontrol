@@ -1,11 +1,11 @@
 
 from fullcontrol.geometry import Point, Vector
 from math import atan2, cos, sin, tau
-from fullcontrol.check import check_points
-from pydantic import BaseModel
+from fullcontrol.core.check import check_points
+from fullcontrol.core.base import BaseModelPlus
 
 
-class PolarPoint(BaseModel):
+class PolarPoint(BaseModelPlus):
     """
     Represents a point in polar coordinates.
 
