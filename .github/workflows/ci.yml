@@ -64,12 +64,11 @@ jobs:
       - name: Clippy (deny warnings)
         working-directory: rust_kernel
         run: cargo clippy --release -- -D warnings
-      - name: Install package + test deps + maturin
+      - name: Install package + test deps
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[test] maturin
-      - name: Build the kernel into the venv
-        working-directory: rust_kernel
-        run: maturin develop --release
+          pip install -e .[test]
+      - name: Build + install the kernel (maturin PEP 517 backend)
+        run: pip install ./rust_kernel
       - name: Run the kernel conformance tests
         run: pytest tests/unit/test_rust_kernel.py -q
