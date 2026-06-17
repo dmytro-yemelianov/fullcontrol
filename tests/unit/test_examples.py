@@ -10,7 +10,7 @@ import pytest
 import fullcontrol as fc
 from fullcontrol.core.point import Point  # geometry helpers return core Points (fc.Point subclasses it)
 from examples import (GALLERY, spiral_vase, ripple_vase, nonplanar_spacer, wave_bowl,
-                      twisted_polygon_vase, helical_screw, textured_cone, revolve)
+                      twisted_polygon_vase, helical_screw, textured_cone, revolve, mobius_band)
 
 _BUILD = {'nozzle_temp': 210, 'bed_temp': 40, 'primer': 'front_lines_then_y',
           'build_volume_x': 200, 'build_volume_y': 200, 'build_volume_z': 200}
@@ -25,6 +25,7 @@ _SMALL = {
                                                          sides=5, twist_turns=0.5),
     'helical_screw': lambda: helical_screw(height=3, segments_per_layer=48, starts=2),
     'textured_cone': lambda: textured_cone(height=3, segments_per_layer=48, cells_up=4),
+    'mobius_band': lambda: mobius_band(loop_segments=60, strokes_across=6),
 }
 
 
@@ -59,7 +60,8 @@ def test_design_validates_without_errors(name):
 
 def test_gallery_registry_matches_callables():
     assert set(GALLERY) == {'spiral_vase', 'ripple_vase', 'nonplanar_spacer', 'wave_bowl',
-                            'gyroid_infill', 'twisted_polygon_vase', 'helical_screw', 'textured_cone'}
+                            'gyroid_infill', 'twisted_polygon_vase', 'helical_screw', 'textured_cone',
+                            'mobius_band'}
     for fn in GALLERY.values():
         assert callable(fn)
 
@@ -153,6 +155,24 @@ def test_helical_screw_double_start_has_two_crests_per_turn():
     rs = [r for r, _ in layer]
     crests = sum(1 for i in range(1, len(rs) - 1) if rs[i] > rs[i - 1] and rs[i] >= rs[i + 1])
     assert crests == 2
+
+
+def test_mobius_band_has_a_half_twist_and_forms_a_loop():
+    'The ribbon is flat where u=0 and vertical where u=pi (the half-twist), around a radius loop.'
+    import math
+    sa, ls = 8, 120
+    steps = mobius_band(loop_radius=20, width=9, loop_segments=ls, strokes_across=sa, centre=(50, 50))
+    pts = [s for s in steps if isinstance(s, Point)]
+    stroke = sa + 1
+
+    def z_range(pp):
+        return max(p.z for p in pp) - min(p.z for p in pp)
+
+    assert z_range(pts[:stroke]) < 0.5                       # u=0: band lies flat
+    mid = (ls // 2) * stroke
+    assert z_range(pts[mid:mid + stroke]) > 8.0              # u=pi: band stands vertical (~width 9)
+    radii = [math.hypot(p.x - 50, p.y - 50) for p in pts]
+    assert min(radii) < 18 and max(radii) > 22              # a loop of radius ~20 (± width/2)
 
 
 def test_revolve_smooth_follows_the_profile_exactly():
