@@ -99,28 +99,41 @@ def resolve(steps, controls, include_procedures=True, initial_extruder_on=None, 
     walk = ctx.steps if include_procedures else steps
     events = []
 
+    # Running point as plain float locals (avoids per-move pydantic __setattr__ on ctx.point);
+    # px/py/pz replicate Point.update_from's None-inheritance exactly. ctx.point is no longer
+    # read/written in the loop (non-motion steps still update_from their own ctx.* objects).
+    px, py, pz = ctx.point.x, ctx.point.y, ctx.point.z
+
     for i, step in enumerate(walk):
         if isinstance(step, Arc):
-            geom = arc_geometry(step, ctx.point.x, ctx.point.y, ctx.point.z)
+            geom = arc_geometry(step, px, py, pz)
             on = ctx.extruder.on
             speed = ctx.printer.print_speed if on else ctx.printer.travel_speed
             vol = geom.arc_length * (ctx.extrusion_geometry.area or 0.0) if on else 0.0
-            start = (ctx.point.x, ctx.point.y, ctx.point.z)
-            pts = tuple(arc_points(step, start[0], start[1], start[2], geom))
-            ctx.point.update_from(step.end)
-            end = (ctx.point.x, ctx.point.y, ctx.point.z)
+            start = (px, py, pz)
+            pts = tuple(arc_points(step, px, py, pz, geom))
+            end_step = step.end
+            px = px if end_step.x is None else end_step.x
+            py = py if end_step.y is None else end_step.y
+            pz = pz if end_step.z is None else end_step.z
+            end = (px, py, pz)
             events.append(Segment(start, end, not on, speed, geom.arc_length, vol,
                                   vol * (ctx.extruder.volume_to_e or 0.0), i, kind='arc',
                                   centre=(geom.cx, geom.cy), clockwise=geom.clockwise,
                                   width=ctx.extrusion_geometry.width, height=ctx.extrusion_geometry.height,
                                   arc_points=pts))
         elif isinstance(step, Point):
-            length = _distance(ctx.point, step)
-            start = (ctx.point.x, ctx.point.y, ctx.point.z)
+            dx = 0.0 if px is None or step.x is None else step.x - px
+            dy = 0.0 if py is None or step.y is None else step.y - py
+            dz = 0.0 if pz is None or step.z is None else step.z - pz
+            length = (dx * dx + dy * dy + dz * dz) ** 0.5
+            start = (px, py, pz)
             on = ctx.extruder.on
             color = getattr(step, 'color', None)
-            ctx.point.update_from(step)
-            end = (ctx.point.x, ctx.point.y, ctx.point.z)
+            px = px if step.x is None else step.x
+            py = py if step.y is None else step.y
+            pz = pz if step.z is None else step.z
+            end = (px, py, pz)
             if end != start:  # any axis changed -> a move (length may be 0 for first positioning)
                 speed = ctx.printer.print_speed if on else ctx.printer.travel_speed
                 vol = length * (ctx.extrusion_geometry.area or 0.0) if on else 0.0
