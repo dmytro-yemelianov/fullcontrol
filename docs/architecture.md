@@ -89,6 +89,22 @@ dispatch resolves correctly via the MRO for the combined user classes, the multi
 subclasses, *and* bare core instances — backend-free code (e.g. the geometry generators)
 can build designs from core classes that still render identically.
 
+## The Toolpath IR (state propagation, resolved once)
+
+Historically each backend re-walked the step list and re-implemented forward state
+propagation with its own running `State`. That duplication is being removed by a single
+`resolve(design, controls) → Toolpath` pass (`fullcontrol/ir/`): the **Toolpath IR** is an
+immutable, backend-agnostic event stream — mostly `Segment`s, where every move already carries
+absolute coordinates, the resolved feedrate, and the *semantic* material deposited (a FFF
+target maps that to `E`; a laser/CNC target would use it as power). A backend then becomes a
+plain **fold** over the IR with no state machine of its own.
+
+The **simulation backend** is the first consumer (`simulate_from_ir` in
+`simulate/run.py`) — it went from a singledispatch state machine to ~15 lines of arithmetic,
+byte-for-byte equivalent. The gcode and plot backends can migrate onto the same IR
+incrementally (each `Segment` already carries arc centre/direction so a gcode dialect can emit
+`I/J` and `G2/G3`); until they do, they keep their existing `State`-based renderers.
+
 ## Extension point 1 — a new step type
 
 1. Add the data class in the relevant backend subpackage (and expose it in `classes.py`).
