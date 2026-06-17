@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING
 # from fullcontrol.vis_OO2.color import PathColors, Color
 from fullcontrol.common import Extruder
@@ -21,13 +21,13 @@ class Path(BaseModel):
         heights (Optional[list]): List of heights for the line.
     """
 
-    xvals: list | None = []
-    yvals: list | None = []
-    zvals: list | None = []
-    colors: list | None = []  # [r,g,b]
+    xvals: list | None = Field(default_factory=list)
+    yvals: list | None = Field(default_factory=list)
+    zvals: list | None = Field(default_factory=list)
+    colors: list | None = Field(default_factory=list)  # [r,g,b]
     extruder: Extruder | None = None
-    widths: list | None = []
-    heights: list | None = []
+    widths: list | None = Field(default_factory=list)
+    heights: list | None = Field(default_factory=list)
 
     def add_point(self, state: 'State'):
         """

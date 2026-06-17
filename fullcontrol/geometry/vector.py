@@ -1,7 +1,7 @@
-from pydantic import BaseModel
+from fullcontrol.core.base import BaseModelPlus
 
 
-class Vector(BaseModel):
+class Vector(BaseModelPlus):
     """A vector defined by x, y, and z distances.
 
     Attributes:
