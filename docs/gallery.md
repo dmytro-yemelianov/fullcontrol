@@ -26,6 +26,15 @@ real print (time/material > 0), and validates with no errors against a 200³ bui
 | **nonplanar_spacer** | non-planar concentric rings | z varies *within* each ring (sinusoidal `waves`) so the whole washer is one ramped non-planar spiral; needs a pointy nozzle (reimplements `nonplanar_spacer`) | ~1.5k segs, ~1 min |
 | **wave_bowl** *(new)* | curved wall profile + ramped rim wave | combines a flaring `sin` wall profile with a rim ripple whose amplitude grows as height² — clean base, wavy lip | ~13.3k segs, ~10 min |
 | **gyroid_infill** *(new)* | continuous gyroid-TPMS weave | one seamless bead (zero travels/retractions) — per-layer sine serpentine whose phase shears with z and whose direction alternates each layer, interlocking like a gyroid | ~10k segs, ~9 min |
+| **twisted_polygon_vase** *(new)* | rotating / morphing polygon cross-section | a regular n-gon cross-section that twists with height and can morph to a different vertex count (e.g. pentagon → octagon), as one continuous spiral | ~21k segs @40mm |
+
+### Analysis tool (not a printable design)
+**`print_time_study.sweep(design_fn, param, values, **fixed)`** simulates a design once per
+parameter value and returns the metrics; `study_table()` formats them and `study_figure()` returns a
+Plotly chart of print time and material against the parameter. Built on the `simulation` backend
+(now the Rust kernel), so sweeping many large designs is fast — e.g. 8 full ripple vases (151k
+segments total) simulate in ~370 ms. Useful for spotting trade-offs: sweeping `extrusion_width`, for
+instance, shows print time staying flat while filament use climbs.
 
 ### Validator showcase (not a printable design)
 **`validation_gauntlet()`** returns a `dict[str, list]` of twelve tiny designs, each crafted to trip
@@ -54,8 +63,8 @@ library gap worth closing first.
 ### A. More parametric geometry (pure design — no library change)
 - ✅ **Gyroid / TPMS infill block** — *done* (`gyroid_infill`): a single continuous toolpath
   approximating a gyroid surface; the poster-child for "impossible to slice" designs.
-- **Twisted polygon vase** — `polygonXY` cross-section lerped between two rotated polygons up the
-  height (square→octagon twist).
+- ✅ **Twisted polygon vase** — *done* (`twisted_polygon_vase`): an n-gon cross-section that twists
+  with height and can morph to a different vertex count (pentagon→octagon).
 - **Helical screw / auger** — a flighting surface as a spiral ramp; tests steep-overhang printing.
 - **Möbius strip / trefoil band** — a closed non-planar ribbon (parametric centre-line + width).
 - **Lattice cylinder** — diagonal helices in both directions forming a printable diamond lattice
@@ -83,11 +92,11 @@ library gap worth closing first.
   `nonplanar_spacer` does by hand.)*
 
 ### D. Backend-showcase designs
-- **Print-time/material study** — one shape swept over a parameter, charting `simulation` output —
-  shows the columnar simulate fast-path doing real work.
+- ✅ **Print-time/material study** — *done* (`print_time_study`): one shape swept over a parameter,
+  charting `simulation` output — exercises the Rust-kernel simulate fast-path on many large designs.
 - ✅ **Validation gauntlet** — *done* (`validation_gauntlet`): twelve designs that each trip one
   validation rule — living documentation of the checks.
 
-**Done so far:** `gyroid_infill` and `validation_gauntlet` (the two that were suggested first).
-**Suggested next:** the **twisted polygon vase** (cheap, striking) and a **print-time/material study**
-(section D) that charts `simulation` output over a swept parameter.
+**Done so far:** `gyroid_infill`, `validation_gauntlet`, `twisted_polygon_vase`, `print_time_study`.
+**Suggested next:** the **helical screw / auger** (steep-overhang test) and the **surface-conforming
+transform helper** (section C — enables a whole class of conical / cylindrical-mapped designs).
