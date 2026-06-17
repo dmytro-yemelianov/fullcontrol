@@ -113,6 +113,10 @@ def test_resolve_columnar_columns_match_object_resolve_field_by_field():
         assert abs(col.deposited_volume[i] - seg.deposited_volume) <= 1e-12, f'seg {i} vol'
         assert abs(col.filament_length[i] - seg.filament_length) <= 1e-12, f'seg {i} fil'
         assert col.source_index[i] == seg.source_index, f'seg {i} source_index'
+        _w = None if np.isnan(col.width[i]) else col.width[i]
+        _h = None if np.isnan(col.height[i]) else col.height[i]
+        assert _w == seg.width, f'seg {i} width'
+        assert _h == seg.height, f'seg {i} height'
     # stationary extrusion is aggregated into the material scalars
     assert abs(col.material_volume - 5.0) <= 1e-12
 
