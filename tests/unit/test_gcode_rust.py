@@ -13,7 +13,7 @@ from fullcontrol.gcode.dialect import gcode_from_ir
 from fullcontrol.ir import resolve
 
 pytest.importorskip("fullcontrol_kernel")
-from fullcontrol.ir.kernel import emit_gcode_moves_rust  # noqa: E402
+from fullcontrol.ir.kernel import emit_gcode_moves_rust, emit_gcode_rust  # noqa: E402
 
 
 def _controls():
@@ -72,3 +72,36 @@ def test_stationary_extrusion_material_line():
              fc.StationaryExtrusion(volume=5.0, speed=200), fc.Point(x=20, y=0, z=0.2)]
     rust = _assert_motion_matches(steps)
     assert any('F200' in ln for ln in rust)   # the material line carries the stationary speed
+
+
+# --- full g-code (motion + procedures + the common non-motion commands) ---
+
+def _assert_full_gcode_matches(steps, init):
+    'The complete Rust file (with procedures) == fc.transform(steps, "gcode"), byte-for-byte.'
+    controls = fc.GcodeControls(printer_name='generic', initialization_data=init)
+    py = fc.transform(steps, 'gcode', controls, show_tips=False)
+    dstate = State(steps, controls)
+    toolpath = resolve(steps, controls, state=dstate)
+    rel = dstate.extruder.relative_gcode is True
+    tf = dstate.extruder.travel_format == 'G1_E0'
+    rust = '\n'.join(emit_gcode_rust(toolpath, relative_e=rel, travel_g1_e0=tf))
+    assert rust == py
+
+
+def test_full_gcode_with_temps_and_fan():
+    from examples import spiral_vase
+    _assert_full_gcode_matches(spiral_vase(height=2, segments_per_layer=24, lobes=5),
+                               {'nozzle_temp': 210, 'bed_temp': 50, 'fan_percent': 80})
+
+
+def test_full_gcode_minimal():
+    from examples import spiral_vase
+    _assert_full_gcode_matches(spiral_vase(height=1.5, segments_per_layer=16), {'nozzle_temp': 210})
+
+
+def test_full_gcode_arcs():
+    steps = [fc.ExtrusionGeometry(width=0.6, height=0.2),
+             fc.Point(x=20, y=0, z=0.2), fc.Extruder(on=True),
+             fc.Arc(centre=fc.Point(x=0, y=0), end=fc.Point(x=0, y=20), direction='anticlockwise'),
+             fc.Point(x=0, y=30, z=0.2)]
+    _assert_full_gcode_matches(steps, {'nozzle_temp': 215, 'bed_temp': 60})

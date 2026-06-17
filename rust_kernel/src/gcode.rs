@@ -1,15 +1,15 @@
-//! G-code motion emission from the serialized Toolpath IR (fullcontrol/ir/serialize.py format).
+//! G-code emission from the serialized Toolpath IR (fullcontrol/ir/serialize.py format).
 //!
-//! Consumes the IR JSON and emits the motion lines - G0/G1 linear moves, G2/G3 arcs, and the
-//! stationary-extrusion (MaterialEvent) lines - byte-for-byte identical to the Python gcode
-//! dialect (`fullcontrol/gcode/dialect.py`). This is the per-move hot path of g-code generation
-//! (one formatted line per move); the surrounding orchestration that this increment does NOT yet
-//! emit - the start/end procedures, retraction/temperature/fan commands, the M82/M83 mode line,
-//! and non-Marlin flavours - stays in Python and is the enumerated next surface.
+//! Consumes the IR JSON and emits g-code byte-for-byte identical to the Python dialect + Marlin
+//! flavor (`fullcontrol/gcode/dialect.py`, `flavor.py`, `renderers.py`).
 //!
-//! `speed_changed` (whether a move prefixes an F word) follows the dialect exactly: it starts true,
-//! a move consumes it, and it is re-armed by a MaterialEvent or by a pass-through Printer (with a
-//! speed), Extruder (with `on`), Retraction or Unretraction step.
+//! `emit_moves` emits the motion lines only (G0/G1/G2/G3 + stationary extrusion) - for callers that
+//! already have the procedures/commands (or don't want them). `emit_gcode` additionally emits the
+//! common non-motion commands - extrusion mode (M82/M83), hotend/bed temperature, fan, and
+//! pass-through ManualGcode - so a design resolved *with* procedures round-trips to a full file.
+//!
+//! Marlin flavor only; NOT yet emitted (the next surface, kept in Python): retraction, acceleration
+//! /jerk/pressure-advance, PrinterCommand command-lists, GcodeComment line-append, other firmwares.
 
 use serde_json::Value;
 
@@ -31,6 +31,15 @@ fn axis(v: &Value) -> Option<f64> {
 
 fn xyz(v: &Value) -> [Option<f64>; 3] {
     [axis(&v[0]), axis(&v[1]), axis(&v[2])]
+}
+
+/// Format a JSON number as Python's `f'{n}'` would (an int stays an int, e.g. a temperature/speed).
+fn num_word(v: &Value) -> String {
+    if let Some(i) = v.as_i64() {
+        i.to_string()
+    } else {
+        format!("{}", v.as_f64().unwrap_or(0.0))
+    }
 }
 
 /// X/Y/Z words for axes that are defined and changed (mirrors dialect `_axes`).
@@ -76,20 +85,53 @@ fn e_word(
     }
 }
 
-/// Format a MaterialEvent / stationary speed as Python's `f'{speed}'` would (an int stays an int).
-fn speed_word(v: &Value) -> String {
-    if let Some(i) = v.as_i64() {
-        i.to_string()
+// --- Marlin flavor vocabulary (mirrors fullcontrol/gcode/flavor.py) ---
+
+fn extrusion_mode(relative: bool) -> String {
+    if relative {
+        "M83 ; relative extrusion".to_string()
     } else {
-        fmt(v.as_f64().unwrap_or(0.0), 1)
+        "M82 ; absolute extrusion\nG92 E0 ; reset extrusion position to zero".to_string()
     }
 }
 
-/// Emit the motion lines for an IR document (the parsed `to_json` output).
-pub fn emit_moves(ir: &Value, relative_e: bool, travel_g1_e0: bool) -> Vec<String> {
+fn hotend_temp(temp: &Value, wait: bool, tool: &Value) -> String {
+    let t = num_word(temp);
+    match (tool.is_null(), wait) {
+        (true, false) => format!("M104 S{t} ; set hotend temp and continue"),
+        (true, true) => format!("M109 S{t} ; set hotend temp and wait"),
+        (false, false) => {
+            let tl = num_word(tool);
+            format!("M104 S{t} T{tl} ; set hotend temp for tool {tl} and continue")
+        }
+        (false, true) => {
+            let tl = num_word(tool);
+            format!("M109 S{t} T{tl} ; set hotend temp for tool {tl} and wait")
+        }
+    }
+}
+
+fn bed_temp(temp: &Value, wait: bool) -> String {
+    let t = num_word(temp);
+    if wait {
+        format!("M190 S{t} ; set bed temp and wait")
+    } else {
+        format!("M140 S{t} ; set bed temp and continue")
+    }
+}
+
+fn fan(speed_percent: f64) -> String {
+    let pwm = (speed_percent * 255.0 / 100.0) as i64; // Python int(): truncates toward zero
+    format!("M106 S{pwm} ; set fan speed")
+}
+
+/// Core fold over the IR. `full` enables non-motion command emission; otherwise only motion lines
+/// (and the speed_changed bookkeeping) are produced.
+fn emit(ir: &Value, relative_e: bool, travel_g1_e0: bool, full: bool) -> Vec<String> {
     let mut out = Vec::new();
     let mut speed_changed = true;
     let mut e_total = 0.0_f64;
+    let mut relative = relative_e;
     let empty: Vec<Value> = Vec::new();
     let events = ir
         .get("events")
@@ -109,7 +151,7 @@ pub fn emit_moves(ir: &Value, relative_e: bool, travel_g1_e0: bool) -> Vec<Strin
                 } else {
                     String::new()
                 };
-                let e_str = e_word(fil, travel, relative_e, travel_g1_e0, &mut e_total);
+                let e_str = e_word(fil, travel, relative, travel_g1_e0, &mut e_total);
                 let line = if ev["kind"].as_str() == Some("arc") {
                     let mut coords = format!(
                         "X{} Y{} ",
@@ -150,13 +192,13 @@ pub fn emit_moves(ir: &Value, relative_e: bool, travel_g1_e0: bool) -> Vec<Strin
             }
             Some("material") => {
                 let fil = ev["filament_length"].as_f64().unwrap_or(0.0);
-                let e = if relative_e {
+                let e = if relative {
                     fil
                 } else {
                     e_total += fil;
                     e_total
                 };
-                out.push(format!("G1 F{} E{}", speed_word(&ev["speed"]), fmt(e, 6)));
+                out.push(format!("G1 F{} E{}", num_word(&ev["speed"]), fmt(e, 6)));
                 speed_changed = true;
             }
             Some("step") => {
@@ -167,8 +209,31 @@ pub fn emit_moves(ir: &Value, relative_e: bool, travel_g1_e0: bool) -> Vec<Strin
                     {
                         speed_changed = true
                     }
-                    Some("Extruder") if !data["on"].is_null() => speed_changed = true,
+                    Some("Extruder") => {
+                        if !data["on"].is_null() {
+                            speed_changed = true;
+                        }
+                        if full && !data["relative_gcode"].is_null() {
+                            relative = data["relative_gcode"].as_bool().unwrap_or(false);
+                            out.push(extrusion_mode(relative));
+                        }
+                    }
                     Some("Retraction") | Some("Unretraction") => speed_changed = true,
+                    Some("Hotend") if full && !data["temp"].is_null() => out.push(hotend_temp(
+                        &data["temp"],
+                        data["wait"].as_bool().unwrap_or(false),
+                        &data["tool"],
+                    )),
+                    Some("Buildplate") if full && !data["temp"].is_null() => out.push(bed_temp(
+                        &data["temp"],
+                        data["wait"].as_bool().unwrap_or(false),
+                    )),
+                    Some("Fan") if full && !data["speed_percent"].is_null() => {
+                        out.push(fan(data["speed_percent"].as_f64().unwrap_or(0.0)))
+                    }
+                    Some("ManualGcode") if full && !data["text"].is_null() => {
+                        out.push(data["text"].as_str().unwrap_or("").to_string())
+                    }
                     _ => {}
                 }
             }
@@ -176,4 +241,15 @@ pub fn emit_moves(ir: &Value, relative_e: bool, travel_g1_e0: bool) -> Vec<Strin
         }
     }
     out
+}
+
+/// Emit only the motion lines (G0/G1/G2/G3 + stationary extrusion) for an IR document.
+pub fn emit_moves(ir: &Value, relative_e: bool, travel_g1_e0: bool) -> Vec<String> {
+    emit(ir, relative_e, travel_g1_e0, false)
+}
+
+/// Emit a full g-code line list (motion + the common non-motion commands) for an IR document
+/// resolved with procedures. Join with '\n' to get the file.
+pub fn emit_gcode(ir: &Value, relative_e: bool, travel_g1_e0: bool) -> Vec<String> {
+    emit(ir, relative_e, travel_g1_e0, true)
 }
