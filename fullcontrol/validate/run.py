@@ -33,9 +33,9 @@ def validate(steps, controls, show_tips=True) -> ValidationResult:
     controls.initialize()
     init = resolve_initialization_data(controls.printer_name, controls.initialization_data)
     state = State(steps, controls)
-    # geometric checks consume the resolved Toolpath IR (one shared resolve pass); config /
-    # ordering checks still walk the resolved step list (they are about commanded values/order)
-    segments = [e for e in resolve(steps, controls).events if isinstance(e, Segment)]
+    # geometric checks consume the resolved Toolpath IR (one shared resolve pass, reusing the
+    # State just built); config / ordering checks still walk the resolved step list
+    segments = [e for e in resolve(steps, controls, state=state).events if isinstance(e, Segment)]
     result = ValidationResult()
     _check_bounds(segments, init, result)
     _check_first_layer(segments, result)

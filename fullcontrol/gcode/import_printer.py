@@ -62,7 +62,13 @@ def safe_eval(expression: str, data: dict):
     return _eval_node(tree, data)
 
 
+from functools import cache
+
+
+@cache
 def load_json(library, file_name):
+    # cached: the device library index (library.json) is read-only reference data, so the same
+    # parsed dict can be reused across transforms instead of re-reading the file each time
     resource = resources.files('fullcontrol') / 'devices' / library / file_name
     with resource.open('r') as file:
         return json.load(file)

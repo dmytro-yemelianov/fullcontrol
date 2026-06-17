@@ -86,7 +86,8 @@ def resolve(steps, controls, include_procedures=True, initial_extruder_on=None, 
     from fullcontrol.gcode.state import State
     controls.initialize()
     if state is None:
-        ctx = State(steps, controls)   # config + procedures + the single running context
+        # build a State; skip the primer/procedures when the caller only wants the user steps
+        ctx = State(steps, controls, procedures=include_procedures)
     else:
         from copy import deepcopy
         from types import SimpleNamespace
