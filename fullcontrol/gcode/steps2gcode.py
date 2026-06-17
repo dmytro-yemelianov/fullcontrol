@@ -26,7 +26,7 @@ def gcode(steps: list, gcode_controls: GcodeControls, show_tips: bool):
     if show_tips: tips(gcode_controls)
 
     dstate = State(steps, gcode_controls)
-    toolpath = resolve(steps, gcode_controls)
+    toolpath = resolve(steps, gcode_controls, state=dstate)   # reuse dstate; no second State build
     gcode_from_ir(toolpath, dstate)
     gc = '\n'.join(dstate.gcode)
 

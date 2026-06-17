@@ -68,7 +68,7 @@ def _distance(p1, p2) -> float:
     return (dx * dx + dy * dy + dz * dz) ** 0.5
 
 
-def resolve(steps, controls, include_procedures=True, initial_extruder_on=None) -> Toolpath:
+def resolve(steps, controls, include_procedures=True, initial_extruder_on=None, state=None) -> Toolpath:
     '''The single state-propagation pass: design -> Toolpath IR.
 
     Reuses the gcode `State` for *initialisation* only (printer-config resolution, the primer,
@@ -78,10 +78,21 @@ def resolve(steps, controls, include_procedures=True, initial_extruder_on=None) 
     include_procedures=False walks only the user `steps` (no primer/start-end procedures) and
     initial_extruder_on sets the starting extruder state - used by the plot backend, which
     visualises the design alone and defaults the extruder on.
+
+    state: a caller's already-built gcode `State` to reuse instead of building a second one (the
+    gcode backend passes its emission State). Its resolved step list is shared; the small running
+    context is copied so the caller's State stays at its initial values for emission.
     '''
     from fullcontrol.gcode.state import State
     controls.initialize()
-    ctx = State(steps, controls)   # config + procedures + the single running context
+    if state is None:
+        ctx = State(steps, controls)   # config + procedures + the single running context
+    else:
+        from copy import deepcopy
+        from types import SimpleNamespace
+        ctx = SimpleNamespace(point=deepcopy(state.point), extruder=deepcopy(state.extruder),
+                              printer=deepcopy(state.printer),
+                              extrusion_geometry=deepcopy(state.extrusion_geometry), steps=state.steps)
     if initial_extruder_on is not None:
         ctx.extruder.on = initial_extruder_on
     walk = ctx.steps if include_procedures else steps
