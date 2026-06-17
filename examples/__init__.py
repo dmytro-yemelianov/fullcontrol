@@ -19,18 +19,20 @@ from examples.ripple_vase import ripple_vase
 from examples.nonplanar_spacer import nonplanar_spacer
 from examples.wave_bowl import wave_bowl
 from examples.gyroid_infill import gyroid_infill
+from examples.twisted_polygon_vase import twisted_polygon_vase
 from examples.validation_gauntlet import validation_gauntlet
 
 # GALLERY holds the printable designs (each name -> a function returning a step list). The
-# validation_gauntlet is a different shape (it returns a dict of rule-tripping designs), so it is
-# exported on its own rather than registered here.
+# validation_gauntlet (returns a dict of rule-tripping designs) and the print_time_study tool are
+# different shapes, so they are exported on their own rather than registered here.
 GALLERY = {
     'spiral_vase': spiral_vase,
     'ripple_vase': ripple_vase,
     'nonplanar_spacer': nonplanar_spacer,
     'wave_bowl': wave_bowl,
     'gyroid_infill': gyroid_infill,
+    'twisted_polygon_vase': twisted_polygon_vase,
 }
 
 __all__ = ['spiral_vase', 'ripple_vase', 'nonplanar_spacer', 'wave_bowl', 'gyroid_infill',
-           'validation_gauntlet', 'GALLERY']
+           'twisted_polygon_vase', 'validation_gauntlet', 'GALLERY']
