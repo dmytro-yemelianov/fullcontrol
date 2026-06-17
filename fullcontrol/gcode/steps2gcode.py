@@ -3,12 +3,17 @@ from fullcontrol.gcode.state import State
 from fullcontrol.gcode.controls import GcodeControls
 from datetime import datetime
 from fullcontrol.gcode.tips import tips
-from fullcontrol.gcode.renderers import render_gcode
+from fullcontrol.gcode.dialect import gcode_from_ir
+from fullcontrol.ir import resolve
 
 
 def gcode(steps: list, gcode_controls: GcodeControls, show_tips: bool):
     '''
     Generate a gcode string from a list of steps.
+
+    The design is resolved once to the shared Toolpath IR (motion/geometry/speed), then a gcode
+    dialect folds that IR into lines using the running State for the gcode-specific emission
+    state (E accumulator, command list, feedrate suppression, comments).
 
     Args:
         steps (list): A list of step objects.
@@ -20,23 +25,10 @@ def gcode(steps: list, gcode_controls: GcodeControls, show_tips: bool):
     gcode_controls.initialize()
     if show_tips: tips(gcode_controls)
 
-    state = State(steps, gcode_controls)
-    # need a while loop because some classes may change the length of state.steps
-    # max_iterations is a backstop against a step that endlessly appends to state.steps
-    max_iterations = len(state.steps) * 1000 + 1_000_000
-    while state.i < len(state.steps):
-        step = state.steps[state.i]
-        # render each step instance to a line of gcode (or None) via the gcode backend
-        try:
-            gcode_line = render_gcode(step, state)
-        except Exception as e:
-            raise type(e)(f'error generating gcode for step {state.i} ({type(step).__name__}): {e}') from e
-        if gcode_line is not None:
-            state.gcode.append(gcode_line)
-        state.i += 1
-        if state.i > max_iterations:
-            raise RuntimeError(f'gcode generation exceeded {max_iterations} steps - a step is likely appending to the step list without terminating')
-    gc = '\n'.join(state.gcode)
+    dstate = State(steps, gcode_controls)
+    toolpath = resolve(steps, gcode_controls)
+    gcode_from_ir(toolpath, dstate)
+    gc = '\n'.join(dstate.gcode)
 
     if gcode_controls.save_as is not None:
         filename = gcode_controls.save_as

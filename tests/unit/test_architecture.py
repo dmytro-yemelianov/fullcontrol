@@ -36,14 +36,27 @@ def test_every_visualize_step_class_is_exposed_in_combinations():
 
 
 def test_every_gcode_step_class_has_a_renderer():
-    # *Controls are config, not steps; every other gcode class must have a render_gcode handler
+    # *Controls are config; Point/Arc are motion, emitted by the gcode dialect from the IR
+    # (not render_gcode); every other gcode step class must have a render_gcode handler
     from fullcontrol.gcode.renderers import render_gcode
     default = render_gcode.dispatch(object)
-    names = {n for n in _public_step_classes(gc) if not n.endswith('Controls')}
+    motion = {'Point', 'Arc'}
+    names = {n for n in _public_step_classes(gc) if not n.endswith('Controls')} - motion
     assert len(names) >= 8  # guard against the discovery silently collecting nothing
     for name in sorted(names):
         cls = getattr(gc, name)
         assert render_gcode.dispatch(cls) is not default, f'{name} has no gcode renderer'
+
+
+def test_motion_classes_are_emitted_by_the_gcode_dialect():
+    # Point/Arc are rendered from the resolved IR by the dialect; a motion design produces G-lines
+    import fullcontrol as fc
+    g = fc.transform([fc.Point(x=10, y=0, z=0.2), fc.Extruder(on=True), fc.Point(x=20, y=0, z=0.2),
+                      fc.Arc(centre=fc.Point(x=15, y=0), end=fc.Point(x=10, y=0), direction='clockwise')],
+                     'gcode', fc.GcodeControls(printer_name='generic', initialization_data={'nozzle_temp': 210}),
+                     show_tips=False)
+    assert any(ln.startswith('G1 ') for ln in g.splitlines())
+    assert any(ln.startswith('G2 ') or ln.startswith('G3 ') for ln in g.splitlines())
 
 
 def test_every_visualize_step_class_has_a_renderer():

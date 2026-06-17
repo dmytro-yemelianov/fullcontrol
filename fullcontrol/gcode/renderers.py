@@ -11,10 +11,10 @@ from functools import singledispatch
 # handlers are registered on the core (backend-free) data classes so that designs built from
 # core classes - e.g. by the geometry generators - render identically to ones using the
 # combined backend classes (which are subclasses and resolve to the same handlers via the MRO)
+# motion (Point/Arc -> G0/G1/G2/G3) is emitted by the gcode dialect from the resolved Toolpath
+# IR (fullcontrol/gcode/dialect.py), not here; render_gcode handles the non-motion steps, which
+# the dialect reuses (and which the multiaxis backend also shares)
 from fullcontrol.common import Printer as CommonPrinter
-from fullcontrol.core.arc import arc_geometry
-from fullcontrol.core.point import Point
-from fullcontrol.gcode.arc import Arc
 from fullcontrol.core.extrusion_classes import Extruder, ExtrusionGeometry, StationaryExtrusion
 from fullcontrol.gcode.extrusion_classes import Retraction, Unretraction
 from fullcontrol.core.auxilliary_components import Fan, Hotend, Buildplate
@@ -27,56 +27,6 @@ from fullcontrol.gcode.number_format import fmt
 def render_gcode(step, state):
     'default: a step with no gcode representation emits nothing'
     return None
-
-
-def _xyz_gcode(step, prev) -> str:
-    'XYZ words to move from prev to step (only axes that are defined and changed); None if no move.'
-    s = ''
-    if step.x is not None and step.x != prev.x:
-        s += f'X{fmt(step.x)} '
-    if step.y is not None and step.y != prev.y:
-        s += f'Y{fmt(step.y)} '
-    if step.z is not None and step.z != prev.z:
-        s += f'Z{fmt(step.z)} '
-    return s if s != '' else None
-
-
-@render_gcode.register
-def _(step: Point, state):
-    axes_str = _xyz_gcode(step, state.point)
-    if axes_str is not None:  # only write a line of gcode if movement occurs
-        f_str = state.printer.f_gcode(state)
-        e_str = state.extruder.e_gcode(step, state)
-        line = state.flavor.linear_move(state.extruder.on, f_str, axes_str, e_str)
-        state.printer.speed_changed = False
-        state.point.update_from(step)
-        return line
-
-
-@render_gcode.register
-def _(step: Arc, state):
-    start = state.point
-    geom = arc_geometry(step, start.x, start.y, start.z)
-    coords = f'X{fmt(step.end.x)} Y{fmt(step.end.y)} '
-    if step.end.z is not None and step.end.z != start.z:
-        coords += f'Z{fmt(step.end.z)} '
-    f_str = state.printer.f_gcode(state)
-    ij_str = f'I{fmt(geom.cx - start.x)} J{fmt(geom.cy - start.y)} '
-    e_str = _arc_e_gcode(state, geom.arc_length)
-    line = state.flavor.arc_move(geom.clockwise, f_str, coords, ij_str, e_str)
-    state.printer.speed_changed = False
-    state.point.update_from(step.end)
-    return line
-
-
-def _arc_e_gcode(state, arc_length: float) -> str:
-    'E word for an arc move of the given length, mirroring Extruder.e_gcode for straight moves'
-    e = state.extruder
-    if e.on:
-        return f'E{fmt(e.get_and_update_volume(arc_length * state.extrusion_geometry.area) * e.volume_to_e)}'
-    if e.travel_format == 'G1_E0':
-        return f'E{fmt(e.get_and_update_volume(0) * e.volume_to_e)}'
-    return ''
 
 
 @render_gcode.register

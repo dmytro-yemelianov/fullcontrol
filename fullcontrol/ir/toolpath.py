@@ -49,6 +49,7 @@ class MaterialEvent:
     deposited_volume: float
     filament_length: float
     source_index: int
+    speed: float = None   # feedrate for the gcode line (StationaryExtrusion.speed)
 
 
 @dataclass
@@ -102,20 +103,24 @@ def resolve(steps, controls) -> Toolpath:
                 events.append(Segment(start, end, not on, speed, length, vol,
                                       vol * (ctx.extruder.volume_to_e or 0.0), i,
                                       width=ctx.extrusion_geometry.width, height=ctx.extrusion_geometry.height))
-        elif isinstance(step, Extruder):
-            ctx.extruder.update_from(step)
-            if getattr(step, 'units', None) is not None or getattr(step, 'dia_feed', None) is not None:
-                ctx.extruder.update_e_ratio()
-        elif isinstance(step, ExtrusionGeometry):
-            ctx.extrusion_geometry.update_from(step)
-            try:
-                ctx.extrusion_geometry.update_area()
-            except TypeError:
-                pass  # not all parameters set yet (None arithmetic)
-        elif isinstance(step, Printer):
-            ctx.printer.update_from(step)
         elif isinstance(step, StationaryExtrusion):
-            events.append(MaterialEvent(step.volume, step.volume * (ctx.extruder.volume_to_e or 0.0), i))
-        # steps with no effect on time/material (temps, fan, commands, raw gcode, retraction)
-        # are skipped here - a future gcode/plot consumer would model them as further IR events
+            events.append(MaterialEvent(step.volume, step.volume * (ctx.extruder.volume_to_e or 0.0), i,
+                                        speed=step.speed))
+        else:
+            # non-motion step: update the running context where it affects future segments
+            # (extruder on / e-ratio, geometry area, printer speed), then pass it through as an
+            # event so a downstream consumer (the gcode dialect) can emit it in order
+            if isinstance(step, Extruder):
+                ctx.extruder.update_from(step)
+                if getattr(step, 'units', None) is not None or getattr(step, 'dia_feed', None) is not None:
+                    ctx.extruder.update_e_ratio()
+            elif isinstance(step, ExtrusionGeometry):
+                ctx.extrusion_geometry.update_from(step)
+                try:
+                    ctx.extrusion_geometry.update_area()
+                except TypeError:
+                    pass  # not all parameters set yet (None arithmetic)
+            elif isinstance(step, Printer):
+                ctx.printer.update_from(step)
+            events.append(step)
     return Toolpath(events)
