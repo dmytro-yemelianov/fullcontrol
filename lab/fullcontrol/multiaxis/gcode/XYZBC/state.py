@@ -7,7 +7,7 @@ from fullcontrol.gcode.flavor import GcodeFlavor, get_flavor
 # from fullcontrol.gcode.printer import Printer
 from fullcontrol.gcode.extrusion_classes import ExtrusionGeometry, Extruder, ExtruderState
 from lab.fullcontrol.multiaxis.gcode.XYZBC.point import Point
-from lab.fullcontrol.multiaxis.gcode.XYZBC.printer import Printer
+from lab.fullcontrol.multiaxis.gcode.XYZBC.printer import PrinterState
 from lab.fullcontrol.multiaxis.gcode.XYZBC.controls import GcodeControls
 
 
@@ -22,7 +22,7 @@ class State(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)  # the flavor is a plain class
 
     extruder: ExtruderState | None = None
-    printer: Printer | None = None
+    printer: PrinterState | None = None
     flavor: GcodeFlavor | None = None
     extrusion_geometry: ExtrusionGeometry | None = None
     steps: list | None = None
@@ -63,7 +63,7 @@ class State(BaseModel):
             on=True)  # on=True is different from 3-axis gcode since the primer has been disabled
         self.extruder.update_e_ratio()
 
-        self.printer = Printer(
+        self.printer = PrinterState(
             command_list=initialization_data['printer_command_list'],
             print_speed=initialization_data['print_speed'],
             travel_speed=initialization_data['travel_speed'],
