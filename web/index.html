@@ -48,8 +48,14 @@
   <label>radius (mm) <span class="v" id="radius-v"></span></label>
   <input type="range" id="radius" min="8" max="30" step="1" value="20">
 
+  <label>nozzle (&deg;C) <span class="v" id="nozzle-v"></span></label>
+  <input type="range" id="nozzle" min="180" max="250" step="5" value="210">
+
+  <label>bed (&deg;C) <span class="v" id="bed-v"></span></label>
+  <input type="range" id="bed" min="0" max="100" step="5" value="50">
+
   <div id="stats"></div>
-  <button id="gcode-btn" disabled>&#10515; download g-code</button>
+  <button id="gcode-btn" disabled>&#10515; download printable g-code</button>
   <div id="engine">&#9679; kernel: loading&hellip;</div>
 </div>
 <div id="canvas-wrap"></div>
@@ -64,7 +70,7 @@
 <script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import init, {simulate, emit_gcode_moves} from './pkg/fullcontrol_kernel.js';
+import init, {simulate, emit_gcode} from './pkg/fullcontrol_kernel.js';
 
 // ---- printer assumptions (match a generic FFF setup) ----
 const EW = 0.8, EH = 0.3;                 // extrusion width / height (mm)
@@ -152,36 +158,51 @@ function simMetrics(pts){
 
 const fmtTime = s => { const m = Math.round(s/60); return m>=60 ? `${(m/60).toFixed(1)} h` : `${m} min`; };
 
-// ---- build the serialized IR and let the WASM engine emit real g-code ----
+// ---- build a FULL serialized IR (procedures + toolpath) and let the WASM engine emit a
+//      complete, printable g-code file (start gcode, heat-up, fan, toolpath, end gcode) ----
 let currentPts = null;
-function buildIR(pts){
-  const n = pts.length/3, events = [];
-  for(let i=1;i<n;i++){
+const START_GCODE = '; FullControl design — full g-code generated in your browser by the Rust (WASM) engine\n'
+                  + 'G28 ; home all axes\nG90 ; absolute coordinates';
+const END_GCODE = 'M104 S0 ; hotend off\nM140 S0 ; bed off\nM107 ; fan off\nG28 X Y ; home x/y\nM84 ; motors off';
+
+function buildFullIR(pts, nozzle, bed){
+  const step = (type, data) => ({k:'step', type, data});
+  const events = [
+    step('ManualGcode', {text: START_GCODE}),
+    step('Buildplate', {temp: bed, wait: false}), step('Hotend', {temp: nozzle, wait: false}),
+    step('Buildplate', {temp: bed, wait: true}),  step('Hotend', {temp: nozzle, wait: true}),
+    step('Fan', {speed_percent: 100}),
+    step('Extruder', {relative_gcode: true}),
+    // travel to the first point, then the extruding toolpath
+    {k:'segment', start:[null,null,null], end:[pts[0],pts[1],pts[2]], travel:true,
+     speed:TRAVEL_SPEED, length:0, filament_length:0, kind:'line'},
+  ];
+  for(let i=1;i<pts.length/3;i++){
     const sx=pts[(i-1)*3], sy=pts[(i-1)*3+1], sz=pts[(i-1)*3+2];
     const ex=pts[i*3], ey=pts[i*3+1], ez=pts[i*3+2];
     const len = Math.hypot(ex-sx, ey-sy, ez-sz);
     events.push({k:'segment', start:[sx,sy,sz], end:[ex,ey,ez], travel:false,
                  speed:PRINT_SPEED, length:len, filament_length:len*AREA*VOL_TO_E, kind:'line'});
   }
+  events.push(step('ManualGcode', {text: END_GCODE}));
   return JSON.stringify({version:1, events});
 }
+
 function downloadGcode(){
   if(!currentPts) return;
+  const nozzle = +document.getElementById('nozzle').value, bed = +document.getElementById('bed').value;
+  const ir = buildFullIR(currentPts, nozzle, bed);
+  const params = JSON.stringify({relative_e:false, travel_g1_e0:false, flavor:'marlin',
+                                 retraction_distance:0, retraction_speed:0, command_list:{}});
   const t0 = performance.now();
-  const moves = emit_gcode_moves(buildIR(currentPts), true, false);   // relative E
+  const lines = emit_gcode(ir, params);                 // full file, in Rust/wasm
   const dt = (performance.now()-t0).toFixed(1);
-  const p = currentPts;
-  const file = [
-    '; FullControl design — g-code generated in your browser by the Rust (WASM) engine',
-    'G90 ; absolute coordinates', 'M83 ; relative extrusion',
-    `G0 F${TRAVEL_SPEED} X${p[0].toFixed(3)} Y${p[1].toFixed(3)} Z${p[2].toFixed(3)}`,
-    ...moves, ''
-  ].join('\n');
+  const file = lines.join('\n') + '\n';
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([file], {type:'text/plain'}));
   a.download = 'design.gcode'; a.click(); URL.revokeObjectURL(a.href);
   document.getElementById('engine').innerHTML =
-    `&#9679; Rust engine (wasm) emitted ${moves.length.toLocaleString()} g-code moves in ${dt} ms`;
+    `&#9679; Rust engine (wasm) emitted a ${(file.length/1024|0).toLocaleString()} KB printable file in ${dt} ms`;
 }
 
 function update(){
@@ -189,7 +210,7 @@ function update(){
     sides:+sides.value, morph:+morph.value, twist:+twist.value,
     height:+height.value, radius:+radius.value
   };
-  for(const k of ['sides','morph','twist','height','radius'])
+  for(const k of ['sides','morph','twist','height','radius','nozzle','bed'])
     document.getElementById(k+'-v').textContent = document.getElementById(k).value;
   const pts = vasePoints(p);
   currentPts = pts;
@@ -212,6 +233,9 @@ function update(){
   await init();                       // load the wasm module
   for(const id of ['sides','morph','twist','height','radius'])
     document.getElementById(id).addEventListener('input', update);
+  for(const id of ['nozzle','bed'])
+    document.getElementById(id).addEventListener('input',
+      e => document.getElementById(id+'-v').textContent = e.target.value);
   const btn = document.getElementById('gcode-btn');
   btn.disabled = false; btn.addEventListener('click', downloadGcode);
   resize(); update();
