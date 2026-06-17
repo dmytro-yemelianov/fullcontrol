@@ -10,7 +10,7 @@ import pytest
 import fullcontrol as fc
 from fullcontrol.core.point import Point  # geometry helpers return core Points (fc.Point subclasses it)
 from examples import (GALLERY, spiral_vase, ripple_vase, nonplanar_spacer, wave_bowl,
-                      twisted_polygon_vase)
+                      twisted_polygon_vase, helical_screw)
 
 _BUILD = {'nozzle_temp': 210, 'bed_temp': 40, 'primer': 'front_lines_then_y',
           'build_volume_x': 200, 'build_volume_y': 200, 'build_volume_z': 200}
@@ -23,6 +23,7 @@ _SMALL = {
     'wave_bowl': lambda: wave_bowl(height=3, segments_per_layer=48, rim_waves=5),
     'twisted_polygon_vase': lambda: twisted_polygon_vase(height=3, segments_per_layer=48,
                                                          sides=5, twist_turns=0.5),
+    'helical_screw': lambda: helical_screw(height=3, segments_per_layer=48, starts=2),
 }
 
 
@@ -57,7 +58,7 @@ def test_design_validates_without_errors(name):
 
 def test_gallery_registry_matches_callables():
     assert set(GALLERY) == {'spiral_vase', 'ripple_vase', 'nonplanar_spacer', 'wave_bowl',
-                            'gyroid_infill', 'twisted_polygon_vase'}
+                            'gyroid_infill', 'twisted_polygon_vase', 'helical_screw'}
     for fn in GALLERY.values():
         assert callable(fn)
 
@@ -120,6 +121,37 @@ def test_morph_blends_vertex_count():
     base_spread = max(radii(pts[:120])) - min(radii(pts[:120]))    # triangle: large spread
     rim_spread = max(radii(pts[-120:])) - min(radii(pts[-120:]))   # octagon: smaller spread
     assert base_spread > rim_spread
+
+
+def test_helical_screw_thread_is_present_and_climbs():
+    'The thread modulates the radius, and its ridge angle shifts with height (a helix, not rings).'
+    import math
+    steps = helical_screw(radius=12, thread_depth=3, starts=1, pitch=8, height=6,
+                          segments_per_layer=120, centre=(50, 50))
+    pts = [s for s in steps if isinstance(s, Point)]
+
+    def polar(p):
+        return (((p.x - 50) ** 2 + (p.y - 50) ** 2) ** 0.5, math.atan2(p.y - 50, p.x - 50))
+
+    def ridge_angle(layer):
+        return max(layer, key=lambda ra: ra[0])[1]      # angle of the thread crest
+
+    bottom = [polar(p) for p in pts[:120]]
+    top = [polar(p) for p in pts[-120:]]
+    radii = [r for r, _ in bottom]
+    assert max(radii) - min(radii) > 2.0                 # the thread stands out from the core
+    assert abs(ridge_angle(bottom) - ridge_angle(top)) > 0.1   # crest rotates with height -> helix
+
+
+def test_helical_screw_double_start_has_two_crests_per_turn():
+    import math
+    steps = helical_screw(radius=12, thread_depth=3, starts=2, height=2, segments_per_layer=240)
+    layer = [(((p.x - 50) ** 2 + (p.y - 50) ** 2) ** 0.5, math.atan2(p.y - 50, p.x - 50))
+             for p in [s for s in steps if isinstance(s, Point)][:240]]
+    # count local radius maxima around one turn (a 2-start thread crests twice)
+    rs = [r for r, _ in layer]
+    crests = sum(1 for i in range(1, len(rs) - 1) if rs[i] > rs[i - 1] and rs[i] >= rs[i + 1])
+    assert crests == 2
 
 
 def test_print_time_study_sweeps_and_metrics_grow_with_size():

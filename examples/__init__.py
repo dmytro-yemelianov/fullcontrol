@@ -20,6 +20,7 @@ from examples.nonplanar_spacer import nonplanar_spacer
 from examples.wave_bowl import wave_bowl
 from examples.gyroid_infill import gyroid_infill
 from examples.twisted_polygon_vase import twisted_polygon_vase
+from examples.helical_screw import helical_screw
 from examples.validation_gauntlet import validation_gauntlet
 
 # GALLERY holds the printable designs (each name -> a function returning a step list). The
@@ -32,7 +33,8 @@ GALLERY = {
     'wave_bowl': wave_bowl,
     'gyroid_infill': gyroid_infill,
     'twisted_polygon_vase': twisted_polygon_vase,
+    'helical_screw': helical_screw,
 }
 
 __all__ = ['spiral_vase', 'ripple_vase', 'nonplanar_spacer', 'wave_bowl', 'gyroid_infill',
-           'twisted_polygon_vase', 'validation_gauntlet', 'GALLERY']
+           'twisted_polygon_vase', 'helical_screw', 'validation_gauntlet', 'GALLERY']
