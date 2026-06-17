@@ -20,6 +20,9 @@
   #stats .row{display:flex;justify-content:space-between}
   #stats b{color:#fff;font-variant-numeric:tabular-nums}
   #stats .k{color:#8b91a3}
+  #gcode-btn{margin-top:16px;width:100%;padding:8px;border:0;border-radius:6px;cursor:pointer;
+             background:#2563c9;color:#fff;font-size:13px}
+  #gcode-btn:disabled{background:#333;color:#888;cursor:default}
   #engine{margin-top:14px;font-size:11px;color:#5fd08a}
   #canvas-wrap{position:absolute;left:268px;top:0;right:0;bottom:0}
   #hint{position:fixed;bottom:10px;right:14px;color:#5b6173;font-size:11px}
@@ -46,6 +49,7 @@
   <input type="range" id="radius" min="8" max="30" step="1" value="20">
 
   <div id="stats"></div>
+  <button id="gcode-btn" disabled>&#10515; download g-code</button>
   <div id="engine">&#9679; kernel: loading&hellip;</div>
 </div>
 <div id="canvas-wrap"></div>
@@ -60,7 +64,7 @@
 <script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import init, {simulate} from './pkg/fullcontrol_kernel.js';
+import init, {simulate, emit_gcode_moves} from './pkg/fullcontrol_kernel.js';
 
 // ---- printer assumptions (match a generic FFF setup) ----
 const EW = 0.8, EH = 0.3;                 // extrusion width / height (mm)
@@ -148,6 +152,38 @@ function simMetrics(pts){
 
 const fmtTime = s => { const m = Math.round(s/60); return m>=60 ? `${(m/60).toFixed(1)} h` : `${m} min`; };
 
+// ---- build the serialized IR and let the WASM engine emit real g-code ----
+let currentPts = null;
+function buildIR(pts){
+  const n = pts.length/3, events = [];
+  for(let i=1;i<n;i++){
+    const sx=pts[(i-1)*3], sy=pts[(i-1)*3+1], sz=pts[(i-1)*3+2];
+    const ex=pts[i*3], ey=pts[i*3+1], ez=pts[i*3+2];
+    const len = Math.hypot(ex-sx, ey-sy, ez-sz);
+    events.push({k:'segment', start:[sx,sy,sz], end:[ex,ey,ez], travel:false,
+                 speed:PRINT_SPEED, length:len, filament_length:len*AREA*VOL_TO_E, kind:'line'});
+  }
+  return JSON.stringify({version:1, events});
+}
+function downloadGcode(){
+  if(!currentPts) return;
+  const t0 = performance.now();
+  const moves = emit_gcode_moves(buildIR(currentPts), true, false);   // relative E
+  const dt = (performance.now()-t0).toFixed(1);
+  const p = currentPts;
+  const file = [
+    '; FullControl design — g-code generated in your browser by the Rust (WASM) engine',
+    'G90 ; absolute coordinates', 'M83 ; relative extrusion',
+    `G0 F${TRAVEL_SPEED} X${p[0].toFixed(3)} Y${p[1].toFixed(3)} Z${p[2].toFixed(3)}`,
+    ...moves, ''
+  ].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([file], {type:'text/plain'}));
+  a.download = 'design.gcode'; a.click(); URL.revokeObjectURL(a.href);
+  document.getElementById('engine').innerHTML =
+    `&#9679; Rust engine (wasm) emitted ${moves.length.toLocaleString()} g-code moves in ${dt} ms`;
+}
+
 function update(){
   const p = {
     sides:+sides.value, morph:+morph.value, twist:+twist.value,
@@ -156,6 +192,7 @@ function update(){
   for(const k of ['sides','morph','twist','height','radius'])
     document.getElementById(k+'-v').textContent = document.getElementById(k).value;
   const pts = vasePoints(p);
+  currentPts = pts;
   buildLine(pts, p.height);
   fitView(p.height, p.radius);
   const t0 = performance.now();
@@ -175,6 +212,8 @@ function update(){
   await init();                       // load the wasm module
   for(const id of ['sides','morph','twist','height','radius'])
     document.getElementById(id).addEventListener('input', update);
+  const btn = document.getElementById('gcode-btn');
+  btn.disabled = false; btn.addEventListener('click', downloadGcode);
   resize(); update();
   (function loop(){ requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); })();
 })();
