@@ -122,6 +122,23 @@ Consumers, in migration order:
 All four backends now consume the one `resolve()` pass; none keeps its own forward
 state-propagation walk - `resolve()` is the single place that state lives.
 
+### IR → IR optimization passes
+
+Because the IR sits between `resolve()` and the backends, slicer-style optimizations are pure
+`Toolpath → Toolpath` functions (`fullcontrol/ir/passes.py`) applied after `resolve()` - so
+every backend sees the optimized toolpath. They are **opt-in** (default output is unchanged)
+via `initialization_data['optimize']`, a list of pass names / `(name, params)` pairs:
+
+```python
+fc.transform(steps, 'gcode', fc.GcodeControls(initialization_data={
+    'optimize': ['merge_collinear', ('retract_on_travel', {'min_distance': 5})]}))
+```
+
+Built-in passes: `merge_collinear` (combine consecutive collinear moves - smaller gcode) and
+`retract_on_travel` (insert retract/prime around long travels - anti-stringing). Register more
+with `register_pass(name, fn)`; this is where auto-retraction, travel reordering, coasting, etc.
+belong.
+
 ## Extension point 1 — a new step type
 
 1. Add the data class in the relevant backend subpackage (and expose it in `classes.py`).
