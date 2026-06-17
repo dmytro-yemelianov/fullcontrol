@@ -41,13 +41,16 @@ class State(BaseModel):
     i: int | None = 0
     gcode: list | None = Field(default_factory=list)
 
-    def __init__(self, steps: list, gcode_controls: GcodeControls):
+    def __init__(self, steps: list, gcode_controls: GcodeControls, procedures: bool = True):
         """
         Initializes a State object.
 
         Args:
             steps (list): A list of steps for the state.
             gcode_controls (GcodeControls): An instance of the GcodeControls class.
+            procedures (bool): include the printer's primer + start/end procedures in self.steps.
+                False (used by the plot backend, which visualises the design alone) skips building
+                them entirely - just the user steps.
 
         Returns:
             None
@@ -87,5 +90,8 @@ class State(BaseModel):
             height=initialization_data['extrusion_height'])
         self.extrusion_geometry.update_area()
 
-        primer_steps = import_module(f'fullcontrol.gcode.primer_library.{initialization_data["primer"]}').primer(first_point(steps))
-        self.steps = initialization_data['starting_procedure_steps'] + primer_steps + steps + initialization_data['ending_procedure_steps']
+        if procedures:
+            primer_steps = import_module(f'fullcontrol.gcode.primer_library.{initialization_data["primer"]}').primer(first_point(steps))
+            self.steps = initialization_data['starting_procedure_steps'] + primer_steps + steps + initialization_data['ending_procedure_steps']
+        else:
+            self.steps = steps  # design only - no primer / start-end procedures (e.g. the plot backend)
