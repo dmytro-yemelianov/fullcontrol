@@ -6,11 +6,21 @@ description = "Rust computational microkernel for FullControl's columnar resolve
 
 [lib]
 name = "fullcontrol_kernel"
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["python"]
+# Python extension (PyO3 + numpy) - the default, built by maturin / `pip install ./rust_kernel`.
+python = ["dep:pyo3", "dep:numpy"]
+# Browser build (wasm-bindgen) - the same compute core, exposed to JS. Build with:
+#   cargo build --release --target wasm32-unknown-unknown --no-default-features --features wasm
+wasm = ["dep:wasm-bindgen"]
 
 [dependencies]
-pyo3 = { version = "0.23", features = ["extension-module"] }
-numpy = "0.23"
+pyo3 = { version = "0.23", features = ["extension-module"], optional = true }
+numpy = { version = "0.23", optional = true }
+# pinned to exactly match the wasm-bindgen CLI used to generate the JS glue
+wasm-bindgen = { version = "=0.2.123", optional = true }
 
 [profile.release]
 opt-level = 3

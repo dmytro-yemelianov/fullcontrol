@@ -58,12 +58,16 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
       - name: Rust format check
         working-directory: rust_kernel
         run: cargo fmt --check
-      - name: Clippy (deny warnings)
+      - name: Clippy (python, deny warnings)
         working-directory: rust_kernel
         run: cargo clippy --release -- -D warnings
+      - name: Clippy (wasm, deny warnings)
+        working-directory: rust_kernel
+        run: cargo clippy --release --target wasm32-unknown-unknown --no-default-features --features wasm -- -D warnings
       - name: Install package + test deps
         run: |
           python -m pip install --upgrade pip
