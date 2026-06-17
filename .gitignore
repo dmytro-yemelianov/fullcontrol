@@ -142,3 +142,6 @@ CLAUDE.md
 
 # Temporary files
 tmp/
+
+# Claude Code agent worktrees / local files
+.claude/
