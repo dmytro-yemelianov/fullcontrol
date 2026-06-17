@@ -63,13 +63,18 @@ def simulate(steps, controls, show_tips=True) -> SimulationResult:
     simulation reflects the gcode that would be produced, including the printer's start/end
     procedures and primer).
 
-    Simulation only needs scalar metrics, so by default it takes the columnar fast-path
-    (resolve straight into numpy columns, then a vectorised fold) - ~2.7x faster end-to-end on
-    large designs. Optimisation passes run on the object IR, so when any are configured we fall
-    back to the object path (resolve -> fold) to honour them.'''
+    Simulation only needs scalar metrics, so it takes the fastest available fold:
+      1. the Rust microkernel (one pass, walk + fold in Rust) when the compiled extension is built,
+      2. else the columnar numpy fast-path (resolve into columns, vectorised fold),
+      3. else (when optimisation passes are configured) the object path, which honours the passes.
+    Passes run on the object IR, so any `optimize` control forces option 3.'''
     controls.initialize()
     optimize = (getattr(controls, 'initialization_data', None) or {}).get('optimize')
     if optimize:
         return simulate_from_ir(resolve(steps, controls))
+    from fullcontrol.ir.kernel import simulate_rust
+    r = simulate_rust(steps, controls)
+    if r is not None:
+        return r
     from fullcontrol.ir.columnar import resolve_columnar
     return simulate_columnar(resolve_columnar(steps, controls))
