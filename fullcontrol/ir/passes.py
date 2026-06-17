@@ -113,3 +113,78 @@ def retract_on_travel(toolpath: Toolpath, min_distance: float = 2.0) -> Toolpath
 
 
 register_pass('retract_on_travel', retract_on_travel)
+
+
+# --------------------------------------------------------------------------- #
+# coasting: stop extruding `distance` mm before the end of a run, to cut blobbing
+# --------------------------------------------------------------------------- #
+
+def _next_motion(events, i):
+    'The next Segment after index i, skipping non-motion events; None if there is none.'
+    for j in range(i + 1, len(events)):
+        if isinstance(events[j], Segment):
+            return events[j]
+    return None
+
+
+def coasting(toolpath: Toolpath, distance: float = 1.0) -> Toolpath:
+    '''Turn the last `distance` mm of each extruding run into a non-extruding (coasting) move,
+    so residual nozzle pressure - not fresh material - finishes the line. Splits the final
+    extruding line move before a travel (or the end) `A->B` into `A->P` (extruding, material
+    scaled to the shortened length) plus `P->B` (travel, no material). Arcs are left untouched.'''
+    if distance <= 0:
+        return toolpath
+    events = toolpath.events
+    out = []
+    for i, ev in enumerate(events):
+        if (isinstance(ev, Segment) and ev.kind == 'line' and not ev.travel
+                and ev.length > distance):
+            nxt = _next_motion(events, i)
+            if nxt is None or nxt.travel:
+                frac = (ev.length - distance) / ev.length
+                p = tuple(None if ev.start[k] is None or ev.end[k] is None
+                          else ev.start[k] + (ev.end[k] - ev.start[k]) * frac for k in range(3))
+                out.append(Segment(ev.start, p, False, ev.speed, ev.length - distance,
+                                   ev.deposited_volume * frac, ev.filament_length * frac,
+                                   ev.source_index, kind='line', width=ev.width,
+                                   height=ev.height, color=ev.color))
+                out.append(Segment(p, ev.end, True, ev.speed, distance, 0.0, 0.0,
+                                   ev.source_index, kind='line', width=ev.width,
+                                   height=ev.height, color=ev.color))
+                continue
+        out.append(ev)
+    return Toolpath(out)
+
+
+register_pass('coasting', coasting)
+
+
+# --------------------------------------------------------------------------- #
+# z_hop: lift the nozzle by `height` for the duration of each travel move
+# --------------------------------------------------------------------------- #
+
+def z_hop(toolpath: Toolpath, height: float = 0.4) -> Toolpath:
+    '''Raise every travel move by `height` in Z so the nozzle clears the print - the classic
+    anti-collision / anti-stringing pass. Each travel line move `A->B` becomes three travel
+    moves: a vertical lift, the travel at the raised Z, and a vertical lower back to B. Arcs,
+    zero-length moves, and the initial positioning move (a None component) are left untouched.'''
+    out = []
+    for ev in toolpath.events:
+        if (isinstance(ev, Segment) and ev.kind == 'line' and ev.travel and ev.length > 0
+                and ev.start[2] is not None and ev.end[2] is not None
+                and None not in ev.start and None not in ev.end):
+            a, b = ev.start, ev.end
+            a_up = (a[0], a[1], a[2] + height)
+            b_up = (b[0], b[1], b[2] + height)
+            out.append(Segment(a, a_up, True, ev.speed, height, 0.0, 0.0, ev.source_index,
+                               kind='line', width=ev.width, height=ev.height, color=ev.color))
+            out.append(Segment(a_up, b_up, True, ev.speed, ev.length, 0.0, 0.0, ev.source_index,
+                               kind='line', width=ev.width, height=ev.height, color=ev.color))
+            out.append(Segment(b_up, b, True, ev.speed, height, 0.0, 0.0, ev.source_index,
+                               kind='line', width=ev.width, height=ev.height, color=ev.color))
+        else:
+            out.append(ev)
+    return Toolpath(out)
+
+
+register_pass('z_hop', z_hop)
