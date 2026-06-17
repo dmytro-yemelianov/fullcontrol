@@ -10,7 +10,7 @@ import pytest
 import fullcontrol as fc
 from fullcontrol.core.point import Point  # geometry helpers return core Points (fc.Point subclasses it)
 from examples import (GALLERY, spiral_vase, ripple_vase, nonplanar_spacer, wave_bowl,
-                      twisted_polygon_vase, helical_screw)
+                      twisted_polygon_vase, helical_screw, textured_cone, revolve)
 
 _BUILD = {'nozzle_temp': 210, 'bed_temp': 40, 'primer': 'front_lines_then_y',
           'build_volume_x': 200, 'build_volume_y': 200, 'build_volume_z': 200}
@@ -24,6 +24,7 @@ _SMALL = {
     'twisted_polygon_vase': lambda: twisted_polygon_vase(height=3, segments_per_layer=48,
                                                          sides=5, twist_turns=0.5),
     'helical_screw': lambda: helical_screw(height=3, segments_per_layer=48, starts=2),
+    'textured_cone': lambda: textured_cone(height=3, segments_per_layer=48, cells_up=4),
 }
 
 
@@ -58,7 +59,7 @@ def test_design_validates_without_errors(name):
 
 def test_gallery_registry_matches_callables():
     assert set(GALLERY) == {'spiral_vase', 'ripple_vase', 'nonplanar_spacer', 'wave_bowl',
-                            'gyroid_infill', 'twisted_polygon_vase', 'helical_screw'}
+                            'gyroid_infill', 'twisted_polygon_vase', 'helical_screw', 'textured_cone'}
     for fn in GALLERY.values():
         assert callable(fn)
 
@@ -152,6 +153,33 @@ def test_helical_screw_double_start_has_two_crests_per_turn():
     rs = [r for r, _ in layer]
     crests = sum(1 for i in range(1, len(rs) - 1) if rs[i] > rs[i - 1] and rs[i] >= rs[i + 1])
     assert crests == 2
+
+
+def test_revolve_smooth_follows_the_profile_exactly():
+    'With no texture, every point sits on profile(height_fraction) — the mapping is exact.'
+    H = 4.0
+    steps = revolve(profile=lambda f: 20 - 12 * f, texture=None, height=H,
+                    segments_per_layer=48, centre=(50, 50))
+    for p in (s for s in steps if isinstance(s, Point)):
+        f = min(1.0, (p.z - 0.8) / H)
+        r = ((p.x - 50) ** 2 + (p.y - 50) ** 2) ** 0.5
+        assert abs(r - (20 - 12 * f)) < 1e-9
+
+
+def test_textured_cone_tapers_and_carries_texture():
+    'The cone narrows base->top, and the egg-crate texture pushes the radius off the smooth profile.'
+    steps = textured_cone(base_radius=20, top_radius=8, height=4, cells_around=8, cells_up=6,
+                          texture_depth=1.2, segments_per_layer=120, centre=(50, 50))
+    pts = [s for s in steps if isinstance(s, Point)]
+
+    def rad(p):
+        return ((p.x - 50) ** 2 + (p.y - 50) ** 2) ** 0.5
+    base_r = sum(rad(p) for p in pts[:120]) / 120
+    top_r = sum(rad(p) for p in pts[-120:]) / 120
+    assert base_r > top_r + 5                        # clearly tapered
+    # texture: within one turn the radius varies (cells_around bumps), beyond the smooth profile
+    first_turn = [rad(p) for p in pts[:120]]
+    assert max(first_turn) - min(first_turn) > 0.5
 
 
 def test_print_time_study_sweeps_and_metrics_grow_with_size():
