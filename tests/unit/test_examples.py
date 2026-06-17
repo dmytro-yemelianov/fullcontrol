@@ -11,7 +11,7 @@ import fullcontrol as fc
 from fullcontrol.core.point import Point  # geometry helpers return core Points (fc.Point subclasses it)
 from examples import (GALLERY, spiral_vase, ripple_vase, nonplanar_spacer, wave_bowl,
                       twisted_polygon_vase, helical_screw, textured_cone, revolve, mobius_band,
-                      trefoil_tube)
+                      trefoil_tube, towers_grid, optimization_report)
 
 _BUILD = {'nozzle_temp': 210, 'bed_temp': 40, 'primer': 'front_lines_then_y',
           'build_volume_x': 200, 'build_volume_y': 200, 'build_volume_z': 200}
@@ -28,6 +28,7 @@ _SMALL = {
     'textured_cone': lambda: textured_cone(height=3, segments_per_layer=48, cells_up=4),
     'mobius_band': lambda: mobius_band(loop_segments=60, strokes_across=6),
     'trefoil_tube': lambda: trefoil_tube(tube_turns=16, cross_points=12),
+    'towers_grid': lambda: towers_grid(rows=2, cols=2, layers=3),
 }
 
 
@@ -63,7 +64,7 @@ def test_design_validates_without_errors(name):
 def test_gallery_registry_matches_callables():
     assert set(GALLERY) == {'spiral_vase', 'ripple_vase', 'nonplanar_spacer', 'wave_bowl',
                             'gyroid_infill', 'twisted_polygon_vase', 'helical_screw', 'textured_cone',
-                            'mobius_band', 'trefoil_tube'}
+                            'mobius_band', 'trefoil_tube', 'towers_grid'}
     for fn in GALLERY.values():
         assert callable(fn)
 
@@ -175,6 +176,17 @@ def test_mobius_band_has_a_half_twist_and_forms_a_loop():
     assert z_range(pts[mid:mid + stroke]) > 8.0              # u=pi: band stands vertical (~width 9)
     radii = [math.hypot(p.x - 50, p.y - 50) for p in pts]
     assert min(radii) < 18 and max(radii) > 22              # a loop of radius ~20 (± width/2)
+
+
+def test_optimization_passes_shrink_segments_and_insert_retractions():
+    'merge_collinear collapses the subdivided edges; retract_on_travel guards the inter-tower hops.'
+    rep = optimization_report(towers_grid(rows=2, cols=2, layers=4, points_per_edge=6))
+    base, opt = rep['baseline'], rep['optimized']
+    assert base['retractions'] == 0                     # the design itself has no retraction
+    assert opt['segments'] < base['segments'] / 2       # merge_collinear: far fewer moves
+    assert opt['retractions'] >= 2                       # retract_on_travel inserted some
+    # the passes optimise the g-code without changing the physical print
+    assert base['sim'].split(';')[0] == opt['sim'].split(';')[0]   # same time estimate
 
 
 def test_trefoil_tube_is_a_closed_3d_tube():
