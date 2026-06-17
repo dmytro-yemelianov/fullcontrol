@@ -25,6 +25,15 @@ real print (time/material > 0), and validates with no errors against a 200³ bui
 | **ripple_vase** | vase-mode + superimposed radial modulation | three stacked effects on one running parameter — fast `ripples`, slow `star_tips`, height-driven `bulge` — give the woven star texture (reimplements `ripple_texture`) | ~12.6k segs, ~20 min |
 | **nonplanar_spacer** | non-planar concentric rings | z varies *within* each ring (sinusoidal `waves`) so the whole washer is one ramped non-planar spiral; needs a pointy nozzle (reimplements `nonplanar_spacer`) | ~1.5k segs, ~1 min |
 | **wave_bowl** *(new)* | curved wall profile + ramped rim wave | combines a flaring `sin` wall profile with a rim ripple whose amplitude grows as height² — clean base, wavy lip | ~13.3k segs, ~10 min |
+| **gyroid_infill** *(new)* | continuous gyroid-TPMS weave | one seamless bead (zero travels/retractions) — per-layer sine serpentine whose phase shears with z and whose direction alternates each layer, interlocking like a gyroid | ~10k segs, ~9 min |
+
+### Validator showcase (not a printable design)
+**`validation_gauntlet()`** returns a `dict[str, list]` of twelve tiny designs, each crafted to trip
+exactly one pre-flight validation rule (out-of-bounds, negative-z, cold-extrusion, nozzle/bed temp,
+zero/fast speed, first-layer-z, unbalanced retraction, zero geometry, stringing). Companion dicts
+`INIT` (the `initialization_data` each needs) and `EXPECTED` (`rule -> (severity, substring)`) make it
+self-checking and turn the validator into living documentation — run any entry through the `validate`
+backend to see exactly the message it demonstrates.
 
 Each function is fully parametric — see its docstring for the knobs (radius/height/wave counts/twist
 /flare/etc.). Run a module directly (`python -m examples.wave_bowl`) to drop a `.gcode` next to it.
@@ -43,8 +52,8 @@ Grouped by what each would exercise in the library. The ones marked **(needs …
 library gap worth closing first.
 
 ### A. More parametric geometry (pure design — no library change)
-- **Gyroid / TPMS infill block** — a single continuous toolpath approximating a gyroid surface; the
-  poster-child for "impossible to slice" designs.
+- ✅ **Gyroid / TPMS infill block** — *done* (`gyroid_infill`): a single continuous toolpath
+  approximating a gyroid surface; the poster-child for "impossible to slice" designs.
 - **Twisted polygon vase** — `polygonXY` cross-section lerped between two rotated polygons up the
   height (square→octagon twist).
 - **Helical screw / auger** — a flighting surface as a spiral ramp; tests steep-overhang printing.
@@ -76,8 +85,9 @@ library gap worth closing first.
 ### D. Backend-showcase designs
 - **Print-time/material study** — one shape swept over a parameter, charting `simulation` output —
   shows the columnar simulate fast-path doing real work.
-- **Validation gauntlet** — a design that deliberately trips each validation rule (out-of-bounds,
-  cold extrusion, stringing, zero geometry) — doubles as living documentation of the checks.
+- ✅ **Validation gauntlet** — *done* (`validation_gauntlet`): twelve designs that each trip one
+  validation rule — living documentation of the checks.
 
-**Suggested next two:** the **gyroid infill block** (the most striking "only-in-FullControl" piece)
-and the **validation gauntlet** (cheap, and turns the validator into self-documenting examples).
+**Done so far:** `gyroid_infill` and `validation_gauntlet` (the two that were suggested first).
+**Suggested next:** the **twisted polygon vase** (cheap, striking) and a **print-time/material study**
+(section D) that charts `simulation` output over a swept parameter.
