@@ -1,0 +1,14 @@
+[build-system]
+requires = ["maturin>=1.14,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "fullcontrol_kernel"
+version = "0.1.0"
+description = "Rust computational microkernel for FullControl's columnar resolve (PoC)"
+requires-python = ">=3.10"
+
+[tool.maturin]
+# self-contained: this crate is NOT part of the main package (packages=['fullcontrol','lab']).
+# It builds a single extension module `fullcontrol_kernel` installed into the shared venv.
+module-name = "fullcontrol_kernel"
