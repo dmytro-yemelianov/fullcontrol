@@ -29,6 +29,7 @@ real print (time/material > 0), and validates with no errors against a 200³ bui
 | **twisted_polygon_vase** *(new)* | rotating / morphing polygon cross-section | a regular n-gon cross-section that twists with height and can morph to a different vertex count (e.g. pentagon → octagon), as one continuous spiral | ~21k segs @40mm |
 | **helical_screw** *(new)* | helical thread / auger | a rod whose wall carries a triangular thread whose phase advances with angle *and* height (`starts` / `pitch` / `thread_depth`, optional tapering core); shallow = screw, deep+coarse = auger — one seamless spiral | ~26k segs @40mm |
 | **textured_cone** *(new)* | flat texture wrapped on a surface of revolution | built on the reusable `revolve(profile, texture, …)` helper — a tapering cone carrying an egg-crate diamond grid; pass your own `profile`/`texture` lambdas to wrap any 2-D pattern onto a cone/cylinder/barrel | ~23k segs @35mm |
+| **mobius_band** *(new)* | parametric non-planar art | the classic Möbius surface (one half-twist, one side, one edge); a boustrophedon rasters the twisting ribbon as one continuous bead. *Needs support to print* — an art / visualisation piece | ~7k segs |
 
 ### Export: self-contained 3D viewer (`result_type='3d_html'`)
 ```python
@@ -81,7 +82,7 @@ library gap worth closing first.
   with height and can morph to a different vertex count (pentagon→octagon).
 - ✅ **Helical screw / auger** — *done* (`helical_screw`): a helical thread (screw → auger via
   depth/pitch/taper); the steeper the thread, the more overhang it tests.
-- **Möbius strip / trefoil band** — a closed non-planar ribbon (parametric centre-line + width).
+- ✅ **Möbius strip** — *done* (`mobius_band`): the classic one-half-twist ribbon, rastered as one continuous bead (a trefoil-knot tube is the next variant).
 - **Lattice cylinder** — diagonal helices in both directions forming a printable diamond lattice
   (generalises `star_polygon_lattice`).
 - **Coaster / texture tile pack** — flat tiles with hilbert-curve, truchet, and concentric-wave fills

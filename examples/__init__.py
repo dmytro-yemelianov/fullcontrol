@@ -22,6 +22,7 @@ from examples.gyroid_infill import gyroid_infill
 from examples.twisted_polygon_vase import twisted_polygon_vase
 from examples.helical_screw import helical_screw
 from examples.surface_texture import revolve, textured_cone
+from examples.mobius_band import mobius_band
 from examples.validation_gauntlet import validation_gauntlet
 
 # GALLERY holds the printable designs (each name -> a function returning a step list). The
@@ -36,8 +37,9 @@ GALLERY = {
     'twisted_polygon_vase': twisted_polygon_vase,
     'helical_screw': helical_screw,
     'textured_cone': textured_cone,
+    'mobius_band': mobius_band,
 }
 
 __all__ = ['spiral_vase', 'ripple_vase', 'nonplanar_spacer', 'wave_bowl', 'gyroid_infill',
-           'twisted_polygon_vase', 'helical_screw', 'textured_cone', 'revolve',
+           'twisted_polygon_vase', 'helical_screw', 'textured_cone', 'revolve', 'mobius_band',
            'validation_gauntlet', 'GALLERY']
