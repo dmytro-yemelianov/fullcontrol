@@ -101,9 +101,13 @@ plain **fold** over the IR with no state machine of its own.
 
 The **simulation backend** is the first consumer (`simulate_from_ir` in
 `simulate/run.py`) — it went from a singledispatch state machine to ~15 lines of arithmetic,
-byte-for-byte equivalent. The gcode and plot backends can migrate onto the same IR
-incrementally (each `Segment` already carries arc centre/direction so a gcode dialect can emit
-`I/J` and `G2/G3`); until they do, they keep their existing `State`-based renderers.
+byte-for-byte equivalent. The **validation backend** is the second: its geometric checks
+(bounds, negative-z, first-layer-z, extrusion-geometry) fold over the IR `Segment`s instead of
+re-walking the steps with their own position/geometry tracking (its config/ordering checks —
+temperatures, speeds, cold-extrusion, retraction balance — still walk the step list). The
+gcode and plot backends can migrate onto the same IR incrementally (each `Segment` already
+carries arc centre/direction so a gcode dialect can emit `I/J` and `G2/G3`, and width/height
+for plot/validate); until they do, they keep their existing `State`-based renderers.
 
 ## Extension point 1 — a new step type
 

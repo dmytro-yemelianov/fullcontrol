@@ -5,7 +5,7 @@ sub-zero Z, and likely cold extrusion. It reuses the gcode State so it sees the 
 coordinates (including the printer's start/end procedures and primer).
 """
 from fullcontrol.core.point import Point
-from fullcontrol.core.extrusion_classes import Extruder, ExtrusionGeometry
+from fullcontrol.core.extrusion_classes import Extruder
 from fullcontrol.core.auxilliary_components import Hotend, Buildplate
 from fullcontrol.core.printer import Printer
 from fullcontrol.gcode.extrusion_classes import Retraction, Unretraction
@@ -29,43 +29,45 @@ def _xy_distance(a: Point, b: Point) -> float:
 def validate(steps, controls, show_tips=True) -> ValidationResult:
     from fullcontrol.gcode.state import State
     from fullcontrol.gcode.import_printer import resolve_initialization_data
+    from fullcontrol.ir import resolve, Segment
     controls.initialize()
     init = resolve_initialization_data(controls.printer_name, controls.initialization_data)
     state = State(steps, controls)
+    # geometric checks consume the resolved Toolpath IR (one shared resolve pass); config /
+    # ordering checks still walk the resolved step list (they are about commanded values/order)
+    segments = [e for e in resolve(steps, controls).events if isinstance(e, Segment)]
     result = ValidationResult()
-    _check_bounds(state.steps, init, result)
+    _check_bounds(segments, init, result)
+    _check_first_layer(segments, result)
+    _check_extrusion_geometry(segments, result)
     _check_cold_extrusion(state.steps, init, result)
     _check_temperatures(state.steps, result)
     _check_speeds(state.steps, init, result)
-    _check_first_layer(state.steps, result)
     _check_retraction_balance(state.steps, init, result)
-    _check_extrusion_geometry(state.steps, init, result)
     _check_stringing(state.steps, result)
     return result
 
 
-def _check_bounds(steps, init, result):
+def _check_bounds(segments, init, result):
+    'Out-of-bounds and negative-z, over the resolved move endpoints.'
     bx, by, bz = init.get('build_volume_x'), init.get('build_volume_y'), init.get('build_volume_z')
     if not (bx and by and bz):
         result.add('info', 'build volume not defined for this printer - out-of-bounds check skipped '
                            "(pass initialization_data={'build_volume_x':.., 'build_volume_y':.., 'build_volume_z':..})")
         return
-    tracked = Point()
     n_out = n_subzero_z = 0
     first_out = None
-    for step in steps:
-        if isinstance(step, Point):
-            tracked.update_from(step)
-            x, y, z = tracked.x, tracked.y, tracked.z
-            outside = ((x is not None and not (0 <= x <= bx)) or
-                       (y is not None and not (0 <= y <= by)) or
-                       (z is not None and not (0 <= z <= bz)))
-            if outside:
-                n_out += 1
-                if first_out is None:
-                    first_out = (x, y, z)
-            if z is not None and z < 0:
-                n_subzero_z += 1
+    for seg in segments:
+        x, y, z = seg.end
+        outside = ((x is not None and not (0 <= x <= bx)) or
+                   (y is not None and not (0 <= y <= by)) or
+                   (z is not None and not (0 <= z <= bz)))
+        if outside:
+            n_out += 1
+            if first_out is None:
+                first_out = (x, y, z)
+        if z is not None and z < 0:
+            n_subzero_z += 1
     if n_out:
         result.add('error', f'{n_out} point(s) outside the build volume ({bx}x{by}x{bz}); '
                             f'first at (x={first_out[0]}, y={first_out[1]}, z={first_out[2]})')
@@ -101,19 +103,14 @@ def _check_speeds(steps, init, result):
             result.add('warning', f'speed {speed} mm/min is implausibly fast (> {MAX_FEEDRATE_MM_MIN} mm/min)')
 
 
-def _check_first_layer(steps, result):
+def _check_first_layer(segments, result):
     'Warn if the first extruding move happens at or below z=0 (nozzle on/under the bed).'
-    extruder_on = False
-    tracked = Point()
-    for step in steps:
-        if isinstance(step, Extruder) and step.on is not None:
-            extruder_on = step.on
-        elif isinstance(step, Point):
-            tracked.update_from(step)
-            if extruder_on:
-                if tracked.z is not None and tracked.z <= 0:
-                    result.add('warning', f'first extrusion move is at z={tracked.z} (<= 0) - nozzle may be at or below the bed')
-                return  # only the first extruding move matters
+    for seg in segments:
+        if not seg.travel:  # first extruding move
+            z = seg.end[2]
+            if z is not None and z <= 0:
+                result.add('warning', f'first extrusion move is at z={z} (<= 0) - nozzle may be at or below the bed')
+            return
 
 
 def _check_retraction_balance(steps, init, result):
@@ -131,28 +128,15 @@ def _check_retraction_balance(steps, init, result):
                               '(more Retraction than Unretraction) - may ooze or under-extrude on the next print')
 
 
-def _check_extrusion_geometry(steps, init, result):
+def _check_extrusion_geometry(segments, result):
     'Warn if the first extruding move happens with a zero/undefined extrusion cross-section.'
-    width, height = init.get('extrusion_width'), init.get('extrusion_height')
-    diameter = None
-    extruder_on = False
-    for step in steps:
-        if isinstance(step, ExtrusionGeometry):
-            if step.width is not None:
-                width = step.width
-            if step.height is not None:
-                height = step.height
-            if step.diameter is not None:
-                diameter = step.diameter
-        elif isinstance(step, Extruder) and step.on is not None:
-            extruder_on = step.on
-        elif isinstance(step, Point) and extruder_on:
-            rect_ok = bool(width) and bool(height) and width > 0 and height > 0
-            circle_ok = bool(diameter) and diameter > 0
-            if not (rect_ok or circle_ok):
+    for seg in segments:
+        if not seg.travel:  # first extruding move
+            w, h = seg.width, seg.height
+            if not (w and h and w > 0 and h > 0):
                 result.add('warning', 'extruding with a zero/undefined extrusion geometry '
-                                      f'(width={width}, height={height}, diameter={diameter}) - no material will be extruded')
-            return  # only the first extruding move matters
+                                      f'(width={w}, height={h}) - no material will be extruded')
+            return
 
 
 def _check_stringing(steps, result):
