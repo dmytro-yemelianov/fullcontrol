@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FullControl in the browser (Pyodide)</title>
+<style>
+  :root{color-scheme:dark}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#0e0e12;color:#d7dae4;
+            font-family:system-ui,-apple-system,sans-serif}
+  header{padding:12px 18px;border-bottom:1px solid #23232c;display:flex;align-items:center;gap:14px}
+  header h1{font-size:15px;margin:0}
+  #status{font-size:12px;color:#f0a44b}
+  #status.ready{color:#5fd08a}
+  main{display:flex;height:calc(100% - 49px)}
+  .pane{flex:1;display:flex;flex-direction:column;min-width:0}
+  .pane.left{border-right:1px solid #23232c}
+  .bar{padding:8px 12px;font-size:12px;color:#8b91a3;display:flex;justify-content:space-between;
+       align-items:center;border-bottom:1px solid #1c1c24}
+  textarea{flex:1;width:100%;border:0;outline:0;resize:none;padding:14px;background:#121219;
+           color:#e6e8ef;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;tab-size:4}
+  button{background:#2563c9;color:#fff;border:0;border-radius:6px;padding:7px 14px;font-size:13px;
+         cursor:pointer}
+  button:disabled{background:#333;color:#888;cursor:default}
+  #out{flex:1;overflow:auto;margin:0;padding:14px;font:12px/1.5 ui-monospace,Menlo,monospace;
+       white-space:pre-wrap;color:#c7cad6}
+  #out .err{color:#ff7b72}
+  #stats{padding:10px 14px;border-top:1px solid #1c1c24;font-size:12px;line-height:1.7}
+  #stats b{color:#fff;font-variant-numeric:tabular-nums}
+  a.dl{color:#49b0ff;text-decoration:none}
+</style>
+</head>
+<body>
+<header>
+  <h1>FullControl &mdash; running in your browser</h1>
+  <span id="status">booting Python (Pyodide)&hellip;</span>
+</header>
+<main>
+  <div class="pane left">
+    <div class="bar"><span>design (Python &middot; <code>fc</code> is FullControl)</span>
+      <button id="run" disabled>Generate g-code &#9654;</button></div>
+    <textarea id="code" spellcheck="false"></textarea>
+  </div>
+  <div class="pane">
+    <div class="bar"><span>output</span><span id="dl"></span></div>
+    <pre id="out">Loading the FullControl wheel + numpy + pydantic into the in-browser Python runtime&hellip;
+First load downloads ~a few MB; it is cached afterwards.</pre>
+    <div id="stats"></div>
+  </div>
+</main>
+
+<script type="module">
+const DEFAULT = `# Edit me. Define a list called \`steps\`; \`fc\` is the FullControl module.
+from math import tau, sin
+
+W, EH = 0.6, 0.24            # extrusion width / height (mm)
+R, H, LOBES, DEPTH = 12, 20, 5, 2.0
+SEGS = 64                    # points per turn
+
+steps = [fc.ExtrusionGeometry(width=W, height=EH)]
+total = int(H / EH) * SEGS
+for i in range(total + 1):
+    f = i / SEGS
+    a = f * tau
+    z = f * EH + 0.8
+    r = R + DEPTH * sin(LOBES * a)          # fluted vase
+    steps.append(fc.polar_to_point(fc.Point(x=50, y=50, z=z), r, a))
+`;
+
+const $ = id => document.getElementById(id);
+const codeEl = $('code'); codeEl.value = DEFAULT;
+const out = $('out'), statusEl = $('status'), runBtn = $('run');
+
+const PY_DRIVER = `
+import json, fullcontrol as fc
+from math import tau, sin, cos, pi
+
+def _run(src):
+    ns = {'fc': fc, 'tau': tau, 'sin': sin, 'cos': cos, 'pi': pi}
+    exec(src, ns)
+    steps = ns.get('steps')
+    if steps is None:
+        raise ValueError("your code must define a list called 'steps'")
+    controls = fc.GcodeControls(printer_name='generic',
+        initialization_data={'nozzle_temp':210,'bed_temp':40,'primer':'front_lines_then_y'})
+    gcode = fc.transform(steps, 'gcode', controls, show_tips=False)
+    sim = fc.transform(steps, 'simulation', controls, show_tips=False)
+    return json.dumps({'gcode':gcode, 'summary':sim.summary(),
+                       'time':sim.total_time_s, 'filament':sim.filament_length,
+                       'volume':sim.extruded_volume, 'segs':sim.segment_count,
+                       'lines':gcode.count(chr(10))+1})
+`;
+
+let pyodide, lastGcode = '';
+
+async function boot(){
+  const {loadPyodide} = await import('https://cdn.jsdelivr.net/pyodide/v0.28.3/full/pyodide.mjs');
+  pyodide = await loadPyodide();
+  statusEl.textContent = 'installing numpy + pydantic + fullcontrol…';
+  await pyodide.loadPackage('micropip');
+  const micropip = pyodide.pyimport('micropip');
+  await micropip.install(['numpy', 'pydantic']);
+  await micropip.install('./fullcontrol-0.1.2-py3-none-any.whl', {deps:false});
+  await pyodide.runPythonAsync(PY_DRIVER);
+  statusEl.textContent = '● FullControl ready (Python in WebAssembly)';
+  statusEl.classList.add('ready');
+  runBtn.disabled = false;
+  out.textContent = 'Ready. Edit the design on the left and click "Generate g-code".';
+  run();
+}
+
+async function run(){
+  runBtn.disabled = true;
+  out.classList.remove('err'); out.textContent = 'generating…';
+  $('dl').textContent = ''; $('stats').textContent = '';
+  const t0 = performance.now();
+  try{
+    const res = JSON.parse(await pyodide.runPythonAsync(`_run(${JSON.stringify(codeEl.value)})`));
+    const dt = (performance.now()-t0).toFixed(0);
+    lastGcode = res.gcode;
+    const head = res.gcode.split('\n').slice(0, 60).join('\n');
+    out.textContent = head + `\n… (${res.lines.toLocaleString()} lines total)`;
+    $('stats').innerHTML =
+      `g-code generated by FullControl in <b>${dt} ms</b> &middot; `+
+      `print <b>${Math.round(res.time/60)} min</b> &middot; `+
+      `filament <b>${res.filament.toFixed(0)} mm</b> &middot; `+
+      `material <b>${(res.volume/1000).toFixed(1)} cm³</b> &middot; `+
+      `<b>${res.segs.toLocaleString()}</b> segments`;
+    const blob = new Blob([res.gcode], {type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'design.gcode';
+    a.className = 'dl'; a.textContent = '↓ download design.gcode';
+    $('dl').innerHTML = ''; $('dl').appendChild(a);
+  }catch(e){
+    out.classList.add('err'); out.textContent = String(e.message || e);
+  }
+  runBtn.disabled = false;
+}
+
+runBtn.addEventListener('click', run);
+boot().catch(e => { statusEl.textContent = 'boot failed'; out.classList.add('err');
+                    out.textContent = String(e.message || e); });
+</script>
+</body>
+</html>

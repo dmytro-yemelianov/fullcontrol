@@ -1,3 +1,26 @@
+# Browser demos
+
+Two complementary ways FullControl runs in the browser:
+
+- **`playground/`** — the **whole library** running client-side via **Pyodide** (CPython in WASM).
+  Edit a FullControl design in Python, click Generate, and real g-code comes back — `fc.transform`
+  runs in the browser, no server. The complete library (all backends, all 695 device profiles).
+- **`index.html`** (below) — a **native-WASM** demo: geometry in JS, print metrics from the Rust
+  kernel compiled to wasm. Tiny and fast, but only the simulate path.
+
+## Pyodide playground (`playground/`)
+
+`playground/index.html` loads Pyodide from a CDN, `micropip`-installs numpy + pydantic, then installs
+the committed FullControl wheel (`deps=False`, so plotly is skipped — g-code/simulate/validate don't
+need it). The editor's Python defines `steps`; the page runs `fc.transform(steps, 'gcode')` plus a
+simulation and shows the g-code + stats + a download link. Rebuild the wheel with
+`bash playground/build-wheel.sh` after changing the library.
+
+Why it works with no porting: FullControl is pure Python and its only runtime deps (numpy, pydantic,
+plotly) all run under Pyodide; the Rust kernel extension isn't loadable there, so simulate uses its
+pure-Python fallback automatically. Deploys to Cloudflare Pages exactly like the rest of `web/` (the
+wheel is committed, so no build step) — first load pulls ~10 MB of Pyodide, cached thereafter.
+
 # Live WASM design viewer
 
 A fully client-side demo: a twisted-polygon-vase designer where the geometry is generated in
