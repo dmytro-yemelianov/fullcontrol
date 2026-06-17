@@ -70,14 +70,12 @@ pub fn emit_gcode_moves(
     Ok(gcode::emit_moves(&ir, relative_e, travel_g1_e0))
 }
 
-/// Emit a full g-code line list (motion + common non-motion commands) from the serialized IR JSON.
+/// Emit a full g-code line list from the serialized IR JSON + a params JSON object.
 #[wasm_bindgen]
-pub fn emit_gcode(
-    ir_json: &str,
-    relative_e: bool,
-    travel_g1_e0: bool,
-) -> Result<Vec<String>, JsError> {
+pub fn emit_gcode(ir_json: &str, params_json: &str) -> Result<Vec<String>, JsError> {
     let ir: serde_json::Value = serde_json::from_str(ir_json)
         .map_err(|e| JsError::new(&format!("invalid IR JSON: {e}")))?;
-    Ok(gcode::emit_gcode(&ir, relative_e, travel_g1_e0))
+    let params: serde_json::Value = serde_json::from_str(params_json)
+        .map_err(|e| JsError::new(&format!("invalid params JSON: {e}")))?;
+    Ok(gcode::emit_gcode(&ir, &gcode::Params::from_json(&params)))
 }

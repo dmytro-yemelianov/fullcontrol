@@ -139,22 +139,23 @@ export class SimMetrics {
 if (Symbol.dispose) SimMetrics.prototype[Symbol.dispose] = SimMetrics.prototype.free;
 
 /**
- * Emit a full g-code line list (motion + common non-motion commands) from the serialized IR JSON.
+ * Emit a full g-code line list from the serialized IR JSON + a params JSON object.
  * @param {string} ir_json
- * @param {boolean} relative_e
- * @param {boolean} travel_g1_e0
+ * @param {string} params_json
  * @returns {string[]}
  */
-export function emit_gcode(ir_json, relative_e, travel_g1_e0) {
+export function emit_gcode(ir_json, params_json) {
     const ptr0 = passStringToWasm0(ir_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.emit_gcode(ptr0, len0, relative_e, travel_g1_e0);
+    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.emit_gcode(ptr0, len0, ptr1, len1);
     if (ret[3]) {
         throw takeFromExternrefTable0(ret[2]);
     }
-    var v2 = getArrayJsValueFromWasm0(ret[0], ret[1]).slice();
+    var v3 = getArrayJsValueFromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 4, 4);
-    return v2;
+    return v3;
 }
 
 /**

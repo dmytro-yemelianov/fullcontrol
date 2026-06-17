@@ -125,14 +125,12 @@ fn emit_gcode_moves(ir_json: &str, relative_e: bool, travel_g1_e0: bool) -> PyRe
     ))
 }
 
-/// Emit a full g-code line list (motion + common non-motion commands) from the serialized IR JSON.
+/// Emit a full g-code line list from the serialized IR JSON + a params object (relative_e,
+/// travel_g1_e0, flavor, retraction_distance, retraction_speed, command_list).
 #[pyfunction]
-fn emit_gcode(ir_json: &str, relative_e: bool, travel_g1_e0: bool) -> PyResult<Vec<String>> {
-    Ok(gcode::emit_gcode(
-        &parse_ir(ir_json)?,
-        relative_e,
-        travel_g1_e0,
-    ))
+fn emit_gcode(ir_json: &str, params_json: &str) -> PyResult<Vec<String>> {
+    let params = gcode::Params::from_json(&parse_ir(params_json)?);
+    Ok(gcode::emit_gcode(&parse_ir(ir_json)?, &params))
 }
 
 #[pymodule]
