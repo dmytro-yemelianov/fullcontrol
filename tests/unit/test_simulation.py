@@ -1,9 +1,12 @@
-"""The simulation backend (result_type='simulation'): time/material/flow estimates."""
-from types import SimpleNamespace
+"""The simulation backend (result_type='simulation'): time/material/flow estimates.
 
+Simulation is a stateless fold over the Toolpath IR; these test the fold and the IR _distance
+helper directly, plus the end-to-end transform.
+"""
 import fullcontrol as fc
 from fullcontrol.simulate.result import SimulationResult
-from fullcontrol.simulate.renderers import render_simulate, _distance
+from fullcontrol.simulate.run import simulate_from_ir
+from fullcontrol.ir.toolpath import _distance, Toolpath, Segment
 
 
 def test_distance_ignores_axes_not_defined_in_both_points():
@@ -11,31 +14,24 @@ def test_distance_ignores_axes_not_defined_in_both_points():
     assert abs(_distance(fc.Point(x=0, y=0, z=None), fc.Point(x=3, y=4, z=5)) - 5) < 1e-9
 
 
-def _stub_state():
-    return SimpleNamespace(
-        point=fc.Point(x=0, y=0, z=0),
-        extruder=SimpleNamespace(on=True, volume_to_e=1.0),
-        printer=SimpleNamespace(print_speed=600, travel_speed=6000),  # 600 mm/min = 10 mm/s
-        extrusion_geometry=SimpleNamespace(area=0.08),
-    )
-
-
-def test_point_handler_accumulates_time_volume_flow():
-    state, r = _stub_state(), SimulationResult()
-    render_simulate(fc.Point(x=10, y=0, z=0), state, r)  # 10mm @ 600mm/min = 1.0s
+def test_fold_accumulates_time_volume_flow_for_an_extruding_segment():
+    # a 10 mm extruding segment at 600 mm/min (=10 mm/s): 1.0 s, 0.8 mm^3, flow 0.8 mm^3/s
+    seg = Segment(start=(0, 0, 0), end=(10, 0, 0), travel=False, speed=600, length=10,
+                  deposited_volume=0.8, filament_length=0.8, source_index=0)
+    r = simulate_from_ir(Toolpath([seg]))
     assert abs(r.total_time_s - 1.0) < 1e-9
     assert abs(r.print_time_s - 1.0) < 1e-9
     assert abs(r.extruding_distance - 10) < 1e-9
-    assert abs(r.extruded_volume - 0.8) < 1e-9      # 10 * 0.08
-    assert abs(r.filament_length - 0.8) < 1e-9      # volume_to_e = 1
-    assert abs(r.max_flow_rate - 0.8) < 1e-9        # 0.8 mm^3 / 1 s
+    assert abs(r.extruded_volume - 0.8) < 1e-9
+    assert abs(r.filament_length - 0.8) < 1e-9
+    assert abs(r.max_flow_rate - 0.8) < 1e-9
     assert r.segment_count == 1
 
 
-def test_travel_move_counts_as_travel_not_print():
-    state, r = _stub_state(), SimulationResult()
-    state.extruder.on = False
-    render_simulate(fc.Point(x=60, y=0, z=0), state, r)  # 60mm @ 6000mm/min = 0.6s
+def test_fold_counts_travel_segment_as_travel_not_print():
+    seg = Segment(start=(0, 0, 0), end=(60, 0, 0), travel=True, speed=6000, length=60,
+                  deposited_volume=0.0, filament_length=0.0, source_index=0)
+    r = simulate_from_ir(Toolpath([seg]))
     assert abs(r.travel_time_s - 0.6) < 1e-9
     assert r.print_time_s == 0.0
     assert abs(r.travel_distance - 60) < 1e-9
