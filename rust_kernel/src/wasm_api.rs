@@ -89,3 +89,23 @@ pub fn parse_gcode(text: &str, params_json: &str) -> Result<String, JsError> {
         .map_err(|e| JsError::new(&format!("invalid params JSON: {e}")))?;
     Ok(parser::parse_gcode(text, &parser::ParseParams::from_json(&params)).to_string())
 }
+
+/// Fold a serialized Toolpath IR JSON (e.g. the output of `parse_gcode`) into the nine simulation
+/// metrics. This completes the browser's parse -> simulate pipeline entirely client-side: no Python.
+#[wasm_bindgen]
+pub fn simulate_from_ir(ir_json: &str) -> Result<SimMetrics, JsError> {
+    let ir: serde_json::Value = serde_json::from_str(ir_json)
+        .map_err(|e| JsError::new(&format!("invalid IR JSON: {e}")))?;
+    let m = metrics::simulate_from_ir(&ir);
+    Ok(SimMetrics {
+        total_time_s: m.total_time_s,
+        print_time_s: m.print_time_s,
+        travel_time_s: m.travel_time_s,
+        extruding_distance: m.extruding_distance,
+        travel_distance: m.travel_distance,
+        extruded_volume: m.extruded_volume,
+        filament_length: m.filament_length,
+        segment_count: m.segment_count as u32,
+        max_flow_rate: m.max_flow_rate,
+    })
+}

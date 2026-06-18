@@ -56,6 +56,12 @@
 
   <div id="stats"></div>
   <button id="gcode-btn" disabled>&#10515; download printable g-code</button>
+
+  <label style="margin-top:18px">analyse an existing .gcode file</label>
+  <input type="file" id="gcode-file" accept=".gcode,.gco,.g,.nc,.txt"
+         style="width:100%;font-size:11px;color:#aeb3c2">
+  <div id="file-stats" style="margin-top:10px;font-size:12px;line-height:1.7"></div>
+
   <div id="engine">&#9679; kernel: loading&hellip;</div>
 </div>
 <div id="canvas-wrap"></div>
@@ -70,7 +76,7 @@
 <script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import init, {simulate, emit_gcode} from './pkg/fullcontrol_kernel.js';
+import init, {simulate, emit_gcode, parse_gcode, simulate_from_ir} from './pkg/fullcontrol_kernel.js';
 
 // ---- printer assumptions (match a generic FFF setup) ----
 const EW = 0.8, EH = 0.3;                 // extrusion width / height (mm)
@@ -205,6 +211,34 @@ function downloadGcode(){
     `&#9679; Rust engine (wasm) emitted a ${(file.length/1024|0).toLocaleString()} KB printable file in ${dt} ms`;
 }
 
+// ---- load & analyse an existing .gcode file: parse -> simulate, entirely client-side ----
+async function analyseFile(file){
+  const fileStats = document.getElementById('file-stats');
+  fileStats.innerHTML = `<span class="k">reading ${file.name}&hellip;</span>`;
+  const text = await file.text();
+  // ParseParams JSON (the same shape the Python ParseParams produces); marlin/mm defaults.
+  const params = JSON.stringify({flavor:'marlin', relative_e:false, e_units:'mm',
+                                 dia_feed:1.75, travel_g1_e0:false});
+  const t0 = performance.now();
+  const ir = parse_gcode(text, params);          // g-code text -> IR JSON, in Rust/wasm
+  const m = simulate_from_ir(ir);                 // IR JSON -> the nine metrics, in Rust/wasm
+  const dt = (performance.now()-t0).toFixed(1);
+  const out = {time:m.total_time_s, print:m.print_time_s, travel:m.travel_time_s,
+               filament:m.filament_length, volume:m.extruded_volume, flow:m.max_flow_rate,
+               segs:m.segment_count};
+  m.free();
+  fileStats.innerHTML =
+    `<div class="row"><span class="k">file</span><b>${file.name}</b></div>`+
+    `<div class="row"><span class="k">print time</span><b>${fmtTime(out.time)}</b></div>`+
+    `<div class="row"><span class="k">moving</span><b>${fmtTime(out.print)} / ${fmtTime(out.travel)} travel</b></div>`+
+    `<div class="row"><span class="k">filament</span><b>${out.filament.toFixed(0)} mm</b></div>`+
+    `<div class="row"><span class="k">material</span><b>${(out.volume/1000).toFixed(1)} cm&sup3;</b></div>`+
+    `<div class="row"><span class="k">peak flow</span><b>${out.flow.toFixed(2)} mm&sup3;/s</b></div>`+
+    `<div class="row"><span class="k">segments</span><b>${out.segs.toLocaleString()}</b></div>`;
+  document.getElementById('engine').innerHTML =
+    `&#9679; Rust engine (wasm) parsed + simulated ${out.segs.toLocaleString()} segments in ${dt} ms`;
+}
+
 function update(){
   const p = {
     sides:+sides.value, morph:+morph.value, twist:+twist.value,
@@ -238,6 +272,11 @@ function update(){
       e => document.getElementById(id+'-v').textContent = e.target.value);
   const btn = document.getElementById('gcode-btn');
   btn.disabled = false; btn.addEventListener('click', downloadGcode);
+  document.getElementById('gcode-file').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if(f) analyseFile(f).catch(err =>
+      document.getElementById('file-stats').innerHTML = `<span class="k">error: ${err}</span>`);
+  });
   resize(); update();
   (function loop(){ requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); })();
 })();

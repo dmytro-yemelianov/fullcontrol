@@ -116,6 +116,25 @@ fn parse_ir(ir_json: &str) -> PyResult<serde_json::Value> {
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("invalid IR JSON: {e}")))
 }
 
+/// Fold a serialized Toolpath IR JSON into the nine simulation metrics (the same shared helper the
+/// wasm build uses). Mirrors `fullcontrol.simulate.run.simulate_from_ir` and exists here for parity
+/// testing of the client-side parse -> simulate pipeline.
+#[pyfunction]
+fn simulate_from_ir(ir_json: &str) -> PyResult<Metrics> {
+    let m = metrics::simulate_from_ir(&parse_ir(ir_json)?);
+    Ok((
+        m.total_time_s,
+        m.print_time_s,
+        m.travel_time_s,
+        m.extruding_distance,
+        m.travel_distance,
+        m.extruded_volume,
+        m.filament_length,
+        m.segment_count,
+        m.max_flow_rate,
+    ))
+}
+
 /// Emit the g-code motion lines from the serialized IR JSON (drop-in for the dialect's motion).
 #[pyfunction]
 fn emit_gcode_moves(ir_json: &str, relative_e: bool, travel_g1_e0: bool) -> PyResult<Vec<String>> {
@@ -146,6 +165,7 @@ fn parse_gcode(text: &str, params_json: &str) -> PyResult<String> {
 fn fullcontrol_kernel(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(resolve_columnar, m)?)?;
     m.add_function(wrap_pyfunction!(simulate, m)?)?;
+    m.add_function(wrap_pyfunction!(simulate_from_ir, m)?)?;
     m.add_function(wrap_pyfunction!(emit_gcode_moves, m)?)?;
     m.add_function(wrap_pyfunction!(emit_gcode, m)?)?;
     m.add_function(wrap_pyfunction!(parse_gcode, m)?)?;
