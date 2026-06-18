@@ -29,7 +29,7 @@ _SMALL = {
     'mobius_band': lambda: mobius_band(loop_segments=60, strokes_across=6),
     'trefoil_tube': lambda: trefoil_tube(tube_turns=16, cross_points=12),
     'towers_grid': lambda: towers_grid(rows=2, cols=2, layers=3),
-    'snake_soapdish': lambda: snake_soapdish(height=8, waves=6, points_per_wave=8),
+    'snake_soapdish': lambda: snake_soapdish(height=8, waves=6, points_per_wave=8, length=40),
 }
 
 
@@ -78,11 +78,8 @@ def test_reverse_engineer_recovers_vase_lobes_from_gcode():
     assert rep['profile'] == 'cylinder'
 
 
-def test_reverse_engineer_recovers_snake_spikes_and_polygon_sides():
+def test_reverse_engineer_recovers_polygon_sides():
     from examples.reverse_engineer import reverse_engineer
-    snake = reverse_engineer(_gcode(snake_soapdish(waves=9, spike_height=10)))
-    assert snake['modulation'] == 'vertical'                    # snake-mode (z spikes)
-    assert snake['vertical_harmonic']['count'] == 9
     poly = reverse_engineer(_gcode(twisted_polygon_vase(sides=6, morph_to_sides=0, twist_turns=0,
                                                         radius=18)))
     assert poly['radial_harmonic']['count'] == 6                # the hexagon
@@ -106,13 +103,17 @@ def test_identify_distinguishes_polygon_from_lobed_vase():
     assert lobed['design'] == 'spiral_vase'           # same count, but sine lobes -> not a polygon
 
 
-def test_identify_recovers_soapdish_waves_and_spike_height():
-    'The soapdish: waves exact, spike_height via forward fit (~true, vs the harmonic which underreads).'
+def test_identify_recovers_snake_soapdish_wall():
+    '''The Snake-Mode Soapdish is an open corrugated wall, not a surface of revolution: identify
+    detects the open-wall case and recovers its corrugation count, length and height.'''
     from examples.reverse_engineer import identify
-    r = identify(_gcode(snake_soapdish(waves=12, spike_height=10, radius=24, height=26)))
+    r = identify(_gcode(snake_soapdish(waves=8, length=60, height=30, amplitude=6)))
     assert r['design'] == 'snake_soapdish'
-    assert r['params']['waves'] == 12
-    assert 7.0 < r['params']['spike_height'] < 14.0   # near the true 10 (harmonic alone gave ~1.7)
+    assert r['params']['waves'] == 8                  # exact corrugation count
+    assert abs(r['params']['length'] - 60) < 6        # mid-height span
+    assert abs(r['params']['height'] - 30) < 3
+    assert abs(r['params']['amplitude'] - 6) < 1.5    # physical corrugation depth
+    assert r['fit_error'] < 2.0                       # regenerates close to the original
 
 
 def test_reverse_engineer_recovers_cone_taper():
@@ -241,23 +242,46 @@ def test_mobius_band_has_a_half_twist_and_forms_a_loop():
     assert min(radii) < 18 and max(radii) > 22              # a loop of radius ~20 (± width/2)
 
 
-def test_snake_soapdish_solid_base_and_spiky_crown():
-    'A solid (flat) base wall, then a crown of `waves` aligned z-spikes that ramp in toward the top.'
-    waves, ppw, R, sh, lh = 8, 12, 20, 10.0, 0.4
-    steps = snake_soapdish(radius=R, height=20, waves=waves, spike_height=sh, base_height=4,
-                           layer_height=lh, points_per_wave=ppw, centre=(50, 50))
-    pts = [s for s in steps if isinstance(s, Point)]
-    for p in pts:
-        assert abs(((p.x - 50) ** 2 + (p.y - 50) ** 2) ** 0.5 - R) < 1e-9   # on the cylinder wall
+def test_snake_soapdish_is_a_corrugated_snake_mode_wall():
+    '''The real FullControl Snake-Mode Soapdish: an OPEN corrugated wall (not a cup) printed in
+    snake mode - print one way, step z up, print back, step up - with a lens silhouette (widest at
+    mid-height) and fat 1mm lines.'''
+    waves, ppw, length, h = 8, 12, 60.0, 16.0
+    steps = snake_soapdish(length=length, height=h, waves=waves, points_per_wave=ppw,
+                           centre=(70, 49))
+    geom = steps[0]
+    assert isinstance(geom, fc.ExtrusionGeometry)
+    assert geom.width == 1.0                                  # FAT 1mm lines (snake mode loves flow)
+
     per_course = waves * ppw + 1
-    base = pts[:per_course]                                   # first course: in the solid base
-    assert max(p.z for p in base) - min(p.z for p in base) < 1e-6           # flat (no spikes yet)
-    top = pts[-per_course:]                                   # last course: full crown
-    zr = max(p.z for p in top) - min(p.z for p in top)
-    assert zr > sh * 0.8                                                    # spikes near spike_height
-    zs = [p.z for p in top]
-    peaks = sum(1 for i in range(1, len(zs) - 1) if zs[i] > zs[i - 1] and zs[i] >= zs[i + 1])
-    assert peaks == waves                                                  # `waves` aligned spikes
+    pts = [s for s in steps if isinstance(s, Point)]
+    courses = [pts[i:i + per_course] for i in range(0, len(pts), per_course)]
+    assert len(courses) > 3
+
+    # snake mode: z is held constant within a course and steps strictly up course to course
+    for c in courses:
+        assert max(p.z for p in c) - min(p.z for p in c) < 1e-9
+    zs = [c[0].z for c in courses]
+    assert all(b > a for a, b in zip(zs, zs[1:]))            # monotonic up (not a z-zigzag)
+
+    # ...and the snake reverses direction each course (open wall, printed there-and-back)
+    dirs = [c[-1].x - c[0].x for c in courses]
+    assert all(a * b < 0 for a, b in zip(dirs, dirs[1:]))    # alternating left/right traverse
+
+    # lens silhouette: the mid-height course is wider than the top and bottom courses
+    def width(c):
+        return max(p.x for p in c) - min(p.x for p in c)
+    assert width(courses[len(courses) // 2]) > width(courses[0]) + 2
+    assert width(courses[len(courses) // 2]) > width(courses[-1]) + 2
+
+    # exactly `waves` corrugations across a mid course (perpendicular oscillation about the baseline)
+    c = courses[len(courses) // 2]
+    ys = [p.y for p in c]
+    base = [sum(ys[max(0, i - 3):i + 4]) / len(ys[max(0, i - 3):i + 4]) for i in range(len(ys))]
+    dev = [y - b for y, b in zip(ys, base)]
+    peaks = sum(1 for i in range(1, len(dev) - 1) if dev[i] > dev[i - 1] and dev[i] >= dev[i + 1]
+                and dev[i] > 0.5)
+    assert peaks == waves
 
 
 def test_optimization_passes_shrink_segments_and_insert_retractions():
