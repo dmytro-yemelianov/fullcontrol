@@ -3,6 +3,7 @@ import json
 
 import fullcontrol as fc
 from fullcontrol.ir import resolve, to_dict, to_json, from_dict, from_json, SCHEMA_VERSION
+from fullcontrol.ir.serialize import LATEST_SCHEMA_VERSION, SUPPORTED_VERSIONS, UNITS
 from fullcontrol.ir.toolpath import Segment, MaterialEvent
 
 
@@ -84,3 +85,46 @@ def test_unknown_version_rejected():
     import pytest
     with pytest.raises(ValueError, match='schema version'):
         from_dict({'version': 999, 'events': []})
+
+
+def test_v1_is_the_default_emitted_version():
+    'Default output stays v1, byte-for-byte unchanged, so existing consumers are not disturbed.'
+    tp = resolve(_feature_rich(), _controls())
+    assert SCHEMA_VERSION == 1 and LATEST_SCHEMA_VERSION == 2
+    doc = to_dict(tp)
+    assert doc['version'] == 1
+    assert 'units' not in doc and 'provenance' not in doc      # v1 carries no header
+
+
+def test_v2_adds_units_provenance_and_invariants_header():
+    tp = resolve(_feature_rich(), _controls())
+    doc = to_dict(tp, version=2,
+                  provenance={'design': 'spiral_vase', 'params': {'lobes': 5}},
+                  invariants=['non_negative_extrusion', 'monotonic_layer_z'])
+    assert doc['version'] == 2
+    # units are declared and self-describing (the FullControl conventions)
+    assert doc['units'] == UNITS
+    assert UNITS['length'] == 'mm' and UNITS['speed'] == 'mm/min' and UNITS['volume'] == 'mm^3'
+    assert doc['units']['flow'] == 'mm^3/s' and doc['units']['temperature'] == 'degC'
+    assert doc['generator'].startswith('fullcontrol')
+    assert doc['provenance'] == {'design': 'spiral_vase', 'params': {'lobes': 5}}
+    assert doc['invariants'] == ['non_negative_extrusion', 'monotonic_layer_z']
+    # the event stream is byte-for-byte the v1 stream (the header is purely additive)
+    assert doc['events'] == to_dict(tp)['events']
+
+
+def test_v2_round_trips_events_identically_to_v1():
+    tp = resolve(_feature_rich(), _controls())
+    from_v2 = from_dict(to_dict(tp, version=2, provenance={'design': 'x'}))
+    from_v1 = from_dict(to_dict(tp))
+    assert from_v2.events == from_v1.events                    # the header doesn't affect rebuild
+    assert 2 in SUPPORTED_VERSIONS and 1 in SUPPORTED_VERSIONS
+
+
+def test_v2_simulates_identically():
+    from fullcontrol.simulate.run import simulate_from_ir
+    tp = resolve(_feature_rich(), _controls())
+    r = simulate_from_ir(from_json(to_json(tp, version=2)))
+    r0 = simulate_from_ir(tp)
+    for field in ('total_time_s', 'extruded_volume', 'segment_count'):
+        assert getattr(r, field) == getattr(r0, field), field
