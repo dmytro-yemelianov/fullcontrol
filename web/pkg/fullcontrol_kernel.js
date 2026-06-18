@@ -178,6 +178,36 @@ export function emit_gcode_moves(ir_json, relative_e, travel_g1_e0) {
 }
 
 /**
+ * Parse g-code text into the serialized Toolpath IR JSON (the same engine the Python build uses).
+ * `params_json` is a JSON object {flavor, relative_e, e_units, dia_feed, travel_g1_e0}.
+ * @param {string} text
+ * @param {string} params_json
+ * @returns {string}
+ */
+export function parse_gcode(text, params_json) {
+    let deferred4_0;
+    let deferred4_1;
+    try {
+        const ptr0 = passStringToWasm0(text, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.parse_gcode(ptr0, len0, ptr1, len1);
+        var ptr3 = ret[0];
+        var len3 = ret[1];
+        if (ret[3]) {
+            ptr3 = 0; len3 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred4_0 = ptr3;
+        deferred4_1 = len3;
+        return getStringFromWasm0(ptr3, len3);
+    } finally {
+        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
+    }
+}
+
+/**
  * Walk + fold the flattened design to simulation metrics (one pass, in wasm).
  * @param {Int32Array} tag
  * @param {Float64Array} a
@@ -202,6 +232,22 @@ export function simulate(tag, a, b, c, d, init) {
     const len5 = WASM_VECTOR_LEN;
     const ret = wasm.simulate(ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3, ptr4, len4, ptr5, len5);
     return SimMetrics.__wrap(ret);
+}
+
+/**
+ * Fold a serialized Toolpath IR JSON (e.g. the output of `parse_gcode`) into the nine simulation
+ * metrics. This completes the browser's parse -> simulate pipeline entirely client-side: no Python.
+ * @param {string} ir_json
+ * @returns {SimMetrics}
+ */
+export function simulate_from_ir(ir_json) {
+    const ptr0 = passStringToWasm0(ir_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.simulate_from_ir(ptr0, len0);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return SimMetrics.__wrap(ret[0]);
 }
 function __wbg_get_imports() {
     const import0 = {
