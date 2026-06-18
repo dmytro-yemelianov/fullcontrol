@@ -1,12 +1,55 @@
 # Browser demos
 
-Two complementary ways FullControl runs in the browser:
+Three complementary ways FullControl runs in the browser:
 
+- **`index.html`** — the **polished demo** (below): a parametric toolpath designer. Pick a design,
+  drag parameter sliders, watch the toolpath regenerate, see live print metrics, and download a
+  full printable g-code file. Geometry is authored in JavaScript; the FullControl **Rust engine runs
+  in WebAssembly** (`simulate_from_ir`, `emit_gcode`). Zero server.
+- **`viewer.html`** — the original single-design (twisted-polygon-vase) viewer, kept for reference;
+  it also parses & simulates an uploaded `.gcode` file entirely client-side.
 - **`playground/`** — the **whole library** running client-side via **Pyodide** (CPython in WASM).
   Edit a FullControl design in Python, click Generate, and real g-code comes back — `fc.transform`
-  runs in the browser, no server. The complete library (all backends, all 695 device profiles).
-- **`index.html`** (below) — a **native-WASM** demo: geometry in JS, print metrics from the Rust
-  kernel compiled to wasm. Tiny and fast, but only the simulate path.
+  runs in the browser, no server. The complete library (all backends, all device profiles).
+
+## The polished demo (`index.html`)
+
+A fully client-side, deployable demo. Files:
+
+```
+web/                     ← Cloudflare Pages output root
+  index.html             the demo: design picker, sliders, 3D viewer, metrics, g-code download
+  designs.js             the design catalogue — vanilla JS that builds the serialized v2 Toolpath IR
+  viewer.html            the original single-design viewer (+ .gcode upload/analyse)
+  pkg/                   generated wasm: fullcontrol_kernel.js + fullcontrol_kernel_bg.wasm
+  playground/            the Pyodide "whole library" page (+ committed wheel)
+  _headers               Pages headers (application/wasm MIME, caching, security)
+  _redirects             friendly aliases (/demo, /viewer, /playground)
+  build.sh               rebuild pkg/ from rust_kernel (cargo + wasm-bindgen)
+../wrangler.toml         Pages project config (pages_build_output_dir = "web")
+```
+
+**Designs** (authored in `designs.js`, all in vanilla JS — no build step): spiral vase, fluted vase,
+arc-scalloped vase (native `fc.Arc` G2/G3 moves), twisted polygon vase, corrugated snake-mode wall,
+spirograph cup. Each builds the **serialized Toolpath IR (schema v2)** — the exact JSON the wasm
+kernel and `fullcontrol.ir.from_dict` consume — so the IR is interchangeable with any FullControl
+front-end ("many front-ends, one IR"). The viewer expands arcs from their `arc_points`; metrics come
+straight from `simulate_from_ir`; the **Download g-code** button wraps the design with start/heat/
+fan/end procedures and lets `emit_gcode` produce a complete printable file (native arcs emit as real
+G2/G3). Two invariants (monotonic layer-z, non-negative extrusion) are checked in JS and shown as a
+✓/⚠ badge.
+
+### Deploy to Cloudflare Pages
+
+After a one-time `npx wrangler login`, one command publishes the static site:
+
+```bash
+npx wrangler pages deploy web --project-name fullcontrol-demo
+```
+
+(`wrangler.toml` at the repo root sets `pages_build_output_dir = "web"`. The `pkg/` wasm and the
+Pyodide wheel are committed, so there is **no build step**. `web/_headers` serves `.wasm` as
+`application/wasm`. three.js is loaded from the unpkg CDN via an importmap.)
 
 ## Pyodide playground (`playground/`)
 
@@ -40,7 +83,13 @@ web/
 It must be served over HTTP (ES modules + wasm don't load from `file://`):
 
 ```bash
-cd web && python -m http.server 8000   # then open http://localhost:8000
+cd web && python3 -m http.server 8787   # then open http://localhost:8787
+```
+
+You can also preview through Wrangler (applies `_headers`/`_redirects` like production):
+
+```bash
+npx wrangler pages dev web
 ```
 
 ## How the kernel gets into the browser

@@ -145,3 +145,11 @@ tmp/
 
 # Claude Code agent worktrees / local files
 .claude/
+
+# Node / TypeScript build output (ts/ binding, optional bundling)
+node_modules/
+ts/dist/
+
+# Cloudflare Wrangler local cache & Playwright MCP artifacts
+.wrangler/
+.playwright-mcp/
