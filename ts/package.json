@@ -1,0 +1,31 @@
+{
+  "name": "fullcontrol-ts",
+  "version": "0.1.0",
+  "description": "A minimal TypeScript authoring binding for FullControl that emits the serialized Toolpath IR (schema v2) consumed by the Python backends and the Rust/wasm kernel.",
+  "type": "module",
+  "main": "dist/fullcontrol.js",
+  "types": "dist/fullcontrol.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "fixtures": "tsc && node dist/generate_fixtures.js",
+    "lint": "tsc --noEmit"
+  },
+  "files": [
+    "src",
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "fullcontrol",
+    "3d-printing",
+    "gcode",
+    "toolpath",
+    "ir",
+    "fff"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "typescript": "^5.9.3"
+  }
+}
