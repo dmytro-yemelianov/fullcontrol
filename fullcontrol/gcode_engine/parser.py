@@ -109,6 +109,10 @@ class _Cursor:
 def parse_gcode(text: str, params: ParseParams = None) -> Toolpath:
     '''Parse g-code text into a Toolpath IR (the inverse of the dialect emitter).
 
+    Tries the Rust g-code engine first (a field-by-field port producing the SAME IR), and falls
+    back to the pure-Python reference parser below when the compiled extension is absent. The
+    behaviour is identical either way; the Rust path is purely a speed-up for large files.
+
     Args:
         text: the g-code as a single string (lines separated by ``\\n``).
         params: a `ParseParams` giving the flavor / E-mode / units / diameter context. When
@@ -124,6 +128,15 @@ def parse_gcode(text: str, params: ParseParams = None) -> Toolpath:
     '''
     if params is None:
         params = ParseParams.detect(text)
+    from fullcontrol.ir.kernel import parse_gcode_rust
+    result = parse_gcode_rust(text, params)
+    if result is not None:
+        return result
+    return _parse_gcode_python(text, params)
+
+
+def _parse_gcode_python(text: str, params: ParseParams) -> Toolpath:
+    'The pure-Python reference parser (the canonical implementation the Rust port mirrors).'
     cur = _Cursor(params)
     events = []
     if text == '':

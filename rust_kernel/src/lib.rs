@@ -8,6 +8,7 @@
 
 mod gcode;
 mod metrics;
+mod parser;
 mod walk;
 
 #[cfg(feature = "python")]
