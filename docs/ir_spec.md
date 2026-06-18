@@ -82,20 +82,21 @@ as the raw dict so nothing is silently lost).
 `fullcontrol/ir/serialize.py` — `to_dict` / `to_json` / `from_dict` / `from_json`. Floats are full
 precision so a consumer reproduces identical output; a `null` axis round-trips to `None`.
 
-### 2.1 Version 1 (default)
+### 2.1 Version 1 (lean shape, on request)
 
 ```json
 {"version": 1, "events": [ {"k":"segment", …}, {"k":"material", …}, {"k":"step", …} ]}
 ```
 
-This is the version emitted by default (`SCHEMA_VERSION == 1`), byte-for-byte stable, so existing
-consumers (the Rust kernel, wasm, cached files, p3d) are never disturbed.
+The headerless shape, available via `to_dict(tp, version=1)` for any consumer that wants the minimal
+form. `from_dict` always accepts it.
 
-### 2.2 Version 2 (opt-in: `to_dict(tp, version=2, …)`)
+### 2.2 Version 2 (the default)
 
-Version 2 prepends a **purely additive, self-describing header** onto the *identical* `events` stream —
-it changes no event, so any consumer that reads only `events` keeps working unchanged (the Rust kernel
-reads `ir["events"]` and ignores everything else; verified: v1 and v2 produce identical kernel metrics).
+Version 2 (emitted by default, `SCHEMA_VERSION == 2`) prepends a **purely additive, self-describing
+header** onto the *identical* `events` stream — it changes no event, so any consumer that reads only
+`events` keeps working unchanged (the Rust kernel reads `ir["events"]` and ignores everything else;
+verified: v1 and v2 produce identical kernel metrics, so g-code/simulation output is unchanged).
 
 ```json
 {
@@ -164,9 +165,9 @@ Apache Arrow recommendation.)
 
 - **Additive, backward-compatible by default.** New optional fields/headers do not bump the major
   contract; `version` increments only for a richer *understood* shape, and old versions stay readable.
-- **`SCHEMA_VERSION` (default-emitted) advances only when consumers are ready.** v1 remains the default
-  wire format until the Rust kernel, wasm and p3d explicitly opt into v2; until then v2 is request-only.
-  Because v2 is a pure superset header, the migration is risk-free for `events`-only consumers.
+- **`SCHEMA_VERSION` (default-emitted) is 2.** v2 is a pure superset header over the v1 `events` stream,
+  so the switch is risk-free for any `events`-only consumer (the Rust kernel, wasm). Consumers that want
+  the lean form request `to_dict(tp, version=1)`; `from_dict` accepts both.
 - **Unknown pass-through step classes** are preserved as raw `{type,data}` — forward-compatible.
 
 ## 6. Interoperation (import / export, not adopt)

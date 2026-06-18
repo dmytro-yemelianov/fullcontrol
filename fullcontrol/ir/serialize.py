@@ -36,10 +36,13 @@ the identical `events` stream - it does not change a single event, so any v1 con
       "events": [ ... identical to v1 ... ]
     }
 
-`SCHEMA_VERSION` (the version emitted by default) stays 1, so existing output is byte-for-byte
-unchanged; `LATEST_SCHEMA_VERSION` is 2 and `from_dict` accepts both. The recognised `invariants`
-vocabulary is documented in docs/ir_spec.md and maps onto the existing validate / verify_gcode rules.
-See docs/ir_spec.md for the full specification and docs/ir_prior_art.md for the standards survey.
+`SCHEMA_VERSION` (the version emitted by default) is 2 - the self-describing header is on by default.
+The lean v1 shape is still available via `to_dict(tp, version=1)`, and `from_dict` accepts both. Because
+v2 only ADDS a header onto the identical `events` stream, the switch is invisible to any consumer that
+reads only `events` (the Rust kernel does exactly this - g-code/simulation output is unchanged). The
+recognised `invariants` vocabulary is documented in docs/ir_spec.md and maps onto the existing validate
+/ verify_gcode rules. See docs/ir_spec.md for the full specification and docs/ir_prior_art.md for the
+standards survey.
 """
 import json
 from dataclasses import asdict
@@ -47,9 +50,9 @@ from dataclasses import asdict
 import fullcontrol
 from fullcontrol.ir.toolpath import Toolpath, Segment, MaterialEvent
 
-SCHEMA_VERSION = 1                       # the version to_dict emits by default (backward-compatible)
+SCHEMA_VERSION = 2                       # the version to_dict emits by default
 LATEST_SCHEMA_VERSION = 2                # the richest version this module understands
-SUPPORTED_VERSIONS = (1, 2)
+SUPPORTED_VERSIONS = (1, 2)             # to_dict(tp, version=1) still emits the lean v1 shape
 
 # The fixed FullControl unit conventions, made explicit and self-describing in v2 (UCUM-style codes).
 UNITS = {
