@@ -87,13 +87,15 @@ def test_unknown_version_rejected():
         from_dict({'version': 999, 'events': []})
 
 
-def test_v1_is_the_default_emitted_version():
-    'Default output stays v1, byte-for-byte unchanged, so existing consumers are not disturbed.'
+def test_v2_is_the_default_emitted_version():
+    'Default output is v2 (self-describing header); the lean v1 shape is still available on request.'
     tp = resolve(_feature_rich(), _controls())
-    assert SCHEMA_VERSION == 1 and LATEST_SCHEMA_VERSION == 2
+    assert SCHEMA_VERSION == 2 and LATEST_SCHEMA_VERSION == 2
     doc = to_dict(tp)
-    assert doc['version'] == 1
-    assert 'units' not in doc and 'provenance' not in doc      # v1 carries no header
+    assert doc['version'] == 2 and 'units' in doc and doc['units'] == UNITS
+    v1 = to_dict(tp, version=1)
+    assert v1['version'] == 1 and 'units' not in v1           # v1 carries no header
+    assert v1['events'] == doc['events']                       # identical event stream either way
 
 
 def test_v2_adds_units_provenance_and_invariants_header():
