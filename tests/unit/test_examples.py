@@ -78,6 +78,19 @@ def test_reverse_engineer_recovers_vase_lobes_from_gcode():
     assert rep['profile'] == 'cylinder'
 
 
+def test_parse_gcode_strips_the_primer():
+    'The FullControl primer (a wide bed sweep) must not contaminate the recovered point cloud.'
+    from examples.reverse_engineer import parse_gcode
+    import numpy as np
+    gc = fc.transform(spiral_vase(radius=15, height=3), 'gcode', fc.GcodeControls(
+        printer_name='generic',
+        initialization_data={'nozzle_temp': 210, 'primer': 'front_lines_then_y'}), show_tips=False)
+    assert '; START OF PRIMER PROCEDURE' in gc          # the primer is present in the g-code
+    p = parse_gcode(gc)
+    assert np.ptp(p[:, 0]) < 40                          # ~30 (the vase), not ~100 (the primer sweep)
+    assert np.ptp(p[:, 1]) < 40
+
+
 def test_reverse_engineer_recovers_polygon_sides():
     from examples.reverse_engineer import reverse_engineer
     poly = reverse_engineer(_gcode(twisted_polygon_vase(sides=6, morph_to_sides=0, twist_turns=0,

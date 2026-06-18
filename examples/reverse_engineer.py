@@ -18,13 +18,21 @@ import numpy as np
 
 
 def parse_gcode(text: str):
-    'Parse g-code into an (N, 3) array of *extruding* move endpoints (E increases, XY moves).'
+    '''Parse g-code into an (N, 3) array of *extruding* move endpoints (E increases, XY moves).
+
+    The FullControl primer (a wide bed-sweep before the design) is skipped so it can't contaminate the
+    recovered axis/centre/bounding box; position and E state are still carried through it.'''
     pts = []
     x = y = z = e = 0.0
     relative_e = False
+    in_primer = False
     for line in text.split('\n'):
         s = line.strip()
-        if s.startswith('M83'):
+        if 'START OF PRIMER PROCEDURE' in s:
+            in_primer = True
+        elif 'END OF PRIMER PROCEDURE' in s:
+            in_primer = False
+        elif s.startswith('M83'):
             relative_e = True
         elif s.startswith('M82'):
             relative_e = False
@@ -38,7 +46,7 @@ def parse_gcode(text: str):
                         pass
             nx, ny, nz = d.get('X', x), d.get('Y', y), d.get('Z', z)
             de = d.get('E', 0.0) if relative_e else d.get('E', e) - e
-            if de > 1e-9 and (nx != x or ny != y or nz != z):
+            if de > 1e-9 and (nx != x or ny != y or nz != z) and not in_primer:
                 pts.append((nx, ny, nz))
             x, y, z = nx, ny, nz
             if 'E' in d:
