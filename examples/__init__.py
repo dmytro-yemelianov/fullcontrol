@@ -25,7 +25,7 @@ from examples.surface_texture import revolve, textured_cone
 from examples.mobius_band import mobius_band
 from examples.trefoil_tube import trefoil_tube
 from examples.optimization_demo import towers_grid, optimization_report
-from examples.snake_lattice import snake_lattice
+from examples.snake_soapdish import snake_soapdish
 from examples.validation_gauntlet import validation_gauntlet
 
 # GALLERY holds the printable designs (each name -> a function returning a step list). The
@@ -43,9 +43,9 @@ GALLERY = {
     'mobius_band': mobius_band,
     'trefoil_tube': trefoil_tube,
     'towers_grid': towers_grid,
-    'snake_lattice': snake_lattice,
+    'snake_soapdish': snake_soapdish,
 }
 
 __all__ = ['spiral_vase', 'ripple_vase', 'nonplanar_spacer', 'wave_bowl', 'gyroid_infill',
            'twisted_polygon_vase', 'helical_screw', 'textured_cone', 'revolve', 'mobius_band',
-           'trefoil_tube', 'towers_grid', 'snake_lattice', 'optimization_report', 'validation_gauntlet', 'GALLERY']
+           'trefoil_tube', 'towers_grid', 'snake_soapdish', 'optimization_report', 'validation_gauntlet', 'GALLERY']
