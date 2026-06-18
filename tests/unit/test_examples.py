@@ -14,7 +14,8 @@ from examples import (GALLERY, spiral_vase, ripple_vase, nonplanar_spacer, wave_
                       trefoil_tube, towers_grid, optimization_report, snake_soapdish,
                       hex_adapter, lampshade, nuts_and_bolts, star_polygon_lattice,
                       phone_stand, pin_support_challenge, overhang_challenge,
-                      arc_vase, brush_lettering, bead_studs)
+                      arc_vase, brush_lettering, bead_studs, retraction_test, blob_printing,
+                      freeform_frosting, fractional_design_engine, tape_reinforcement)
 
 _BUILD = {'nozzle_temp': 210, 'bed_temp': 40, 'primer': 'front_lines_then_y',
           'build_volume_x': 200, 'build_volume_y': 200, 'build_volume_z': 200}
@@ -43,6 +44,11 @@ _SMALL = {
     'arc_vase': lambda: arc_vase(height=3, petals=6),
     'brush_lettering': lambda: brush_lettering(segments=60),
     'bead_studs': lambda: bead_studs(rows=2, cols=3, base_layers=1),
+    'retraction_test': lambda: retraction_test(retractions=40),
+    'blob_printing': lambda: blob_printing(rows=2, cols=3, blob_layers=1),
+    'freeform_frosting': lambda: freeform_frosting(height=4, segments_per_layer=48),
+    'fractional_design_engine': lambda: fractional_design_engine(points=80),
+    'tape_reinforcement': lambda: tape_reinforcement(length=40, width=20, layers=2),
 }
 
 
@@ -157,7 +163,9 @@ def test_gallery_registry_matches_callables():
                             'mobius_band', 'trefoil_tube', 'towers_grid', 'snake_soapdish',
                             'hex_adapter', 'lampshade', 'nuts_and_bolts', 'star_polygon_lattice',
                             'phone_stand', 'pin_support_challenge', 'overhang_challenge',
-                            'arc_vase', 'brush_lettering', 'bead_studs'}
+                            'arc_vase', 'brush_lettering', 'bead_studs', 'retraction_test',
+                            'blob_printing', 'freeform_frosting', 'fractional_design_engine',
+                            'tape_reinforcement'}
     for fn in GALLERY.values():
         assert callable(fn)
 
