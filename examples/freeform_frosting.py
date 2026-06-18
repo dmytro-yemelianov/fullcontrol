@@ -18,16 +18,17 @@ from math import tau, sin, pi
 import fullcontrol as fc
 
 
-def freeform_frosting(base_radius: float = 15.0, height: float = 30.0, top_diameter: float = 0.0,
-                      concave_offset: float = 0.0, swirls: int = 7, swirl_amplitude: float = 50.0,
-                      swirl_turns: float = 2.0, peak: bool = True, vary_fan: bool = False,
+def freeform_frosting(base_radius: float = 15.8, height: float = 50.0, top_diameter: float = 0.0,
+                      concave_offset: float = -1.0, swirls: int = 3, swirl_amplitude: float = 50.0,
+                      swirl_turns: float = 4.7, peak: bool = True, vary_fan: bool = False,
                       vary_speed: bool = False, layer_height: float = 0.3,
                       segments_per_layer: int = 128, extrusion_width: float = 0.6,
                       centre=(50.0, 50.0), first_layer_gap: float = 0.5) -> list:
     """Build a freeform piped-frosting swirl column.
 
     base_radius: nominal wall radius at the bottom (mm) - the wide foot of the frosting.
-    height: total height (mm); maps the catalogue's unnamed slider #2 (range 10-50, default 30).
+    height: total height (mm); maps the catalogue's unnamed slider #2 (range 10-50). Default 50
+        reproduces the published gcode: a ~32x32x50 tall, narrow swirled column tapering to a point.
     top_diameter: width of the column at the very top (mm); the catalogue 'Diameter at top'
         slider (0-60). 0 with peak=True closes to a point (the soft-serve tip); larger keeps a
         flat-ish cap.
@@ -47,7 +48,7 @@ def freeform_frosting(base_radius: float = 15.0, height: float = 30.0, top_diame
     cx, cy = centre
     eh = layer_height
     top_radius = 0.0 if peak else max(0.0, top_diameter / 2)
-    amp = (swirl_amplitude / 100.0) * base_radius * 0.25   # ripple depth (mm), scaled to size
+    amp = (swirl_amplitude / 100.0) * base_radius * 0.15   # ripple depth (mm), scaled to size
     total_segments = max(1, int((height / eh) * segments_per_layer))
     base_speed = 1000
 

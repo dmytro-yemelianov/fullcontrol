@@ -40,7 +40,7 @@ def _star_polygon(cx: float, cy: float, z: float, radius: float, points: int, st
 
 
 def star_polygon_lattice(points: int = 6, step: int = 2, radius: float = 2.5,
-                         cols: int = 9, rows: int = 4, layers: int = 2,
+                         cols: int = 14, rows: int = 6, layers: int = 2,
                          extrusion_width: float = 0.5, extrusion_height: float = 0.2,
                          x_start: float = 30.0, y_start: float = 30.0) -> list:
     """Build a tiled star-polygon {points/step} lattice as one continuous bead.

@@ -11,12 +11,13 @@ The real g-codes are a single continuous bead in three phases printed as one sea
   2. a straight VERTICAL WALL at `base_radius` (a circle for the base challenge; a regular polygon for
      the Plus variant), then
   3. an OUTWARD FLARE near the top where the radius grows linearly with height (5 mm -> ~10 mm over
-     ~1.4 mm of z in the originals): the wall leans progressively off vertical until it is an almost-
+     ~1.3 mm of z in the originals): the wall leans progressively off vertical until it is an almost-
      90-degree overhang - the whole point of the test.
 
 Reverse-engineered from the supplied g-codes:
   - overhang-challenge.gcode:      ~2176 pts, bbox 19.8 x 19.8 x 4.3 mm, circular wall (r=5),
-    flare r 5->10 over z~3.1->4.5 (dr/dz ~ 3.76 -> ~75 deg off vertical, i.e. a steep overhang).
+    straight wall z~0->3.0, flare r 5->10 over z~3.0->4.3 (dr/dz ~ 3.9 -> ~75 deg off vertical, i.e.
+    a steep overhang). The shipped defaults (wall_height=3.0, flare_height=1.3) reproduce this.
   - overhang-challenge-plus.gcode: ~186 pts,  bbox 17.1 x 19.7 x 4.3 mm, HEXAGONAL wall (circumradius
     5, vertices at +-30/+-90/+-150 deg), same outward flare.
 
@@ -39,10 +40,10 @@ def _ngon_radius(angle: float, sides: int, circumradius: float) -> float:
 
 
 def overhang_challenge(base_radius: float = 5.0, foot_radius: float = 10.0,
-                       wall_height: float = 2.4, flare_height: float = 1.4,
+                       wall_height: float = 3.0, flare_height: float = 1.3,
                        flare_radius: float = 10.0, plus: bool = False, sides: int = 6,
                        outward: bool = True, stack: int = 1, scale_xy: float = 1.0,
-                       scale_z: float = 1.0, layer_height: float = 0.5,
+                       scale_z: float = 1.0, layer_height: float = 0.3,
                        segments_per_layer: int = 100, base_rings: int = 7,
                        extrusion_width: float = 0.6, centre=(50.0, 50.0),
                        first_layer_gap: float = 0.0) -> list:

@@ -111,6 +111,40 @@ def test_blob_volume_reflected_in_extruded_volume():
     assert (v2_big - v1_big) > per_blob
 
 
+def test_default_tube_matches_reference_footprint():
+    """The default (no rows/cols) builds the published tube: a ~20mm circle of blobs with a side
+    spoke (~30mm X extent) stacked ten rings tall to z~8mm, matching `blob-printing.gcode`."""
+    steps = blob_printing()
+    pts = [s for s in steps if isinstance(s, fc.Point)]
+    xs = [p.x for p in pts]
+    ys = [p.y for p in pts]
+    zs = [p.z for p in pts]
+    # reference extents: X 40.0..69.65 (29.6), Y 40.01..59.99 (20.0), z 0.76..7.96
+    assert (max(xs) - min(xs)) == pytest.approx(29.6, abs=1.0)   # circle + lead-in spoke
+    assert (max(ys) - min(ys)) == pytest.approx(20.0, abs=1.0)   # circle diameter
+    assert min(zs) == pytest.approx(0.76, abs=0.01)
+    assert max(zs) == pytest.approx(7.96, abs=0.01)
+
+
+def test_default_is_a_stacked_circular_tube():
+    """Blobs sit on a circle of radius ~10mm centred at (50, 50) across ten z-rings."""
+    from math import hypot
+    steps = blob_printing()
+    pts = [s for s in steps if isinstance(s, fc.Point)]
+    assert len(set(round(p.z, 3) for p in pts)) == 10          # ten stacked rings
+    # ignore the straight lead-in spoke (Y==centre, X beyond the ring) when checking the circle
+    ring = [p for p in pts if not (abs(p.y - 50.0) < 1e-6 and p.x > 60.5)]
+    radii = [hypot(p.x - 50.0, p.y - 50.0) for p in ring]
+    assert all(r == pytest.approx(10.0, abs=0.01) for r in radii)
+
+
+def test_default_generates_valid_gcode():
+    steps = blob_printing()
+    r = fc.transform(steps, 'validate', _controls(), show_tips=False)
+    assert r.ok, [e['message'] for e in r.errors]
+    assert _n_blobs(steps) > 100                                # a real field of blobs
+
+
 def test_rejects_bad_args():
     with pytest.raises(ValueError):
         blob_printing(rows=0)

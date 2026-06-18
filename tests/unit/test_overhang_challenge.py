@@ -75,6 +75,32 @@ def test_footprint_and_height_match_the_real_models():
     assert 3.5 < (max(zs) - min(zs)) < 5.0                     # ~4.3 mm tall
 
 
+def test_default_profile_matches_the_real_gcode_phases():
+    '''The real overhang-challenge.gcode has a precise three-phase radius-vs-height profile:
+    a flat spiral base (r 5->10 at z~0), a straight vertical wall (r==5 up to z~3.0), then an
+    outward flare (r 5->10 over z~3.0->4.3, dr/dz~3.9 => ~75 deg off vertical). The shipped
+    defaults must reproduce that shape.'''
+    pts = _points(overhang_challenge())
+    zmin = min(p.z for p in pts)
+
+    # phase 1: a flat spiral base at the bottom layer spanning the wall radius out to the foot
+    base = [_radius(p) for p in pts if p.z - zmin < 0.01]
+    assert min(base) <= 5.05                                   # starts at the wall radius
+    assert max(base) >= 9.5                                    # ...and fills out to the ~10 mm foot
+
+    # phase 2: a straight vertical wall at r~5 over a real ~3 mm span (constant radius)
+    wall = [p for p in pts if abs(_radius(p) - 5.0) < 0.05 and p.z - zmin > 0.01]
+    wall_span = max(p.z for p in wall) - min(p.z for p in wall)
+    assert 2.6 < wall_span < 3.3                               # real wall height ~3.0 mm
+
+    # phase 3: the flare reaches the foot radius and is a steep (>70 deg off-vertical) overhang
+    flare = [p for p in pts if _radius(p) > 5.05 and p.z - zmin > 1.0]
+    assert max(_radius(p) for p in flare) >= 9.8               # flares out to ~10 mm
+    flare_dz = max(p.z for p in flare) - min(p.z for p in flare)
+    slope = (max(_radius(p) for p in flare) - 5.0) / flare_dz  # dr/dz up the flare
+    assert slope > 2.7                                         # real ~3.9 => ~75 deg off vertical
+
+
 def test_wall_overhangs_outward_and_increases_monotonically_with_height():
     '''The defining feature: above the straight wall the radius grows with z, so the wall leans
     progressively outward - the radius at the top is greater than at the base of the flare, and the

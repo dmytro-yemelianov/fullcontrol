@@ -37,6 +37,20 @@ def test_starts_with_extrusion_geometry():
     assert geom.width > 0 and geom.height > 0
 
 
+def test_default_is_tall_narrow_swirled_column():
+    """The published gcode is a TALL, narrow swirled column: bbox ~32x32x50mm (tall!), not a
+    squat cone. The default output must reproduce that ~50mm height and slender proportions."""
+    pts = _points(freeform_frosting())
+    zs = [p.z for p in pts]
+    height = max(zs) - min(zs)
+    assert height > 45.0, f'default too short: {height:.1f}mm (real is ~50mm tall)'
+    # footprint: max radius from centre -> diameter ~32mm, so column is taller than it is wide
+    rmax = max(_polar(p)[0] for p in pts)
+    diameter = 2 * rmax
+    assert height > 1.4 * diameter, f'not narrow enough: h {height:.1f} vs dia {diameter:.1f}'
+    assert diameter < 40.0
+
+
 def test_design_generates_gcode():
     gcode = fc.transform(_small(), 'gcode', _controls(), show_tips=False)
     assert isinstance(gcode, str)
