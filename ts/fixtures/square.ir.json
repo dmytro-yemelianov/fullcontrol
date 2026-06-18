@@ -1,0 +1,184 @@
+{
+  "version": 2,
+  "units": {
+    "length": "mm",
+    "speed": "mm/min",
+    "volume": "mm^3",
+    "flow": "mm^3/s",
+    "temperature": "degC",
+    "angle": "deg"
+  },
+  "generator": "fullcontrol-ts 0.1.0",
+  "provenance": {
+    "design": "square",
+    "params": {
+      "size": 20,
+      "origin": [
+        50,
+        50
+      ],
+      "z": 0.2
+    }
+  },
+  "invariants": [
+    "non_negative_extrusion",
+    "monotonic_layer_z"
+  ],
+  "events": [
+    {
+      "k": "step",
+      "type": "ExtrusionGeometry",
+      "data": {
+        "area_model": "rectangle",
+        "width": 0.6,
+        "height": 0.2,
+        "diameter": null,
+        "area": 0.12
+      }
+    },
+    {
+      "k": "segment",
+      "start": [
+        null,
+        null,
+        null
+      ],
+      "end": [
+        50,
+        50,
+        0.2
+      ],
+      "travel": true,
+      "speed": 8000,
+      "length": 0,
+      "deposited_volume": 0,
+      "filament_length": 0,
+      "source_index": 1,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.2,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "step",
+      "type": "Extruder",
+      "data": {
+        "on": true
+      }
+    },
+    {
+      "k": "segment",
+      "start": [
+        50,
+        50,
+        0.2
+      ],
+      "end": [
+        70,
+        50,
+        0.2
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 20,
+      "deposited_volume": 2.4,
+      "filament_length": 0.9978040513842908,
+      "source_index": 3,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.2,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        70,
+        50,
+        0.2
+      ],
+      "end": [
+        70,
+        70,
+        0.2
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 20,
+      "deposited_volume": 2.4,
+      "filament_length": 0.9978040513842908,
+      "source_index": 4,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.2,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        70,
+        70,
+        0.2
+      ],
+      "end": [
+        50,
+        70,
+        0.2
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 20,
+      "deposited_volume": 2.4,
+      "filament_length": 0.9978040513842908,
+      "source_index": 5,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.2,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        50,
+        70,
+        0.2
+      ],
+      "end": [
+        50,
+        50,
+        0.2
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 20,
+      "deposited_volume": 2.4,
+      "filament_length": 0.9978040513842908,
+      "source_index": 6,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.2,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "step",
+      "type": "Extruder",
+      "data": {
+        "on": false
+      }
+    }
+  ]
+}

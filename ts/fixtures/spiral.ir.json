@@ -1,0 +1,7870 @@
+{
+  "version": 2,
+  "units": {
+    "length": "mm",
+    "speed": "mm/min",
+    "volume": "mm^3",
+    "flow": "mm^3/s",
+    "temperature": "degC",
+    "angle": "deg"
+  },
+  "generator": "fullcontrol-ts 0.1.0",
+  "provenance": {
+    "design": "spiral_vase",
+    "params": {
+      "radius": 15,
+      "height": 3,
+      "layer_height": 0.24
+    }
+  },
+  "invariants": [
+    "non_negative_extrusion",
+    "monotonic_layer_z"
+  ],
+  "events": [
+    {
+      "k": "step",
+      "type": "ExtrusionGeometry",
+      "data": {
+        "area_model": "rectangle",
+        "width": 0.6,
+        "height": 0.24,
+        "diameter": null,
+        "area": 0.144
+      }
+    },
+    {
+      "k": "step",
+      "type": "Extruder",
+      "data": {
+        "on": true
+      }
+    },
+    {
+      "k": "segment",
+      "start": [
+        null,
+        null,
+        null
+      ],
+      "end": [
+        65,
+        50,
+        0.8
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 0,
+      "deposited_volume": 0,
+      "filament_length": 0,
+      "source_index": 2,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        65,
+        50,
+        0.8
+      ],
+      "end": [
+        64.48888739433602,
+        53.88228567653781,
+        0.81
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410023,
+      "deposited_volume": 0.5638749890990433,
+      "filament_length": 0.23443197858220763,
+      "source_index": 3,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433602,
+        53.88228567653781,
+        0.81
+      ],
+      "end": [
+        62.99038105676658,
+        57.5,
+        0.8200000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100187,
+      "deposited_volume": 0.5638749890990427,
+      "filament_length": 0.23443197858220735,
+      "source_index": 4,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676658,
+        57.5,
+        0.8200000000000001
+      ],
+      "end": [
+        60.60660171779821,
+        60.60660171779821,
+        0.8300000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410022,
+      "deposited_volume": 0.5638749890990431,
+      "filament_length": 0.23443197858220752,
+      "source_index": 5,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779821,
+        60.60660171779821,
+        0.8300000000000001
+      ],
+      "end": [
+        57.5,
+        62.99038105676658,
+        0.8400000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410022,
+      "deposited_volume": 0.5638749890990431,
+      "filament_length": 0.23443197858220752,
+      "source_index": 6,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.5,
+        62.99038105676658,
+        0.8400000000000001
+      ],
+      "end": [
+        53.88228567653781,
+        64.48888739433602,
+        0.8500000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100187,
+      "deposited_volume": 0.5638749890990427,
+      "filament_length": 0.23443197858220735,
+      "source_index": 7,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653781,
+        64.48888739433602,
+        0.8500000000000001
+      ],
+      "end": [
+        50,
+        65,
+        0.8600000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410023,
+      "deposited_volume": 0.5638749890990433,
+      "filament_length": 0.23443197858220763,
+      "source_index": 8,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        50,
+        65,
+        0.8600000000000001
+      ],
+      "end": [
+        46.11771432346219,
+        64.48888739433602,
+        0.8700000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410023,
+      "deposited_volume": 0.5638749890990433,
+      "filament_length": 0.23443197858220763,
+      "source_index": 9,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346219,
+        64.48888739433602,
+        0.8700000000000001
+      ],
+      "end": [
+        42.5,
+        62.99038105676658,
+        0.88
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100187,
+      "deposited_volume": 0.5638749890990427,
+      "filament_length": 0.23443197858220735,
+      "source_index": 10,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.5,
+        62.99038105676658,
+        0.88
+      ],
+      "end": [
+        39.39339828220179,
+        60.60660171779821,
+        0.89
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410022,
+      "deposited_volume": 0.5638749890990431,
+      "filament_length": 0.23443197858220752,
+      "source_index": 11,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220179,
+        60.60660171779821,
+        0.89
+      ],
+      "end": [
+        37.00961894323342,
+        57.5,
+        0.9
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410022,
+      "deposited_volume": 0.5638749890990431,
+      "filament_length": 0.23443197858220752,
+      "source_index": 12,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.00961894323342,
+        57.5,
+        0.9
+      ],
+      "end": [
+        35.511112605663975,
+        53.88228567653781,
+        0.91
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100213,
+      "deposited_volume": 0.563874989099043,
+      "filament_length": 0.2344319785822075,
+      "source_index": 13,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.511112605663975,
+        53.88228567653781,
+        0.91
+      ],
+      "end": [
+        35,
+        50,
+        0.92
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410022,
+      "deposited_volume": 0.5638749890990431,
+      "filament_length": 0.23443197858220752,
+      "source_index": 14,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35,
+        50,
+        0.92
+      ],
+      "end": [
+        35.511112605663975,
+        46.117714323462195,
+        0.93
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410015,
+      "deposited_volume": 0.5638749890990421,
+      "filament_length": 0.2344319785822071,
+      "source_index": 15,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.511112605663975,
+        46.117714323462195,
+        0.93
+      ],
+      "end": [
+        37.00961894323342,
+        42.5,
+        0.9400000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410028,
+      "deposited_volume": 0.563874989099044,
+      "filament_length": 0.23443197858220788,
+      "source_index": 16,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.00961894323342,
+        42.5,
+        0.9400000000000001
+      ],
+      "end": [
+        39.39339828220179,
+        39.39339828220179,
+        0.9500000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410022,
+      "deposited_volume": 0.5638749890990431,
+      "filament_length": 0.23443197858220752,
+      "source_index": 17,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220179,
+        39.39339828220179,
+        0.9500000000000001
+      ],
+      "end": [
+        42.49999999999999,
+        37.00961894323342,
+        0.96
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100164,
+      "deposited_volume": 0.5638749890990423,
+      "filament_length": 0.2344319785822072,
+      "source_index": 18,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.49999999999999,
+        37.00961894323342,
+        0.96
+      ],
+      "end": [
+        46.11771432346219,
+        35.511112605663975,
+        0.9700000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410028,
+      "deposited_volume": 0.563874989099044,
+      "filament_length": 0.23443197858220788,
+      "source_index": 19,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346219,
+        35.511112605663975,
+        0.9700000000000001
+      ],
+      "end": [
+        50,
+        35,
+        0.98
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410022,
+      "deposited_volume": 0.5638749890990431,
+      "filament_length": 0.23443197858220752,
+      "source_index": 20,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        50,
+        35,
+        0.98
+      ],
+      "end": [
+        53.882285676537805,
+        35.511112605663975,
+        0.99
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410015,
+      "deposited_volume": 0.5638749890990421,
+      "filament_length": 0.2344319785822071,
+      "source_index": 21,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.882285676537805,
+        35.511112605663975,
+        0.99
+      ],
+      "end": [
+        57.5,
+        37.00961894323342,
+        1
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410028,
+      "deposited_volume": 0.563874989099044,
+      "filament_length": 0.23443197858220788,
+      "source_index": 22,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.5,
+        37.00961894323342,
+        1
+      ],
+      "end": [
+        60.60660171779821,
+        39.39339828220179,
+        1.01
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410022,
+      "deposited_volume": 0.5638749890990431,
+      "filament_length": 0.23443197858220752,
+      "source_index": 23,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779821,
+        39.39339828220179,
+        1.01
+      ],
+      "end": [
+        62.99038105676658,
+        42.49999999999999,
+        1.02
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100164,
+      "deposited_volume": 0.5638749890990423,
+      "filament_length": 0.2344319785822072,
+      "source_index": 24,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676658,
+        42.49999999999999,
+        1.02
+      ],
+      "end": [
+        64.48888739433602,
+        46.11771432346219,
+        1.03
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100253,
+      "deposited_volume": 0.5638749890990437,
+      "filament_length": 0.23443197858220777,
+      "source_index": 25,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433602,
+        46.11771432346219,
+        1.03
+      ],
+      "end": [
+        65,
+        49.99999999999999,
+        1.04
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410016,
+      "deposited_volume": 0.5638749890990422,
+      "filament_length": 0.23443197858220716,
+      "source_index": 26,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        65,
+        49.99999999999999,
+        1.04
+      ],
+      "end": [
+        64.48888739433602,
+        53.88228567653782,
+        1.05
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100373,
+      "deposited_volume": 0.5638749890990453,
+      "filament_length": 0.23443197858220843,
+      "source_index": 27,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433602,
+        53.88228567653782,
+        1.05
+      ],
+      "end": [
+        62.99038105676659,
+        57.499999999999986,
+        1.06
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099965,
+      "deposited_volume": 0.5638749890990394,
+      "filament_length": 0.234431978582206,
+      "source_index": 28,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676659,
+        57.499999999999986,
+        1.06
+      ],
+      "end": [
+        60.60660171779821,
+        60.60660171779821,
+        1.07
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100378,
+      "deposited_volume": 0.5638749890990454,
+      "filament_length": 0.2344319785822085,
+      "source_index": 29,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779821,
+        60.60660171779821,
+        1.07
+      ],
+      "end": [
+        57.49999999999999,
+        62.99038105676658,
+        1.08
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100275,
+      "deposited_volume": 0.5638749890990439,
+      "filament_length": 0.23443197858220785,
+      "source_index": 30,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.49999999999999,
+        62.99038105676658,
+        1.08
+      ],
+      "end": [
+        53.882285676537826,
+        64.48888739433602,
+        1.09
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409999,
+      "deposited_volume": 0.5638749890990399,
+      "filament_length": 0.23443197858220619,
+      "source_index": 31,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.882285676537826,
+        64.48888739433602,
+        1.09
+      ],
+      "end": [
+        50.00000000000001,
+        65,
+        1.1
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.91579853541003,
+      "deposited_volume": 0.5638749890990443,
+      "filament_length": 0.23443197858220802,
+      "source_index": 32,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        50.00000000000001,
+        65,
+        1.1
+      ],
+      "end": [
+        46.117714323462195,
+        64.48888739433603,
+        1.11
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100213,
+      "deposited_volume": 0.563874989099043,
+      "filament_length": 0.2344319785822075,
+      "source_index": 33,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.117714323462195,
+        64.48888739433603,
+        1.11
+      ],
+      "end": [
+        42.500000000000014,
+        62.99038105676659,
+        1.12
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410015,
+      "deposited_volume": 0.5638749890990421,
+      "filament_length": 0.2344319785822071,
+      "source_index": 34,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.500000000000014,
+        62.99038105676659,
+        1.12
+      ],
+      "end": [
+        39.3933982822018,
+        60.60660171779823,
+        1.13
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100178,
+      "deposited_volume": 0.5638749890990425,
+      "filament_length": 0.2344319785822073,
+      "source_index": 35,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.3933982822018,
+        60.60660171779823,
+        1.13
+      ],
+      "end": [
+        37.00961894323342,
+        57.5,
+        1.1400000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100417,
+      "deposited_volume": 0.563874989099046,
+      "filament_length": 0.2344319785822087,
+      "source_index": 36,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.00961894323342,
+        57.5,
+        1.1400000000000001
+      ],
+      "end": [
+        35.511112605663975,
+        53.88228567653781,
+        1.15
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100213,
+      "deposited_volume": 0.563874989099043,
+      "filament_length": 0.2344319785822075,
+      "source_index": 37,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.511112605663975,
+        53.88228567653781,
+        1.15
+      ],
+      "end": [
+        35,
+        50.00000000000001,
+        1.1600000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410015,
+      "deposited_volume": 0.5638749890990421,
+      "filament_length": 0.2344319785822071,
+      "source_index": 38,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35,
+        50.00000000000001,
+        1.1600000000000001
+      ],
+      "end": [
+        35.511112605663975,
+        46.117714323462195,
+        1.17
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410022,
+      "deposited_volume": 0.5638749890990431,
+      "filament_length": 0.23443197858220752,
+      "source_index": 39,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.511112605663975,
+        46.117714323462195,
+        1.17
+      ],
+      "end": [
+        37.00961894323341,
+        42.500000000000014,
+        1.18
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410012,
+      "deposited_volume": 0.5638749890990417,
+      "filament_length": 0.23443197858220693,
+      "source_index": 40,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.00961894323341,
+        42.500000000000014,
+        1.18
+      ],
+      "end": [
+        39.393398282201794,
+        39.39339828220178,
+        1.19
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100475,
+      "deposited_volume": 0.5638749890990468,
+      "filament_length": 0.23443197858220904,
+      "source_index": 41,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.393398282201794,
+        39.39339828220178,
+        1.19
+      ],
+      "end": [
+        42.5,
+        37.00961894323342,
+        1.2000000000000002
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410012,
+      "deposited_volume": 0.5638749890990417,
+      "filament_length": 0.23443197858220693,
+      "source_index": 42,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.5,
+        37.00961894323342,
+        1.2000000000000002
+      ],
+      "end": [
+        46.11771432346219,
+        35.511112605663975,
+        1.21
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100213,
+      "deposited_volume": 0.563874989099043,
+      "filament_length": 0.2344319785822075,
+      "source_index": 43,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346219,
+        35.511112605663975,
+        1.21
+      ],
+      "end": [
+        49.99999999999999,
+        35,
+        1.22
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410015,
+      "deposited_volume": 0.5638749890990421,
+      "filament_length": 0.2344319785822071,
+      "source_index": 44,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        49.99999999999999,
+        35,
+        1.22
+      ],
+      "end": [
+        53.882285676537805,
+        35.511112605663975,
+        1.23
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410022,
+      "deposited_volume": 0.5638749890990431,
+      "filament_length": 0.23443197858220752,
+      "source_index": 45,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.882285676537805,
+        35.511112605663975,
+        1.23
+      ],
+      "end": [
+        57.499999999999986,
+        37.00961894323341,
+        1.24
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410012,
+      "deposited_volume": 0.5638749890990417,
+      "filament_length": 0.23443197858220693,
+      "source_index": 46,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.499999999999986,
+        37.00961894323341,
+        1.24
+      ],
+      "end": [
+        60.6066017177982,
+        39.39339828220177,
+        1.25
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100178,
+      "deposited_volume": 0.5638749890990425,
+      "filament_length": 0.2344319785822073,
+      "source_index": 47,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.6066017177982,
+        39.39339828220177,
+        1.25
+      ],
+      "end": [
+        62.99038105676658,
+        42.5,
+        1.26
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100417,
+      "deposited_volume": 0.563874989099046,
+      "filament_length": 0.2344319785822087,
+      "source_index": 48,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676658,
+        42.5,
+        1.26
+      ],
+      "end": [
+        64.48888739433602,
+        46.11771432346219,
+        1.27
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100187,
+      "deposited_volume": 0.5638749890990427,
+      "filament_length": 0.23443197858220735,
+      "source_index": 49,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433602,
+        46.11771432346219,
+        1.27
+      ],
+      "end": [
+        65,
+        49.99999999999999,
+        1.28
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410016,
+      "deposited_volume": 0.5638749890990422,
+      "filament_length": 0.23443197858220716,
+      "source_index": 50,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        65,
+        49.99999999999999,
+        1.28
+      ],
+      "end": [
+        64.48888739433603,
+        53.8822856765378,
+        1.29
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410014,
+      "deposited_volume": 0.563874989099042,
+      "filament_length": 0.23443197858220707,
+      "source_index": 51,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433603,
+        53.8822856765378,
+        1.29
+      ],
+      "end": [
+        62.99038105676657,
+        57.50000000000001,
+        1.3
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100466,
+      "deposited_volume": 0.5638749890990467,
+      "filament_length": 0.234431978582209,
+      "source_index": 52,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676657,
+        57.50000000000001,
+        1.3
+      ],
+      "end": [
+        60.606601717798206,
+        60.60660171779821,
+        1.31
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100164,
+      "deposited_volume": 0.5638749890990423,
+      "filament_length": 0.2344319785822072,
+      "source_index": 53,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.606601717798206,
+        60.60660171779821,
+        1.31
+      ],
+      "end": [
+        57.50000000000002,
+        62.990381056766566,
+        1.3199999999999998
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099907,
+      "deposited_volume": 0.5638749890990387,
+      "filament_length": 0.23443197858220569,
+      "source_index": 54,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.50000000000002,
+        62.990381056766566,
+        1.3199999999999998
+      ],
+      "end": [
+        53.88228567653781,
+        64.48888739433602,
+        1.33
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 55,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653781,
+        64.48888739433602,
+        1.33
+      ],
+      "end": [
+        50.00000000000001,
+        65,
+        1.34
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410016,
+      "deposited_volume": 0.5638749890990422,
+      "filament_length": 0.23443197858220716,
+      "source_index": 56,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        50.00000000000001,
+        65,
+        1.34
+      ],
+      "end": [
+        46.1177143234622,
+        64.48888739433603,
+        1.35
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410014,
+      "deposited_volume": 0.563874989099042,
+      "filament_length": 0.23443197858220707,
+      "source_index": 57,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.1177143234622,
+        64.48888739433603,
+        1.35
+      ],
+      "end": [
+        42.49999999999999,
+        62.99038105676658,
+        1.36
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 58,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.49999999999999,
+        62.99038105676658,
+        1.36
+      ],
+      "end": [
+        39.3933982822018,
+        60.60660171779823,
+        1.37
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099965,
+      "deposited_volume": 0.5638749890990394,
+      "filament_length": 0.234431978582206,
+      "source_index": 59,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.3933982822018,
+        60.60660171779823,
+        1.37
+      ],
+      "end": [
+        37.009618943233434,
+        57.50000000000002,
+        1.38
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100164,
+      "deposited_volume": 0.5638749890990423,
+      "filament_length": 0.2344319785822072,
+      "source_index": 60,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.009618943233434,
+        57.50000000000002,
+        1.38
+      ],
+      "end": [
+        35.511112605663975,
+        53.88228567653782,
+        1.3900000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.91579853541004,
+      "deposited_volume": 0.5638749890990458,
+      "filament_length": 0.23443197858220863,
+      "source_index": 61,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.511112605663975,
+        53.88228567653782,
+        1.3900000000000001
+      ],
+      "end": [
+        35,
+        50.00000000000001,
+        1.4
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410022,
+      "deposited_volume": 0.5638749890990431,
+      "filament_length": 0.23443197858220752,
+      "source_index": 62,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35,
+        50.00000000000001,
+        1.4
+      ],
+      "end": [
+        35.51111260566397,
+        46.1177143234622,
+        1.4100000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410014,
+      "deposited_volume": 0.563874989099042,
+      "filament_length": 0.23443197858220707,
+      "source_index": 63,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.51111260566397,
+        46.1177143234622,
+        1.4100000000000001
+      ],
+      "end": [
+        37.00961894323341,
+        42.500000000000014,
+        1.42
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100213,
+      "deposited_volume": 0.563874989099043,
+      "filament_length": 0.2344319785822075,
+      "source_index": 64,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.00961894323341,
+        42.500000000000014,
+        1.42
+      ],
+      "end": [
+        39.39339828220179,
+        39.39339828220179,
+        1.4300000000000002
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100378,
+      "deposited_volume": 0.5638749890990454,
+      "filament_length": 0.2344319785822085,
+      "source_index": 65,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220179,
+        39.39339828220179,
+        1.4300000000000002
+      ],
+      "end": [
+        42.49999999999998,
+        37.009618943233434,
+        1.44
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099965,
+      "deposited_volume": 0.5638749890990394,
+      "filament_length": 0.234431978582206,
+      "source_index": 66,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.49999999999998,
+        37.009618943233434,
+        1.44
+      ],
+      "end": [
+        46.11771432346218,
+        35.511112605663975,
+        1.4500000000000002
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.91579853541004,
+      "deposited_volume": 0.5638749890990458,
+      "filament_length": 0.23443197858220863,
+      "source_index": 67,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346218,
+        35.511112605663975,
+        1.4500000000000002
+      ],
+      "end": [
+        49.999999999999964,
+        35,
+        1.46
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099942,
+      "deposited_volume": 0.5638749890990391,
+      "filament_length": 0.23443197858220585,
+      "source_index": 68,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        49.999999999999964,
+        35,
+        1.46
+      ],
+      "end": [
+        53.8822856765378,
+        35.51111260566397,
+        1.47
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410042,
+      "deposited_volume": 0.563874989099046,
+      "filament_length": 0.2344319785822087,
+      "source_index": 69,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.8822856765378,
+        35.51111260566397,
+        1.47
+      ],
+      "end": [
+        57.50000000000001,
+        37.00961894323342,
+        1.48
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 70,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.50000000000001,
+        37.00961894323342,
+        1.48
+      ],
+      "end": [
+        60.6066017177982,
+        39.39339828220177,
+        1.49
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099965,
+      "deposited_volume": 0.5638749890990394,
+      "filament_length": 0.234431978582206,
+      "source_index": 71,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.6066017177982,
+        39.39339828220177,
+        1.49
+      ],
+      "end": [
+        62.99038105676658,
+        42.5,
+        1.5
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100417,
+      "deposited_volume": 0.563874989099046,
+      "filament_length": 0.2344319785822087,
+      "source_index": 72,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676658,
+        42.5,
+        1.5
+      ],
+      "end": [
+        64.48888739433603,
+        46.11771432346221,
+        1.51
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 73,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433603,
+        46.11771432346221,
+        1.51
+      ],
+      "end": [
+        65,
+        49.999999999999986,
+        1.52
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099862,
+      "deposited_volume": 0.563874989099038,
+      "filament_length": 0.2344319785822054,
+      "source_index": 74,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        65,
+        49.999999999999986,
+        1.52
+      ],
+      "end": [
+        64.48888739433603,
+        53.88228567653777,
+        1.53
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099933,
+      "deposited_volume": 0.563874989099039,
+      "filament_length": 0.23443197858220582,
+      "source_index": 75,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433603,
+        53.88228567653777,
+        1.53
+      ],
+      "end": [
+        62.99038105676659,
+        57.499999999999986,
+        1.54
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410048,
+      "deposited_volume": 0.5638749890990469,
+      "filament_length": 0.2344319785822091,
+      "source_index": 76,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676659,
+        57.499999999999986,
+        1.54
+      ],
+      "end": [
+        60.60660171779821,
+        60.60660171779821,
+        1.55
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100378,
+      "deposited_volume": 0.5638749890990454,
+      "filament_length": 0.2344319785822085,
+      "source_index": 77,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779821,
+        60.60660171779821,
+        1.55
+      ],
+      "end": [
+        57.50000000000003,
+        62.990381056766566,
+        1.56
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099907,
+      "deposited_volume": 0.5638749890990387,
+      "filament_length": 0.23443197858220569,
+      "source_index": 78,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.50000000000003,
+        62.990381056766566,
+        1.56
+      ],
+      "end": [
+        53.88228567653782,
+        64.48888739433602,
+        1.57
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 79,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653782,
+        64.48888739433602,
+        1.57
+      ],
+      "end": [
+        49.999999999999986,
+        65,
+        1.58
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 80,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        49.999999999999986,
+        65,
+        1.58
+      ],
+      "end": [
+        46.1177143234622,
+        64.48888739433603,
+        1.5899999999999999
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099933,
+      "deposited_volume": 0.563874989099039,
+      "filament_length": 0.23443197858220582,
+      "source_index": 81,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.1177143234622,
+        64.48888739433603,
+        1.5899999999999999
+      ],
+      "end": [
+        42.49999999999999,
+        62.99038105676658,
+        1.6
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 82,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.49999999999999,
+        62.99038105676658,
+        1.6
+      ],
+      "end": [
+        39.3933982822018,
+        60.60660171779823,
+        1.6099999999999999
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099965,
+      "deposited_volume": 0.5638749890990394,
+      "filament_length": 0.234431978582206,
+      "source_index": 83,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.3933982822018,
+        60.60660171779823,
+        1.6099999999999999
+      ],
+      "end": [
+        37.00961894323342,
+        57.5,
+        1.62
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100417,
+      "deposited_volume": 0.563874989099046,
+      "filament_length": 0.2344319785822087,
+      "source_index": 84,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.00961894323342,
+        57.5,
+        1.62
+      ],
+      "end": [
+        35.51111260566397,
+        53.88228567653779,
+        1.63
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 85,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.51111260566397,
+        53.88228567653779,
+        1.63
+      ],
+      "end": [
+        35,
+        50.000000000000014,
+        1.6400000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099862,
+      "deposited_volume": 0.563874989099038,
+      "filament_length": 0.2344319785822054,
+      "source_index": 86,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35,
+        50.000000000000014,
+        1.6400000000000001
+      ],
+      "end": [
+        35.51111260566397,
+        46.11771432346223,
+        1.65
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099933,
+      "deposited_volume": 0.563874989099039,
+      "filament_length": 0.23443197858220582,
+      "source_index": 87,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.51111260566397,
+        46.11771432346223,
+        1.65
+      ],
+      "end": [
+        37.009618943233406,
+        42.50000000000002,
+        1.6600000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100386,
+      "deposited_volume": 0.5638749890990455,
+      "filament_length": 0.23443197858220854,
+      "source_index": 88,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.009618943233406,
+        42.50000000000002,
+        1.6600000000000001
+      ],
+      "end": [
+        39.39339828220179,
+        39.39339828220179,
+        1.67
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100475,
+      "deposited_volume": 0.5638749890990468,
+      "filament_length": 0.23443197858220904,
+      "source_index": 89,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220179,
+        39.39339828220179,
+        1.67
+      ],
+      "end": [
+        42.49999999999997,
+        37.009618943233434,
+        1.68
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099907,
+      "deposited_volume": 0.5638749890990387,
+      "filament_length": 0.23443197858220569,
+      "source_index": 90,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.49999999999997,
+        37.009618943233434,
+        1.68
+      ],
+      "end": [
+        46.11771432346218,
+        35.51111260566398,
+        1.69
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 91,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346218,
+        35.51111260566398,
+        1.69
+      ],
+      "end": [
+        49.99999999999996,
+        35,
+        1.7
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409988,
+      "deposited_volume": 0.5638749890990382,
+      "filament_length": 0.2344319785822055,
+      "source_index": 92,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        49.99999999999996,
+        35,
+        1.7
+      ],
+      "end": [
+        53.88228567653779,
+        35.51111260566397,
+        1.71
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410042,
+      "deposited_volume": 0.563874989099046,
+      "filament_length": 0.2344319785822087,
+      "source_index": 93,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653779,
+        35.51111260566397,
+        1.71
+      ],
+      "end": [
+        57.5,
+        37.00961894323342,
+        1.7200000000000002
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 94,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.5,
+        37.00961894323342,
+        1.7200000000000002
+      ],
+      "end": [
+        60.60660171779819,
+        39.39339828220177,
+        1.73
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099965,
+      "deposited_volume": 0.5638749890990394,
+      "filament_length": 0.234431978582206,
+      "source_index": 95,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779819,
+        39.39339828220177,
+        1.73
+      ],
+      "end": [
+        62.99038105676658,
+        42.49999999999999,
+        1.74
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410041,
+      "deposited_volume": 0.5638749890990459,
+      "filament_length": 0.23443197858220868,
+      "source_index": 96,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676658,
+        42.49999999999999,
+        1.74
+      ],
+      "end": [
+        64.48888739433603,
+        46.1177143234622,
+        1.75
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 97,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433603,
+        46.1177143234622,
+        1.75
+      ],
+      "end": [
+        65,
+        49.999999999999986,
+        1.76
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099933,
+      "deposited_volume": 0.563874989099039,
+      "filament_length": 0.23443197858220582,
+      "source_index": 98,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        65,
+        49.999999999999986,
+        1.76
+      ],
+      "end": [
+        64.48888739433602,
+        53.88228567653782,
+        1.77
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 99,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433602,
+        53.88228567653782,
+        1.77
+      ],
+      "end": [
+        62.990381056766594,
+        57.49999999999998,
+        1.7799999999999998
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409987,
+      "deposited_volume": 0.5638749890990381,
+      "filament_length": 0.23443197858220544,
+      "source_index": 100,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.990381056766594,
+        57.49999999999998,
+        1.7799999999999998
+      ],
+      "end": [
+        60.60660171779821,
+        60.60660171779821,
+        1.79
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100475,
+      "deposited_volume": 0.5638749890990468,
+      "filament_length": 0.23443197858220904,
+      "source_index": 101,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779821,
+        60.60660171779821,
+        1.79
+      ],
+      "end": [
+        57.499999999999986,
+        62.99038105676659,
+        1.8
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100378,
+      "deposited_volume": 0.5638749890990454,
+      "filament_length": 0.2344319785822085,
+      "source_index": 102,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.499999999999986,
+        62.99038105676659,
+        1.8
+      ],
+      "end": [
+        53.882285676537876,
+        64.488887394336,
+        1.8099999999999998
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099383,
+      "deposited_volume": 0.5638749890990311,
+      "filament_length": 0.23443197858220255,
+      "source_index": 103,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.882285676537876,
+        64.488887394336,
+        1.8099999999999998
+      ],
+      "end": [
+        49.999999999999986,
+        65,
+        1.82
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354101026,
+      "deposited_volume": 0.5638749890990548,
+      "filament_length": 0.23443197858221237,
+      "source_index": 104,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        49.999999999999986,
+        65,
+        1.82
+      ],
+      "end": [
+        46.11771432346216,
+        64.48888739433602,
+        1.83
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100373,
+      "deposited_volume": 0.5638749890990453,
+      "filament_length": 0.23443197858220843,
+      "source_index": 105,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346216,
+        64.48888739433602,
+        1.83
+      ],
+      "end": [
+        42.50000000000004,
+        62.99038105676661,
+        1.8399999999999999
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099423,
+      "deposited_volume": 0.5638749890990317,
+      "filament_length": 0.23443197858220277,
+      "source_index": 106,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.50000000000004,
+        62.99038105676661,
+        1.8399999999999999
+      ],
+      "end": [
+        39.39339828220181,
+        60.606601717798235,
+        1.85
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410043,
+      "deposited_volume": 0.5638749890990462,
+      "filament_length": 0.23443197858220882,
+      "source_index": 107,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220181,
+        60.606601717798235,
+        1.85
+      ],
+      "end": [
+        37.00961894323342,
+        57.50000000000001,
+        1.86
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410046,
+      "deposited_volume": 0.5638749890990467,
+      "filament_length": 0.234431978582209,
+      "source_index": 108,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.00961894323342,
+        57.50000000000001,
+        1.86
+      ],
+      "end": [
+        35.51111260566398,
+        53.88228567653785,
+        1.8699999999999999
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099925,
+      "deposited_volume": 0.5638749890990389,
+      "filament_length": 0.23443197858220577,
+      "source_index": 109,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.51111260566398,
+        53.88228567653785,
+        1.8699999999999999
+      ],
+      "end": [
+        35,
+        50.000000000000014,
+        1.8800000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 110,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35,
+        50.000000000000014,
+        1.8800000000000001
+      ],
+      "end": [
+        35.511112605663975,
+        46.11771432346218,
+        1.8900000000000001
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410043,
+      "deposited_volume": 0.5638749890990462,
+      "filament_length": 0.23443197858220882,
+      "source_index": 111,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.511112605663975,
+        46.11771432346218,
+        1.8900000000000001
+      ],
+      "end": [
+        37.009618943233406,
+        42.50000000000002,
+        1.9
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.91579853540999,
+      "deposited_volume": 0.5638749890990384,
+      "filament_length": 0.23443197858220557,
+      "source_index": 112,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.009618943233406,
+        42.50000000000002,
+        1.9
+      ],
+      "end": [
+        39.39339828220179,
+        39.39339828220179,
+        1.91
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100475,
+      "deposited_volume": 0.5638749890990468,
+      "filament_length": 0.23443197858220904,
+      "source_index": 113,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220179,
+        39.39339828220179,
+        1.91
+      ],
+      "end": [
+        42.500000000000014,
+        37.00961894323341,
+        1.9200000000000002
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100378,
+      "deposited_volume": 0.5638749890990454,
+      "filament_length": 0.2344319785822085,
+      "source_index": 114,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.500000000000014,
+        37.00961894323341,
+        1.9200000000000002
+      ],
+      "end": [
+        46.117714323462124,
+        35.511112605663996,
+        1.93
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099383,
+      "deposited_volume": 0.5638749890990311,
+      "filament_length": 0.23443197858220255,
+      "source_index": 115,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.117714323462124,
+        35.511112605663996,
+        1.93
+      ],
+      "end": [
+        49.99999999999996,
+        35,
+        1.94
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410046,
+      "deposited_volume": 0.5638749890990467,
+      "filament_length": 0.234431978582209,
+      "source_index": 116,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        49.99999999999996,
+        35,
+        1.94
+      ],
+      "end": [
+        53.88228567653784,
+        35.51111260566398,
+        1.9500000000000002
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100933,
+      "deposited_volume": 0.5638749890990534,
+      "filament_length": 0.23443197858221182,
+      "source_index": 117,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653784,
+        35.51111260566398,
+        1.9500000000000002
+      ],
+      "end": [
+        57.49999999999996,
+        37.00961894323339,
+        1.96
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099423,
+      "deposited_volume": 0.5638749890990317,
+      "filament_length": 0.23443197858220277,
+      "source_index": 118,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.49999999999996,
+        37.00961894323339,
+        1.96
+      ],
+      "end": [
+        60.60660171779819,
+        39.393398282201765,
+        1.97
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410043,
+      "deposited_volume": 0.5638749890990462,
+      "filament_length": 0.23443197858220882,
+      "source_index": 119,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779819,
+        39.393398282201765,
+        1.97
+      ],
+      "end": [
+        62.99038105676658,
+        42.49999999999999,
+        1.98
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410046,
+      "deposited_volume": 0.5638749890990467,
+      "filament_length": 0.234431978582209,
+      "source_index": 120,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676658,
+        42.49999999999999,
+        1.98
+      ],
+      "end": [
+        64.48888739433602,
+        46.11771432346215,
+        1.99
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099925,
+      "deposited_volume": 0.5638749890990389,
+      "filament_length": 0.23443197858220577,
+      "source_index": 121,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433602,
+        46.11771432346215,
+        1.99
+      ],
+      "end": [
+        65,
+        49.99999999999998,
+        2
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100373,
+      "deposited_volume": 0.5638749890990453,
+      "filament_length": 0.23443197858220843,
+      "source_index": 122,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        65,
+        49.99999999999998,
+        2
+      ],
+      "end": [
+        64.48888739433602,
+        53.88228567653781,
+        2.01
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 123,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433602,
+        53.88228567653781,
+        2.01
+      ],
+      "end": [
+        62.990381056766594,
+        57.49999999999998,
+        2.02
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409994,
+      "deposited_volume": 0.5638749890990391,
+      "filament_length": 0.23443197858220585,
+      "source_index": 124,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.990381056766594,
+        57.49999999999998,
+        2.02
+      ],
+      "end": [
+        60.606601717798256,
+        60.60660171779817,
+        2.0300000000000002
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099876,
+      "deposited_volume": 0.5638749890990382,
+      "filament_length": 0.2344319785822055,
+      "source_index": 125,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.606601717798256,
+        60.60660171779817,
+        2.0300000000000002
+      ],
+      "end": [
+        57.50000000000003,
+        62.99038105676656,
+        2.04
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410046,
+      "deposited_volume": 0.5638749890990467,
+      "filament_length": 0.234431978582209,
+      "source_index": 126,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.50000000000003,
+        62.99038105676656,
+        2.04
+      ],
+      "end": [
+        53.882285676537826,
+        64.48888739433602,
+        2.05
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.91579853541004,
+      "deposited_volume": 0.5638749890990458,
+      "filament_length": 0.23443197858220863,
+      "source_index": 127,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.882285676537826,
+        64.48888739433602,
+        2.05
+      ],
+      "end": [
+        49.99999999999999,
+        65,
+        2.06
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 128,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        49.99999999999999,
+        65,
+        2.06
+      ],
+      "end": [
+        46.11771432346216,
+        64.48888739433602,
+        2.0700000000000003
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 129,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346216,
+        64.48888739433602,
+        2.0700000000000003
+      ],
+      "end": [
+        42.50000000000005,
+        62.99038105676661,
+        2.08
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099356,
+      "deposited_volume": 0.5638749890990307,
+      "filament_length": 0.23443197858220235,
+      "source_index": 130,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.50000000000005,
+        62.99038105676661,
+        2.08
+      ],
+      "end": [
+        39.39339828220181,
+        60.606601717798235,
+        2.09
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410049,
+      "deposited_volume": 0.563874989099047,
+      "filament_length": 0.23443197858220913,
+      "source_index": 131,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220181,
+        60.606601717798235,
+        2.09
+      ],
+      "end": [
+        37.00961894323343,
+        57.50000000000001,
+        2.1
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100417,
+      "deposited_volume": 0.563874989099046,
+      "filament_length": 0.2344319785822087,
+      "source_index": 132,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.00961894323343,
+        57.50000000000001,
+        2.1
+      ],
+      "end": [
+        35.511112605663996,
+        53.882285676537904,
+        2.11
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099374,
+      "deposited_volume": 0.5638749890990309,
+      "filament_length": 0.23443197858220244,
+      "source_index": 133,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.511112605663996,
+        53.882285676537904,
+        2.11
+      ],
+      "end": [
+        35,
+        50.00000000000007,
+        2.12
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410046,
+      "deposited_volume": 0.5638749890990467,
+      "filament_length": 0.234431978582209,
+      "source_index": 134,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35,
+        50.00000000000007,
+        2.12
+      ],
+      "end": [
+        35.51111260566399,
+        46.11771432346214,
+        2.13
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410144,
+      "deposited_volume": 0.5638749890990606,
+      "filament_length": 0.23443197858221482,
+      "source_index": 135,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.51111260566399,
+        46.11771432346214,
+        2.13
+      ],
+      "end": [
+        37.009618943233406,
+        42.50000000000003,
+        2.1399999999999997
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099383,
+      "deposited_volume": 0.5638749890990311,
+      "filament_length": 0.23443197858220255,
+      "source_index": 136,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.009618943233406,
+        42.50000000000003,
+        2.1399999999999997
+      ],
+      "end": [
+        39.39339828220178,
+        39.393398282201794,
+        2.15
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410043,
+      "deposited_volume": 0.5638749890990462,
+      "filament_length": 0.23443197858220882,
+      "source_index": 137,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220178,
+        39.393398282201794,
+        2.15
+      ],
+      "end": [
+        42.500000000000014,
+        37.00961894323341,
+        2.16
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100475,
+      "deposited_volume": 0.5638749890990468,
+      "filament_length": 0.23443197858220904,
+      "source_index": 138,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.500000000000014,
+        37.00961894323341,
+        2.16
+      ],
+      "end": [
+        46.117714323462124,
+        35.511112605663996,
+        2.17
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099383,
+      "deposited_volume": 0.5638749890990311,
+      "filament_length": 0.23443197858220255,
+      "source_index": 139,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.117714323462124,
+        35.511112605663996,
+        2.17
+      ],
+      "end": [
+        49.99999999999995,
+        35,
+        2.1799999999999997
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410039,
+      "deposited_volume": 0.5638749890990455,
+      "filament_length": 0.23443197858220854,
+      "source_index": 140,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        49.99999999999995,
+        35,
+        2.1799999999999997
+      ],
+      "end": [
+        53.88228567653779,
+        35.51111260566397,
+        2.1900000000000004
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100493,
+      "deposited_volume": 0.5638749890990471,
+      "filament_length": 0.23443197858220918,
+      "source_index": 141,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653779,
+        35.51111260566397,
+        2.1900000000000004
+      ],
+      "end": [
+        57.5,
+        37.00961894323342,
+        2.2
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 142,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.5,
+        37.00961894323342,
+        2.2
+      ],
+      "end": [
+        60.60660171779823,
+        39.3933982822018,
+        2.21
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100417,
+      "deposited_volume": 0.563874989099046,
+      "filament_length": 0.2344319785822087,
+      "source_index": 143,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779823,
+        39.3933982822018,
+        2.21
+      ],
+      "end": [
+        62.9903810567666,
+        42.500000000000036,
+        2.2199999999999998
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410043,
+      "deposited_volume": 0.5638749890990462,
+      "filament_length": 0.23443197858220882,
+      "source_index": 144,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.9903810567666,
+        42.500000000000036,
+        2.2199999999999998
+      ],
+      "end": [
+        64.48888739433602,
+        46.117714323462145,
+        2.23
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099383,
+      "deposited_volume": 0.5638749890990311,
+      "filament_length": 0.23443197858220255,
+      "source_index": 145,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433602,
+        46.117714323462145,
+        2.23
+      ],
+      "end": [
+        65,
+        49.99999999999998,
+        2.24
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 146,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        65,
+        49.99999999999998,
+        2.24
+      ],
+      "end": [
+        64.48888739433602,
+        53.88228567653781,
+        2.25
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 147,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433602,
+        53.88228567653781,
+        2.25
+      ],
+      "end": [
+        62.99038105676662,
+        57.49999999999993,
+        2.26
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099365,
+      "deposited_volume": 0.5638749890990308,
+      "filament_length": 0.2344319785822024,
+      "source_index": 148,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676662,
+        57.49999999999993,
+        2.26
+      ],
+      "end": [
+        60.606601717798256,
+        60.60660171779817,
+        2.27
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100444,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 149,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.606601717798256,
+        60.60660171779817,
+        2.27
+      ],
+      "end": [
+        57.500000000000036,
+        62.99038105676656,
+        2.2800000000000002
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410041,
+      "deposited_volume": 0.5638749890990459,
+      "filament_length": 0.23443197858220868,
+      "source_index": 150,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.500000000000036,
+        62.99038105676656,
+        2.2800000000000002
+      ],
+      "end": [
+        53.882285676537826,
+        64.48888739433602,
+        2.29
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100466,
+      "deposited_volume": 0.5638749890990467,
+      "filament_length": 0.234431978582209,
+      "source_index": 151,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.882285676537826,
+        64.48888739433602,
+        2.29
+      ],
+      "end": [
+        49.99999999999999,
+        65,
+        2.3
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 152,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        49.99999999999999,
+        65,
+        2.3
+      ],
+      "end": [
+        46.11771432346217,
+        64.48888739433602,
+        2.31
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100373,
+      "deposited_volume": 0.5638749890990453,
+      "filament_length": 0.23443197858220843,
+      "source_index": 153,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346217,
+        64.48888739433602,
+        2.31
+      ],
+      "end": [
+        42.50000000000005,
+        62.99038105676661,
+        2.32
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099423,
+      "deposited_volume": 0.5638749890990317,
+      "filament_length": 0.23443197858220277,
+      "source_index": 154,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.50000000000005,
+        62.99038105676661,
+        2.32
+      ],
+      "end": [
+        39.393398282201815,
+        60.60660171779824,
+        2.33
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410039,
+      "deposited_volume": 0.5638749890990455,
+      "filament_length": 0.23443197858220854,
+      "source_index": 155,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.393398282201815,
+        60.60660171779824,
+        2.33
+      ],
+      "end": [
+        37.00961894323343,
+        57.500000000000014,
+        2.34
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410046,
+      "deposited_volume": 0.5638749890990467,
+      "filament_length": 0.234431978582209,
+      "source_index": 156,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.00961894323343,
+        57.500000000000014,
+        2.34
+      ],
+      "end": [
+        35.511112605664,
+        53.882285676537904,
+        2.3499999999999996
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099414,
+      "deposited_volume": 0.5638749890990316,
+      "filament_length": 0.23443197858220272,
+      "source_index": 157,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.511112605664,
+        53.882285676537904,
+        2.3499999999999996
+      ],
+      "end": [
+        35,
+        49.99999999999997,
+        2.3600000000000003
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354101457,
+      "deposited_volume": 0.563874989099061,
+      "filament_length": 0.23443197858221496,
+      "source_index": 158,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35,
+        49.99999999999997,
+        2.3600000000000003
+      ],
+      "end": [
+        35.51111260566399,
+        46.11771432346214,
+        2.37
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410045,
+      "deposited_volume": 0.5638749890990464,
+      "filament_length": 0.2344319785822089,
+      "source_index": 159,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.51111260566399,
+        46.11771432346214,
+        2.37
+      ],
+      "end": [
+        37.009618943233406,
+        42.50000000000003,
+        2.38
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099383,
+      "deposited_volume": 0.5638749890990311,
+      "filament_length": 0.23443197858220255,
+      "source_index": 160,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.009618943233406,
+        42.50000000000003,
+        2.38
+      ],
+      "end": [
+        39.39339828220178,
+        39.393398282201794,
+        2.3899999999999997
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410043,
+      "deposited_volume": 0.5638749890990462,
+      "filament_length": 0.23443197858220882,
+      "source_index": 161,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220178,
+        39.393398282201794,
+        2.3899999999999997
+      ],
+      "end": [
+        42.50000000000001,
+        37.00961894323341,
+        2.4000000000000004
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100417,
+      "deposited_volume": 0.563874989099046,
+      "filament_length": 0.2344319785822087,
+      "source_index": 162,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.50000000000001,
+        37.00961894323341,
+        2.4000000000000004
+      ],
+      "end": [
+        46.11771432346212,
+        35.511112605663996,
+        2.41
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099383,
+      "deposited_volume": 0.5638749890990311,
+      "filament_length": 0.23443197858220255,
+      "source_index": 163,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346212,
+        35.511112605663996,
+        2.41
+      ],
+      "end": [
+        49.99999999999995,
+        35,
+        2.42
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410046,
+      "deposited_volume": 0.5638749890990467,
+      "filament_length": 0.234431978582209,
+      "source_index": 164,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        49.99999999999995,
+        35,
+        2.42
+      ],
+      "end": [
+        53.882285676537784,
+        35.51111260566397,
+        2.43
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410042,
+      "deposited_volume": 0.563874989099046,
+      "filament_length": 0.2344319785822087,
+      "source_index": 165,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.882285676537784,
+        35.51111260566397,
+        2.43
+      ],
+      "end": [
+        57.49999999999999,
+        37.00961894323342,
+        2.44
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 166,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.49999999999999,
+        37.00961894323342,
+        2.44
+      ],
+      "end": [
+        60.60660171779823,
+        39.3933982822018,
+        2.45
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100475,
+      "deposited_volume": 0.5638749890990468,
+      "filament_length": 0.23443197858220904,
+      "source_index": 167,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779823,
+        39.3933982822018,
+        2.45
+      ],
+      "end": [
+        62.990381056766594,
+        42.50000000000003,
+        2.46
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410033,
+      "deposited_volume": 0.5638749890990447,
+      "filament_length": 0.23443197858220816,
+      "source_index": 168,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.990381056766594,
+        42.50000000000003,
+        2.46
+      ],
+      "end": [
+        64.48888739433602,
+        46.117714323462145,
+        2.4699999999999998
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099476,
+      "deposited_volume": 0.5638749890990324,
+      "filament_length": 0.2344319785822031,
+      "source_index": 169,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433602,
+        46.117714323462145,
+        2.4699999999999998
+      ],
+      "end": [
+        65,
+        49.99999999999997,
+        2.48
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100373,
+      "deposited_volume": 0.5638749890990453,
+      "filament_length": 0.23443197858220843,
+      "source_index": 170,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        65,
+        49.99999999999997,
+        2.48
+      ],
+      "end": [
+        64.48888739433602,
+        53.882285676537805,
+        2.49
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 171,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433602,
+        53.882285676537805,
+        2.49
+      ],
+      "end": [
+        62.99038105676662,
+        57.49999999999992,
+        2.5
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099365,
+      "deposited_volume": 0.5638749890990308,
+      "filament_length": 0.2344319785822024,
+      "source_index": 172,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676662,
+        57.49999999999992,
+        2.5
+      ],
+      "end": [
+        60.606601717798256,
+        60.60660171779816,
+        2.51
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100444,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 173,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.606601717798256,
+        60.60660171779816,
+        2.51
+      ],
+      "end": [
+        57.500000000000036,
+        62.99038105676656,
+        2.52
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410045,
+      "deposited_volume": 0.5638749890990464,
+      "filament_length": 0.2344319785822089,
+      "source_index": 174,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.500000000000036,
+        62.99038105676656,
+        2.52
+      ],
+      "end": [
+        53.88228567653783,
+        64.48888739433602,
+        2.53
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.91579853541004,
+      "deposited_volume": 0.5638749890990458,
+      "filament_length": 0.23443197858220863,
+      "source_index": 175,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653783,
+        64.48888739433602,
+        2.53
+      ],
+      "end": [
+        50,
+        65,
+        2.54
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 176,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        50,
+        65,
+        2.54
+      ],
+      "end": [
+        46.11771432346217,
+        64.48888739433602,
+        2.55
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 177,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346217,
+        64.48888739433602,
+        2.55
+      ],
+      "end": [
+        42.50000000000006,
+        62.99038105676661,
+        2.5599999999999996
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099356,
+      "deposited_volume": 0.5638749890990307,
+      "filament_length": 0.23443197858220235,
+      "source_index": 178,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.50000000000006,
+        62.99038105676661,
+        2.5599999999999996
+      ],
+      "end": [
+        39.393398282201815,
+        60.60660171779824,
+        2.5700000000000003
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100444,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 179,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.393398282201815,
+        60.60660171779824,
+        2.5700000000000003
+      ],
+      "end": [
+        37.00961894323343,
+        57.500000000000014,
+        2.58
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410046,
+      "deposited_volume": 0.5638749890990467,
+      "filament_length": 0.234431978582209,
+      "source_index": 180,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.00961894323343,
+        57.500000000000014,
+        2.58
+      ],
+      "end": [
+        35.511112605664,
+        53.88228567653791,
+        2.59
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099347,
+      "deposited_volume": 0.5638749890990306,
+      "filament_length": 0.2344319785822023,
+      "source_index": 181,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.511112605664,
+        53.88228567653791,
+        2.59
+      ],
+      "end": [
+        35,
+        50.00000000000008,
+        2.5999999999999996
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410047,
+      "deposited_volume": 0.5638749890990468,
+      "filament_length": 0.23443197858220904,
+      "source_index": 182,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35,
+        50.00000000000008,
+        2.5999999999999996
+      ],
+      "end": [
+        35.51111260566399,
+        46.117714323462145,
+        2.6100000000000003
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410144,
+      "deposited_volume": 0.5638749890990606,
+      "filament_length": 0.23443197858221482,
+      "source_index": 183,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.51111260566399,
+        46.117714323462145,
+        2.6100000000000003
+      ],
+      "end": [
+        37.009618943233406,
+        42.50000000000003,
+        2.62
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409945,
+      "deposited_volume": 0.563874989099032,
+      "filament_length": 0.2344319785822029,
+      "source_index": 184,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.009618943233406,
+        42.50000000000003,
+        2.62
+      ],
+      "end": [
+        39.39339828220177,
+        39.3933982822018,
+        2.63
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410033,
+      "deposited_volume": 0.5638749890990447,
+      "filament_length": 0.23443197858220816,
+      "source_index": 185,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220177,
+        39.3933982822018,
+        2.63
+      ],
+      "end": [
+        42.50000000000001,
+        37.00961894323342,
+        2.64
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100475,
+      "deposited_volume": 0.5638749890990468,
+      "filament_length": 0.23443197858220904,
+      "source_index": 186,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.50000000000001,
+        37.00961894323342,
+        2.64
+      ],
+      "end": [
+        46.11771432346212,
+        35.511112605663996,
+        2.65
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099414,
+      "deposited_volume": 0.5638749890990316,
+      "filament_length": 0.23443197858220272,
+      "source_index": 187,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346212,
+        35.511112605663996,
+        2.65
+      ],
+      "end": [
+        49.99999999999994,
+        35,
+        2.66
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410039,
+      "deposited_volume": 0.5638749890990455,
+      "filament_length": 0.23443197858220854,
+      "source_index": 188,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        49.99999999999994,
+        35,
+        2.66
+      ],
+      "end": [
+        53.88228567653778,
+        35.51111260566397,
+        2.67
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410042,
+      "deposited_volume": 0.563874989099046,
+      "filament_length": 0.2344319785822087,
+      "source_index": 189,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653778,
+        35.51111260566397,
+        2.67
+      ],
+      "end": [
+        57.49999999999999,
+        37.00961894323341,
+        2.6799999999999997
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410048,
+      "deposited_volume": 0.5638749890990469,
+      "filament_length": 0.2344319785822091,
+      "source_index": 190,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.49999999999999,
+        37.00961894323341,
+        2.6799999999999997
+      ],
+      "end": [
+        60.60660171779822,
+        39.393398282201794,
+        2.69
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100417,
+      "deposited_volume": 0.563874989099046,
+      "filament_length": 0.2344319785822087,
+      "source_index": 191,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779822,
+        39.393398282201794,
+        2.69
+      ],
+      "end": [
+        62.990381056766594,
+        42.50000000000003,
+        2.7
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410043,
+      "deposited_volume": 0.5638749890990462,
+      "filament_length": 0.23443197858220882,
+      "source_index": 192,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.990381056766594,
+        42.50000000000003,
+        2.7
+      ],
+      "end": [
+        64.48888739433602,
+        46.11771432346214,
+        2.71
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099414,
+      "deposited_volume": 0.5638749890990316,
+      "filament_length": 0.23443197858220272,
+      "source_index": 193,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433602,
+        46.11771432346214,
+        2.71
+      ],
+      "end": [
+        65,
+        49.99999999999997,
+        2.7199999999999998
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 194,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        65,
+        49.99999999999997,
+        2.7199999999999998
+      ],
+      "end": [
+        64.48888739433605,
+        53.8822856765377,
+        2.7299999999999995
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099347,
+      "deposited_volume": 0.5638749890990306,
+      "filament_length": 0.2344319785822023,
+      "source_index": 195,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433605,
+        53.8822856765377,
+        2.7299999999999995
+      ],
+      "end": [
+        62.99038105676657,
+        57.500000000000014,
+        2.74
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354101505,
+      "deposited_volume": 0.5638749890990616,
+      "filament_length": 0.23443197858221523,
+      "source_index": 196,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676657,
+        57.500000000000014,
+        2.74
+      ],
+      "end": [
+        60.60660171779826,
+        60.60660171779816,
+        2.75
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099365,
+      "deposited_volume": 0.5638749890990308,
+      "filament_length": 0.2344319785822024,
+      "source_index": 197,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779826,
+        60.60660171779816,
+        2.75
+      ],
+      "end": [
+        57.50000000000004,
+        62.99038105676655,
+        2.76
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410041,
+      "deposited_volume": 0.5638749890990459,
+      "filament_length": 0.23443197858220868,
+      "source_index": 198,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.50000000000004,
+        62.99038105676655,
+        2.76
+      ],
+      "end": [
+        53.88228567653783,
+        64.48888739433602,
+        2.77
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100493,
+      "deposited_volume": 0.5638749890990471,
+      "filament_length": 0.23443197858220918,
+      "source_index": 199,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653783,
+        64.48888739433602,
+        2.77
+      ],
+      "end": [
+        50.00000000000001,
+        65,
+        2.7800000000000002
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100373,
+      "deposited_volume": 0.5638749890990453,
+      "filament_length": 0.23443197858220843,
+      "source_index": 200,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        50.00000000000001,
+        65,
+        2.7800000000000002
+      ],
+      "end": [
+        46.11771432346227,
+        64.48888739433605,
+        2.79
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409942,
+      "deposited_volume": 0.5638749890990316,
+      "filament_length": 0.23443197858220272,
+      "source_index": 201,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346227,
+        64.48888739433605,
+        2.79
+      ],
+      "end": [
+        42.499999999999964,
+        62.99038105676656,
+        2.8
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410149,
+      "deposited_volume": 0.5638749890990614,
+      "filament_length": 0.23443197858221515,
+      "source_index": 202,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.499999999999964,
+        62.99038105676656,
+        2.8
+      ],
+      "end": [
+        39.393398282201815,
+        60.60660171779824,
+        2.8099999999999996
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409941,
+      "deposited_volume": 0.5638749890990314,
+      "filament_length": 0.2344319785822027,
+      "source_index": 203,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.393398282201815,
+        60.60660171779824,
+        2.8099999999999996
+      ],
+      "end": [
+        37.009618943233484,
+        57.500000000000114,
+        2.8199999999999994
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099325,
+      "deposited_volume": 0.5638749890990302,
+      "filament_length": 0.23443197858220216,
+      "source_index": 204,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.009618943233484,
+        57.500000000000114,
+        2.8199999999999994
+      ],
+      "end": [
+        35.511112605663975,
+        53.88228567653781,
+        2.83
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410151,
+      "deposited_volume": 0.5638749890990618,
+      "filament_length": 0.2344319785822153,
+      "source_index": 205,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.511112605663975,
+        53.88228567653781,
+        2.83
+      ],
+      "end": [
+        35,
+        49.99999999999998,
+        2.84
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410043,
+      "deposited_volume": 0.5638749890990462,
+      "filament_length": 0.23443197858220882,
+      "source_index": 206,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35,
+        49.99999999999998,
+        2.84
+      ],
+      "end": [
+        35.51111260566396,
+        46.11771432346225,
+        2.8499999999999996
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099356,
+      "deposited_volume": 0.5638749890990307,
+      "filament_length": 0.23443197858220235,
+      "source_index": 207,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.51111260566396,
+        46.11771432346225,
+        2.8499999999999996
+      ],
+      "end": [
+        37.00961894323345,
+        42.49999999999994,
+        2.8600000000000003
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410149,
+      "deposited_volume": 0.5638749890990614,
+      "filament_length": 0.23443197858221515,
+      "source_index": 208,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.00961894323345,
+        42.49999999999994,
+        2.8600000000000003
+      ],
+      "end": [
+        39.39339828220177,
+        39.3933982822018,
+        2.87
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099396,
+      "deposited_volume": 0.5638749890990312,
+      "filament_length": 0.23443197858220258,
+      "source_index": 209,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220177,
+        39.3933982822018,
+        2.87
+      ],
+      "end": [
+        42.49999999999991,
+        37.00961894323347,
+        2.88
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099383,
+      "deposited_volume": 0.5638749890990311,
+      "filament_length": 0.23443197858220255,
+      "source_index": 210,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.49999999999991,
+        37.00961894323347,
+        2.88
+      ],
+      "end": [
+        46.11771432346221,
+        35.51111260566397,
+        2.8899999999999997
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354101483,
+      "deposited_volume": 0.5638749890990613,
+      "filament_length": 0.2344319785822151,
+      "source_index": 211,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346221,
+        35.51111260566397,
+        2.8899999999999997
+      ],
+      "end": [
+        49.99999999999994,
+        35,
+        2.9000000000000004
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099436,
+      "deposited_volume": 0.5638749890990319,
+      "filament_length": 0.23443197858220285,
+      "source_index": 212,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        49.99999999999994,
+        35,
+        2.9000000000000004
+      ],
+      "end": [
+        53.88228567653778,
+        35.51111260566397,
+        2.91
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410042,
+      "deposited_volume": 0.563874989099046,
+      "filament_length": 0.2344319785822087,
+      "source_index": 213,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653778,
+        35.51111260566397,
+        2.91
+      ],
+      "end": [
+        57.499999999999986,
+        37.00961894323341,
+        2.92
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100413,
+      "deposited_volume": 0.5638749890990459,
+      "filament_length": 0.23443197858220868,
+      "source_index": 214,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.499999999999986,
+        37.00961894323341,
+        2.92
+      ],
+      "end": [
+        60.60660171779822,
+        39.393398282201794,
+        2.9299999999999997
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100475,
+      "deposited_volume": 0.5638749890990468,
+      "filament_length": 0.23443197858220904,
+      "source_index": 215,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779822,
+        39.393398282201794,
+        2.9299999999999997
+      ],
+      "end": [
+        62.99038105676654,
+        42.499999999999936,
+        2.9399999999999995
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409935,
+      "deposited_volume": 0.5638749890990307,
+      "filament_length": 0.23443197858220235,
+      "source_index": 216,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676654,
+        42.499999999999936,
+        2.9399999999999995
+      ],
+      "end": [
+        64.48888739433603,
+        46.11771432346224,
+        2.95
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354101457,
+      "deposited_volume": 0.563874989099061,
+      "filament_length": 0.23443197858221496,
+      "source_index": 217,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433603,
+        46.11771432346224,
+        2.95
+      ],
+      "end": [
+        65,
+        49.999999999999964,
+        2.96
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099365,
+      "deposited_volume": 0.5638749890990308,
+      "filament_length": 0.2344319785822024,
+      "source_index": 218,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        65,
+        49.999999999999964,
+        2.96
+      ],
+      "end": [
+        64.48888739433606,
+        53.8822856765377,
+        2.9699999999999998
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099396,
+      "deposited_volume": 0.5638749890990312,
+      "filament_length": 0.23443197858220258,
+      "source_index": 219,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433606,
+        53.8822856765377,
+        2.9699999999999998
+      ],
+      "end": [
+        62.99038105676657,
+        57.50000000000001,
+        2.9800000000000004
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410149,
+      "deposited_volume": 0.5638749890990614,
+      "filament_length": 0.23443197858221515,
+      "source_index": 220,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676657,
+        57.50000000000001,
+        2.9800000000000004
+      ],
+      "end": [
+        60.60660171779826,
+        60.606601717798156,
+        2.99
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099365,
+      "deposited_volume": 0.5638749890990308,
+      "filament_length": 0.2344319785822024,
+      "source_index": 221,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779826,
+        60.606601717798156,
+        2.99
+      ],
+      "end": [
+        57.50000000000004,
+        62.99038105676655,
+        3
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410045,
+      "deposited_volume": 0.5638749890990464,
+      "filament_length": 0.2344319785822089,
+      "source_index": 222,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.50000000000004,
+        62.99038105676655,
+        3
+      ],
+      "end": [
+        53.88228567653784,
+        64.48888739433602,
+        3.01
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100426,
+      "deposited_volume": 0.5638749890990461,
+      "filament_length": 0.23443197858220877,
+      "source_index": 223,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653784,
+        64.48888739433602,
+        3.01
+      ],
+      "end": [
+        50.00000000000001,
+        65,
+        3.0199999999999996
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410044,
+      "deposited_volume": 0.5638749890990463,
+      "filament_length": 0.23443197858220885,
+      "source_index": 224,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        50.00000000000001,
+        65,
+        3.0199999999999996
+      ],
+      "end": [
+        46.11771432346228,
+        64.48888739433605,
+        3.0300000000000002
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099347,
+      "deposited_volume": 0.5638749890990306,
+      "filament_length": 0.2344319785822023,
+      "source_index": 225,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346228,
+        64.48888739433605,
+        3.0300000000000002
+      ],
+      "end": [
+        42.49999999999997,
+        62.99038105676656,
+        3.04
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410149,
+      "deposited_volume": 0.5638749890990614,
+      "filament_length": 0.23443197858221515,
+      "source_index": 226,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.49999999999997,
+        62.99038105676656,
+        3.04
+      ],
+      "end": [
+        39.39339828220182,
+        60.60660171779825,
+        3.05
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099365,
+      "deposited_volume": 0.5638749890990308,
+      "filament_length": 0.2344319785822024,
+      "source_index": 227,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220182,
+        60.60660171779825,
+        3.05
+      ],
+      "end": [
+        37.009618943233484,
+        57.500000000000114,
+        3.0599999999999996
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099427,
+      "deposited_volume": 0.5638749890990317,
+      "filament_length": 0.23443197858220277,
+      "source_index": 228,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.009618943233484,
+        57.500000000000114,
+        3.0599999999999996
+      ],
+      "end": [
+        35.511112605663975,
+        53.88228567653781,
+        3.0700000000000003
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410151,
+      "deposited_volume": 0.5638749890990618,
+      "filament_length": 0.2344319785822153,
+      "source_index": 229,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.511112605663975,
+        53.88228567653781,
+        3.0700000000000003
+      ],
+      "end": [
+        35,
+        50.000000000000085,
+        3.08
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099374,
+      "deposited_volume": 0.5638749890990309,
+      "filament_length": 0.23443197858220244,
+      "source_index": 230,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35,
+        50.000000000000085,
+        3.08
+      ],
+      "end": [
+        35.51111260566396,
+        46.11771432346225,
+        3.09
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100413,
+      "deposited_volume": 0.5638749890990459,
+      "filament_length": 0.23443197858220868,
+      "source_index": 231,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.51111260566396,
+        46.11771432346225,
+        3.09
+      ],
+      "end": [
+        37.00961894323345,
+        42.49999999999994,
+        3.1000000000000005
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410149,
+      "deposited_volume": 0.5638749890990614,
+      "filament_length": 0.23443197858221515,
+      "source_index": 232,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.00961894323345,
+        42.49999999999994,
+        3.1000000000000005
+      ],
+      "end": [
+        39.39339828220177,
+        39.3933982822018,
+        3.1100000000000003
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099396,
+      "deposited_volume": 0.5638749890990312,
+      "filament_length": 0.23443197858220258,
+      "source_index": 233,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220177,
+        39.3933982822018,
+        3.1100000000000003
+      ],
+      "end": [
+        42.49999999999991,
+        37.00961894323348,
+        3.12
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409934,
+      "deposited_volume": 0.5638749890990304,
+      "filament_length": 0.23443197858220227,
+      "source_index": 234,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.49999999999991,
+        37.00961894323348,
+        3.12
+      ],
+      "end": [
+        46.11771432346221,
+        35.51111260566397,
+        3.13
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410151,
+      "deposited_volume": 0.5638749890990618,
+      "filament_length": 0.2344319785822153,
+      "source_index": 235,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346221,
+        35.51111260566397,
+        3.13
+      ],
+      "end": [
+        49.999999999999936,
+        35,
+        3.1399999999999997
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099365,
+      "deposited_volume": 0.5638749890990308,
+      "filament_length": 0.2344319785822024,
+      "source_index": 236,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        49.999999999999936,
+        35,
+        3.1399999999999997
+      ],
+      "end": [
+        53.88228567653778,
+        35.51111260566397,
+        3.1499999999999995
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100493,
+      "deposited_volume": 0.5638749890990471,
+      "filament_length": 0.23443197858220918,
+      "source_index": 237,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653778,
+        35.51111260566397,
+        3.1499999999999995
+      ],
+      "end": [
+        57.499999999999986,
+        37.00961894323341,
+        3.16
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100413,
+      "deposited_volume": 0.5638749890990459,
+      "filament_length": 0.23443197858220868,
+      "source_index": 238,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.499999999999986,
+        37.00961894323341,
+        3.16
+      ],
+      "end": [
+        60.60660171779821,
+        39.39339828220179,
+        3.17
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100378,
+      "deposited_volume": 0.5638749890990454,
+      "filament_length": 0.2344319785822085,
+      "source_index": 239,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779821,
+        39.39339828220179,
+        3.17
+      ],
+      "end": [
+        62.99038105676654,
+        42.49999999999993,
+        3.1799999999999997
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099396,
+      "deposited_volume": 0.5638749890990312,
+      "filament_length": 0.23443197858220258,
+      "source_index": 240,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676654,
+        42.49999999999993,
+        3.1799999999999997
+      ],
+      "end": [
+        64.48888739433603,
+        46.11771432346224,
+        3.1900000000000004
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410152,
+      "deposited_volume": 0.5638749890990619,
+      "filament_length": 0.23443197858221532,
+      "source_index": 241,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433603,
+        46.11771432346224,
+        3.1900000000000004
+      ],
+      "end": [
+        65,
+        49.999999999999964,
+        3.2
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099365,
+      "deposited_volume": 0.5638749890990308,
+      "filament_length": 0.2344319785822024,
+      "source_index": 242,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        65,
+        49.999999999999964,
+        3.2
+      ],
+      "end": [
+        64.48888739433606,
+        53.88228567653769,
+        3.21
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409933,
+      "deposited_volume": 0.5638749890990303,
+      "filament_length": 0.23443197858220222,
+      "source_index": 243,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433606,
+        53.88228567653769,
+        3.21
+      ],
+      "end": [
+        62.99038105676658,
+        57.50000000000001,
+        3.2199999999999998
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410153,
+      "deposited_volume": 0.563874989099062,
+      "filament_length": 0.23443197858221537,
+      "source_index": 244,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676658,
+        57.50000000000001,
+        3.2199999999999998
+      ],
+      "end": [
+        60.60660171779827,
+        60.606601717798156,
+        3.2299999999999995
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099365,
+      "deposited_volume": 0.5638749890990308,
+      "filament_length": 0.2344319785822024,
+      "source_index": 245,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779827,
+        60.606601717798156,
+        3.2299999999999995
+      ],
+      "end": [
+        57.50000000000005,
+        62.99038105676655,
+        3.24
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410045,
+      "deposited_volume": 0.5638749890990464,
+      "filament_length": 0.2344319785822089,
+      "source_index": 246,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.50000000000005,
+        62.99038105676655,
+        3.24
+      ],
+      "end": [
+        53.88228567653784,
+        64.48888739433602,
+        3.25
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354100493,
+      "deposited_volume": 0.5638749890990471,
+      "filament_length": 0.23443197858220918,
+      "source_index": 247,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653784,
+        64.48888739433602,
+        3.25
+      ],
+      "end": [
+        50.00000000000012,
+        65,
+        3.26
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099316,
+      "deposited_volume": 0.5638749890990301,
+      "filament_length": 0.23443197858220213,
+      "source_index": 248,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        50.00000000000012,
+        65,
+        3.26
+      ],
+      "end": [
+        46.11771432346218,
+        64.48888739433602,
+        3.2699999999999996
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354101497,
+      "deposited_volume": 0.5638749890990615,
+      "filament_length": 0.23443197858221518,
+      "source_index": 249,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346218,
+        64.48888739433602,
+        3.2699999999999996
+      ],
+      "end": [
+        42.500000000000064,
+        62.990381056766616,
+        3.2800000000000002
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409939,
+      "deposited_volume": 0.5638749890990312,
+      "filament_length": 0.23443197858220258,
+      "source_index": 250,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.500000000000064,
+        62.990381056766616,
+        3.2800000000000002
+      ],
+      "end": [
+        39.393398282201744,
+        60.60660171779817,
+        3.29
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410154,
+      "deposited_volume": 0.5638749890990622,
+      "filament_length": 0.23443197858221546,
+      "source_index": 251,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.393398282201744,
+        60.60660171779817,
+        3.29
+      ],
+      "end": [
+        37.009618943233434,
+        57.50000000000003,
+        3.3
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409931,
+      "deposited_volume": 0.56387498909903,
+      "filament_length": 0.23443197858220208,
+      "source_index": 252,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.009618943233434,
+        57.50000000000003,
+        3.3
+      ],
+      "end": [
+        35.51111260566395,
+        53.88228567653771,
+        3.3100000000000005
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410153,
+      "deposited_volume": 0.563874989099062,
+      "filament_length": 0.23443197858221537,
+      "source_index": 253,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.51111260566395,
+        53.88228567653771,
+        3.3100000000000005
+      ],
+      "end": [
+        35,
+        49.999999999999986,
+        3.3200000000000003
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099347,
+      "deposited_volume": 0.5638749890990306,
+      "filament_length": 0.2344319785822023,
+      "source_index": 254,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35,
+        49.999999999999986,
+        3.3200000000000003
+      ],
+      "end": [
+        35.51111260566395,
+        46.11771432346226,
+        3.33
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099347,
+      "deposited_volume": 0.5638749890990306,
+      "filament_length": 0.2344319785822023,
+      "source_index": 255,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.51111260566395,
+        46.11771432346226,
+        3.33
+      ],
+      "end": [
+        37.00961894323345,
+        42.49999999999995,
+        3.34
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410152,
+      "deposited_volume": 0.5638749890990619,
+      "filament_length": 0.23443197858221532,
+      "source_index": 256,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.00961894323345,
+        42.49999999999995,
+        3.34
+      ],
+      "end": [
+        39.39339828220177,
+        39.3933982822018,
+        3.3499999999999996
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099454,
+      "deposited_volume": 0.5638749890990321,
+      "filament_length": 0.23443197858220297,
+      "source_index": 257,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220177,
+        39.3933982822018,
+        3.3499999999999996
+      ],
+      "end": [
+        42.49999999999991,
+        37.00961894323348,
+        3.3599999999999994
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409934,
+      "deposited_volume": 0.5638749890990304,
+      "filament_length": 0.23443197858220227,
+      "source_index": 258,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.49999999999991,
+        37.00961894323348,
+        3.3599999999999994
+      ],
+      "end": [
+        46.11771432346221,
+        35.51111260566397,
+        3.37
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410151,
+      "deposited_volume": 0.5638749890990618,
+      "filament_length": 0.2344319785822153,
+      "source_index": 259,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346221,
+        35.51111260566397,
+        3.37
+      ],
+      "end": [
+        49.999999999999936,
+        35,
+        3.38
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099365,
+      "deposited_volume": 0.5638749890990308,
+      "filament_length": 0.2344319785822024,
+      "source_index": 260,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        49.999999999999936,
+        35,
+        3.38
+      ],
+      "end": [
+        53.88228567653766,
+        35.51111260566394,
+        3.3899999999999997
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409933,
+      "deposited_volume": 0.5638749890990303,
+      "filament_length": 0.23443197858220222,
+      "source_index": 261,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653766,
+        35.51111260566394,
+        3.3899999999999997
+      ],
+      "end": [
+        57.49999999999998,
+        37.009618943233406,
+        3.4000000000000004
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410148,
+      "deposited_volume": 0.5638749890990613,
+      "filament_length": 0.2344319785822151,
+      "source_index": 262,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.49999999999998,
+        37.009618943233406,
+        3.4000000000000004
+      ],
+      "end": [
+        60.606601717798135,
+        39.393398282201716,
+        3.41
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099423,
+      "deposited_volume": 0.5638749890990317,
+      "filament_length": 0.23443197858220277,
+      "source_index": 263,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.606601717798135,
+        39.393398282201716,
+        3.41
+      ],
+      "end": [
+        62.99038105676648,
+        42.49999999999984,
+        3.42
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099356,
+      "deposited_volume": 0.5638749890990307,
+      "filament_length": 0.23443197858220235,
+      "source_index": 264,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676648,
+        42.49999999999984,
+        3.42
+      ],
+      "end": [
+        64.488887394336,
+        46.11771432346213,
+        3.4299999999999997
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354101497,
+      "deposited_volume": 0.5638749890990615,
+      "filament_length": 0.23443197858221518,
+      "source_index": 265,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.488887394336,
+        46.11771432346213,
+        3.4299999999999997
+      ],
+      "end": [
+        65,
+        49.99999999999985,
+        3.4399999999999995
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099334,
+      "deposited_volume": 0.5638749890990303,
+      "filament_length": 0.23443197858220222,
+      "source_index": 266,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        65,
+        49.99999999999985,
+        3.4399999999999995
+      ],
+      "end": [
+        64.48888739433603,
+        53.88228567653779,
+        3.45
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410148,
+      "deposited_volume": 0.5638749890990613,
+      "filament_length": 0.2344319785822151,
+      "source_index": 267,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433603,
+        53.88228567653779,
+        3.45
+      ],
+      "end": [
+        62.99038105676652,
+        57.50000000000009,
+        3.46
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410151,
+      "deposited_volume": 0.5638749890990618,
+      "filament_length": 0.2344319785822153,
+      "source_index": 268,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676652,
+        57.50000000000009,
+        3.46
+      ],
+      "end": [
+        60.6066017177982,
+        60.60660171779823,
+        3.4699999999999998
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409934,
+      "deposited_volume": 0.5638749890990304,
+      "filament_length": 0.23443197858220227,
+      "source_index": 269,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.6066017177982,
+        60.60660171779823,
+        3.4699999999999998
+      ],
+      "end": [
+        57.50000000000005,
+        62.99038105676655,
+        3.4799999999999995
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099454,
+      "deposited_volume": 0.5638749890990321,
+      "filament_length": 0.23443197858220297,
+      "source_index": 270,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.50000000000005,
+        62.99038105676655,
+        3.4799999999999995
+      ],
+      "end": [
+        53.88228567653774,
+        64.48888739433605,
+        3.49
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410152,
+      "deposited_volume": 0.5638749890990619,
+      "filament_length": 0.23443197858221532,
+      "source_index": 271,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653774,
+        64.48888739433605,
+        3.49
+      ],
+      "end": [
+        50.000000000000014,
+        65,
+        3.5
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099347,
+      "deposited_volume": 0.5638749890990306,
+      "filament_length": 0.2344319785822023,
+      "source_index": 272,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        50.000000000000014,
+        65,
+        3.5
+      ],
+      "end": [
+        46.11771432346229,
+        64.48888739433605,
+        3.51
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099347,
+      "deposited_volume": 0.5638749890990306,
+      "filament_length": 0.2344319785822023,
+      "source_index": 273,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346229,
+        64.48888739433605,
+        3.51
+      ],
+      "end": [
+        42.49999999999997,
+        62.990381056766566,
+        3.5200000000000005
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410153,
+      "deposited_volume": 0.563874989099062,
+      "filament_length": 0.23443197858221537,
+      "source_index": 274,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.49999999999997,
+        62.990381056766566,
+        3.5200000000000005
+      ],
+      "end": [
+        39.39339828220183,
+        60.606601717798256,
+        3.5300000000000002
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409931,
+      "deposited_volume": 0.56387498909903,
+      "filament_length": 0.23443197858220208,
+      "source_index": 275,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220183,
+        60.606601717798256,
+        3.5300000000000002
+      ],
+      "end": [
+        37.00961894323349,
+        57.50000000000012,
+        3.54
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099427,
+      "deposited_volume": 0.5638749890990317,
+      "filament_length": 0.23443197858220277,
+      "source_index": 276,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.00961894323349,
+        57.50000000000012,
+        3.54
+      ],
+      "end": [
+        35.51111260566398,
+        53.88228567653782,
+        3.55
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410151,
+      "deposited_volume": 0.5638749890990618,
+      "filament_length": 0.2344319785822153,
+      "source_index": 277,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.51111260566398,
+        53.88228567653782,
+        3.55
+      ],
+      "end": [
+        35,
+        50.00000000000009,
+        3.5599999999999996
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099383,
+      "deposited_volume": 0.5638749890990311,
+      "filament_length": 0.23443197858220255,
+      "source_index": 278,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35,
+        50.00000000000009,
+        3.5599999999999996
+      ],
+      "end": [
+        35.511112605663925,
+        46.117714323462366,
+        3.5699999999999994
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409931,
+      "deposited_volume": 0.56387498909903,
+      "filament_length": 0.23443197858220208,
+      "source_index": 279,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.511112605663925,
+        46.117714323462366,
+        3.5699999999999994
+      ],
+      "end": [
+        37.00961894323339,
+        42.50000000000004,
+        3.58
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354101545,
+      "deposited_volume": 0.5638749890990622,
+      "filament_length": 0.23443197858221546,
+      "source_index": 280,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.00961894323339,
+        42.50000000000004,
+        3.58
+      ],
+      "end": [
+        39.39339828220169,
+        39.393398282201886,
+        3.59
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409934,
+      "deposited_volume": 0.5638749890990304,
+      "filament_length": 0.23443197858220227,
+      "source_index": 281,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220169,
+        39.393398282201886,
+        3.59
+      ],
+      "end": [
+        42.49999999999999,
+        37.00961894323342,
+        3.5999999999999996
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410156,
+      "deposited_volume": 0.5638749890990624,
+      "filament_length": 0.23443197858221557,
+      "source_index": 282,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.49999999999999,
+        37.00961894323342,
+        3.5999999999999996
+      ],
+      "end": [
+        46.1177143234621,
+        35.511112605663996,
+        3.6100000000000003
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099414,
+      "deposited_volume": 0.5638749890990316,
+      "filament_length": 0.23443197858220272,
+      "source_index": 283,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.1177143234621,
+        35.511112605663996,
+        3.6100000000000003
+      ],
+      "end": [
+        50.000000000000036,
+        35,
+        3.62
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354101448,
+      "deposited_volume": 0.5638749890990608,
+      "filament_length": 0.23443197858221487,
+      "source_index": 284,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        50.000000000000036,
+        35,
+        3.62
+      ],
+      "end": [
+        53.88228567653776,
+        35.51111260566397,
+        3.63
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099365,
+      "deposited_volume": 0.5638749890990308,
+      "filament_length": 0.2344319785822024,
+      "source_index": 285,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653776,
+        35.51111260566397,
+        3.63
+      ],
+      "end": [
+        57.50000000000007,
+        37.00961894323346,
+        3.6399999999999997
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410152,
+      "deposited_volume": 0.5638749890990619,
+      "filament_length": 0.23443197858221532,
+      "source_index": 286,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.50000000000007,
+        37.00961894323346,
+        3.6399999999999997
+      ],
+      "end": [
+        60.60660171779821,
+        39.39339828220179,
+        3.6500000000000004
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099396,
+      "deposited_volume": 0.5638749890990312,
+      "filament_length": 0.23443197858220258,
+      "source_index": 287,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779821,
+        39.39339828220179,
+        3.6500000000000004
+      ],
+      "end": [
+        62.99038105676654,
+        42.49999999999992,
+        3.66
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409934,
+      "deposited_volume": 0.5638749890990304,
+      "filament_length": 0.23443197858220227,
+      "source_index": 288,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676654,
+        42.49999999999992,
+        3.66
+      ],
+      "end": [
+        64.48888739433603,
+        46.11771432346223,
+        3.67
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410152,
+      "deposited_volume": 0.5638749890990619,
+      "filament_length": 0.23443197858221532,
+      "source_index": 289,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433603,
+        46.11771432346223,
+        3.67
+      ],
+      "end": [
+        65,
+        49.99999999999996,
+        3.6799999999999997
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099365,
+      "deposited_volume": 0.5638749890990308,
+      "filament_length": 0.2344319785822024,
+      "source_index": 290,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        65,
+        49.99999999999996,
+        3.6799999999999997
+      ],
+      "end": [
+        64.48888739433606,
+        53.882285676537684,
+        3.6899999999999995
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535409933,
+      "deposited_volume": 0.5638749890990303,
+      "filament_length": 0.23443197858220222,
+      "source_index": 291,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        64.48888739433606,
+        53.882285676537684,
+        3.6899999999999995
+      ],
+      "end": [
+        62.99038105676658,
+        57.5,
+        3.7
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410153,
+      "deposited_volume": 0.563874989099062,
+      "filament_length": 0.23443197858221537,
+      "source_index": 292,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        62.99038105676658,
+        57.5,
+        3.7
+      ],
+      "end": [
+        60.60660171779827,
+        60.606601717798156,
+        3.71
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099423,
+      "deposited_volume": 0.5638749890990317,
+      "filament_length": 0.23443197858220277,
+      "source_index": 293,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        60.60660171779827,
+        60.606601717798156,
+        3.71
+      ],
+      "end": [
+        57.50000000000015,
+        62.990381056766495,
+        3.7199999999999998
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099316,
+      "deposited_volume": 0.5638749890990301,
+      "filament_length": 0.23443197858220213,
+      "source_index": 294,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        57.50000000000015,
+        62.990381056766495,
+        3.7199999999999998
+      ],
+      "end": [
+        53.88228567653785,
+        64.48888739433602,
+        3.7300000000000004
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354101563,
+      "deposited_volume": 0.5638749890990624,
+      "filament_length": 0.23443197858221557,
+      "source_index": 295,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        53.88228567653785,
+        64.48888739433602,
+        3.7300000000000004
+      ],
+      "end": [
+        50.00000000000013,
+        65,
+        3.74
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099316,
+      "deposited_volume": 0.5638749890990301,
+      "filament_length": 0.23443197858220213,
+      "source_index": 296,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        50.00000000000013,
+        65,
+        3.74
+      ],
+      "end": [
+        46.11771432346219,
+        64.48888739433602,
+        3.75
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354101497,
+      "deposited_volume": 0.5638749890990615,
+      "filament_length": 0.23443197858221518,
+      "source_index": 297,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        46.11771432346219,
+        64.48888739433602,
+        3.75
+      ],
+      "end": [
+        42.50000000000007,
+        62.99038105676662,
+        3.76
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099365,
+      "deposited_volume": 0.5638749890990308,
+      "filament_length": 0.2344319785822024,
+      "source_index": 298,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        42.50000000000007,
+        62.99038105676662,
+        3.76
+      ],
+      "end": [
+        39.39339828220175,
+        60.60660171779818,
+        3.7699999999999996
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410154,
+      "deposited_volume": 0.5638749890990622,
+      "filament_length": 0.23443197858221546,
+      "source_index": 299,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        39.39339828220175,
+        60.60660171779818,
+        3.7699999999999996
+      ],
+      "end": [
+        37.00961894323344,
+        57.50000000000003,
+        3.7799999999999994
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099365,
+      "deposited_volume": 0.5638749890990308,
+      "filament_length": 0.2344319785822024,
+      "source_index": 300,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        37.00961894323344,
+        57.50000000000003,
+        3.7799999999999994
+      ],
+      "end": [
+        35.51111260566395,
+        53.88228567653772,
+        3.79
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.915798535410149,
+      "deposited_volume": 0.5638749890990614,
+      "filament_length": 0.23443197858221515,
+      "source_index": 301,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    },
+    {
+      "k": "segment",
+      "start": [
+        35.51111260566395,
+        53.88228567653772,
+        3.79
+      ],
+      "end": [
+        35,
+        49.99999999999999,
+        3.8
+      ],
+      "travel": false,
+      "speed": 1000,
+      "length": 3.9157985354099347,
+      "deposited_volume": 0.5638749890990306,
+      "filament_length": 0.2344319785822023,
+      "source_index": 302,
+      "kind": "line",
+      "centre": null,
+      "clockwise": false,
+      "width": 0.6,
+      "height": 0.24,
+      "color": null,
+      "arc_points": null
+    }
+  ]
+}
