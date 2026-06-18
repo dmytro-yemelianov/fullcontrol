@@ -133,9 +133,23 @@ decorative: it can be enforced.
 | `no_cold_extrusion` | no extrusion before the hotend is hot | `cold_extrusion` |
 | `bounded_flow` | volumetric flow under the process ceiling | `flow_rate_ceiling` |
 
-(Defined as `INVARIANTS` in `serialize.py`; emitting an unrecognised name raises.) A future
-`check_invariants(toolpath)` helper can run the declared set and return per-invariant pass/fail; today
-the same checks are reachable via `fc.verify_gcode` on the lowered g-code.
+(Defined as `INVARIANTS` in `serialize.py`; emitting an unrecognised name raises.) The declaration is
+**enforceable**, not decorative: `fullcontrol.ir.check_invariants(toolpath, names, build_volume=…,
+max_flow=…)` folds the IR event stream and returns an `InvariantReport` (`.ok` / `.all_checked` /
+`.summary()` / `.raise_if_violated()`), with each result listing the offending event indices. Invariants
+that need a parameter (`within_build_volume` → `build_volume`, `bounded_flow` → `max_flow`) report
+`checked=False` (vacuously ok) when it is absent, so declaring an invariant you cannot yet check is safe.
+For the v2 flow, pass the declared list straight through:
+
+```python
+from fullcontrol.ir import from_dict, check_invariants
+d = ...                                   # a v2 IR dict
+report = check_invariants(from_dict(d), d.get('invariants') or [], build_volume=(200, 200, 200))
+report.raise_if_violated()
+```
+
+The same checks remain reachable via `fc.verify_gcode` on lowered g-code; `check_invariants` is the
+IR-level counterpart.
 
 ## 4. Columnar form (the binary/zero-copy ABI)
 
