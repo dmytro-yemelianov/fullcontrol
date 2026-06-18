@@ -39,6 +39,9 @@ real print (time/material > 0), and validates with no errors against a 200³ bui
 | **phone_stand** *(new)* | adjustable-angle stand — official model | a reimplementation of FullControl's *AnyAngle Phone Stand*: a continuous-Z seamless spiral of a wavy rounded-square tube (~84×84×30mm) that cradles a phone at any lean (`stand_angle`) in portrait or landscape, with a mid-height clamping waist and an "angry mode" that sharpens the corrugations | ~36k segs |
 | **pin_support_challenge** *(new)* | tall thin pin — official model | a reimplementation of FullControl's *Pin-Support Challenge*: a spiral base disc → a single thin vertical bead (the support-free pin) → a 45° spiral cone fanned from the pin tip; `conical_start` swaps the flat base for a tapered one. One seamless bead | ~2.7k segs |
 | **overhang_challenge** *(new)* | progressive overhang — official model | a reimplementation of FullControl's *Overhang Challenge* (+ *Plus*): a spiral foot → vertical wall → linear **outward flare** that leans the wall progressively into a steep (~75°) unsupported overhang; `plus` swaps the circle for an `sides`-gon and toggles inward/outward lean | ~2.2k segs |
+| **arc_vase** *(new)* | native `fc.Arc` (G2/G3) vase | the first gallery design built from true circular **arcs**: each layer is a scalloped/petal cross-section of `petals` tangent `fc.Arc` moves (one G2/G3 each, helical end-z so it climbs as one spiral) — a handful of arc commands per layer instead of hundreds of segments; glass-smooth, tiny g-code. Showcases a capability nothing else in the gallery uses | `petals` arcs/layer |
+| **brush_lettering** *(new)* | per-segment variable line width | a flat plaque where one continuous bead traces a stroke whose **width swells and thins like a brush** (fat downstrokes, hairline upstrokes) by emitting a fresh `ExtrusionGeometry(width=…)` along the path — true calligraphic line weight, impossible in a normal slicer. Presets `sine`/`loop`/`signature` or any `width_fn` | single layer |
+| **bead_studs** *(new)* | `fc.StationaryExtrusion` stud field | a plate dotted with raised domes built by parking the nozzle and oozing a set volume in place (`StationaryExtrusion`) — laid out as a grid or as grade-1 **braille** (a `message` string → dot patterns). Showcases extrude-in-place, which no other design uses | grid / braille |
 | **snake_soapdish** *(new)* | snake-mode open corrugated wall | a faithful reimplementation of FullControl's *Snake-Mode Soapdish*: an **open** corrugated wall (not a cup) printed in snake mode — print one way, step z up, print back, step up — with a sine-wave footprint of `waves` corrugations and a lens silhouette (widest at mid-height). Fat 1mm lines, hot & fast. Verified against the published g-code (60mm × ~100mm, 8 corrugations) | ~15k segs |
 
 ### Export: self-contained 3D viewer (`result_type='3d_html'`)
@@ -135,8 +138,10 @@ library gap worth closing first.
   z-hop-tuned variant with before/after seam stats is the next step.
 
 ### C. New library capability (design + a feature)
-- **Variable-width line art** — per-segment `ExtrusionGeometry.width` driven by a function, for
-  calligraphic single-wall art. *(needs: nothing — already supported; just no demo.)*
+- ✅ **Variable-width line art** — *done* (`brush_lettering`): per-segment `ExtrusionGeometry.width`
+  driven by a function, for calligraphic single-wall art.
+- ✅ **Native-arc design** — *done* (`arc_vase`): a vase built from true `fc.Arc` (G2/G3) moves.
+- ✅ **Extrude-in-place** — *done* (`bead_studs`): a stud/braille field via `fc.StationaryExtrusion`.
 - **Multi-material / tool-change demo** — alternating regions on a toolchanger. *(needs: a richer
   tool-change story than the current `T0`/`T1` manual gcode.)*
 - **Sequenced multi-object plate** — N copies with per-object purge, laid out on a grid. *(uses

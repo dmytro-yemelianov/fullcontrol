@@ -13,7 +13,8 @@ from examples import (GALLERY, spiral_vase, ripple_vase, nonplanar_spacer, wave_
                       twisted_polygon_vase, helical_screw, textured_cone, revolve, mobius_band,
                       trefoil_tube, towers_grid, optimization_report, snake_soapdish,
                       hex_adapter, lampshade, nuts_and_bolts, star_polygon_lattice,
-                      phone_stand, pin_support_challenge, overhang_challenge)
+                      phone_stand, pin_support_challenge, overhang_challenge,
+                      arc_vase, brush_lettering, bead_studs)
 
 _BUILD = {'nozzle_temp': 210, 'bed_temp': 40, 'primer': 'front_lines_then_y',
           'build_volume_x': 200, 'build_volume_y': 200, 'build_volume_z': 200}
@@ -39,6 +40,9 @@ _SMALL = {
     'phone_stand': lambda: phone_stand(stand_height=6, segments_per_layer=60),
     'pin_support_challenge': lambda: pin_support_challenge(height=4, segments_per_layer=32),
     'overhang_challenge': lambda: overhang_challenge(segments_per_layer=40, base_rings=3),
+    'arc_vase': lambda: arc_vase(height=3, petals=6),
+    'brush_lettering': lambda: brush_lettering(segments=60),
+    'bead_studs': lambda: bead_studs(rows=2, cols=3, base_layers=1),
 }
 
 
@@ -152,7 +156,8 @@ def test_gallery_registry_matches_callables():
                             'gyroid_infill', 'twisted_polygon_vase', 'helical_screw', 'textured_cone',
                             'mobius_band', 'trefoil_tube', 'towers_grid', 'snake_soapdish',
                             'hex_adapter', 'lampshade', 'nuts_and_bolts', 'star_polygon_lattice',
-                            'phone_stand', 'pin_support_challenge', 'overhang_challenge'}
+                            'phone_stand', 'pin_support_challenge', 'overhang_challenge',
+                            'arc_vase', 'brush_lettering', 'bead_studs'}
     for fn in GALLERY.values():
         assert callable(fn)
 
