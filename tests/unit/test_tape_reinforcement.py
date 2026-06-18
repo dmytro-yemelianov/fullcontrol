@@ -90,9 +90,11 @@ def test_specimen_is_a_long_flat_multilayer_strip():
     ys = [p.y for p in pts]
     x_span = max(xs) - min(xs)
     y_span = max(ys) - min(ys)
-    assert abs(x_span - length) < 1e-6               # footprint matches length x width...
-    assert abs(y_span - width) < 1e-6
-    assert x_span > y_span                           # ...and it is a LONG strip (length > width)
+    # the long axis (`length`) runs along y, the short axis (`width`) across x - matching the real
+    # long-narrow coupon (~44 wide x ~154 long, long axis = y)
+    assert abs(y_span - length) < 1e-6               # footprint matches width(x) x length(y)...
+    assert abs(x_span - width) < 1e-6
+    assert y_span > x_span                           # ...and it is a LONG strip (length > width)
 
 
 def test_layers_are_solid_raster_fills():
@@ -100,7 +102,19 @@ def test_layers_are_solid_raster_fills():
     length, width = 80.0, 20.0
     steps = tape_reinforcement(length=length, width=width, layers=1, infill=0.6, origin=(30.0, 30.0))
     pts = [s for s in steps if isinstance(s, Point)]
-    # raster lines run the full length in x; every move spans (close to) the whole length
-    assert max(p.x for p in pts) - min(p.x for p in pts) > length - 1e-6
-    # enough parallel lines to fill the width solidly (~width/infill lines, each 2 endpoints)
+    # raster lines run the full length along y (the long axis); every line spans the whole length
+    assert max(p.y for p in pts) - min(p.y for p in pts) > length - 1e-6
+    # enough parallel lines to fill the width (in x) solidly (~width/infill lines, each 2 endpoints)
     assert len(pts) >= 2 * int(width / 0.6)
+
+
+def test_default_is_a_long_narrow_coupon_matching_the_real_model():
+    'The DEFAULT matches the real long-narrow strip: ~40 wide (x) x ~150 long (y), long axis = y.'
+    steps = tape_reinforcement()                     # catalogue defaults: length 150, width 40
+    pts = [s for s in steps if isinstance(s, Point)]
+    x_span = max(p.x for p in pts) - min(p.x for p in pts)
+    y_span = max(p.y for p in pts) - min(p.y for p in pts)
+    assert abs(y_span - 150.0) < 1e-6                # long axis (length) runs along y ~ real 154
+    assert abs(x_span - 40.0) < 1e-6                 # short axis (width) across x ~ real 44
+    assert y_span > x_span                           # a LONG, NARROW coupon
+    assert y_span / x_span > 3                        # markedly long-and-narrow, not wide-and-short

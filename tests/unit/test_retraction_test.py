@@ -59,6 +59,15 @@ def test_design_is_essentially_flat_single_layer():
     assert max(zs) <= 0.2 + 0.6 + 1e-9
 
 
+def test_default_is_a_bed_filling_field():
+    'The default mirrors the real model: a large bed-filling field (~178x146mm), not a tiny strip.'
+    pts = [s for s in retraction_test() if isinstance(s, Point)]
+    xs = [p.x for p in pts]
+    ys = [p.y for p in pts]
+    assert max(xs) - min(xs) > 100                  # fills the bed in x like the real ~178mm field
+    assert max(ys) - min(ys) > 100                  # ...and in y like the real ~146mm field
+
+
 @pytest.mark.parametrize('n', [1, 12, 40, 75])
 def test_retraction_count_is_parametric(n):
     'The whole point of the design: it performs exactly `retractions` retractions.'
