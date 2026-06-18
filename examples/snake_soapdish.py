@@ -1,44 +1,60 @@
-"""Snake-mode soapdish - an open, spiky-rimmed cup, printed like FullControl's Snake-Mode Soapdish.
+"""Snake-Mode Soapdish - a corrugated open wall printed like FullControl's Snake-Mode Soapdish.
 
-"Snake mode" is vase mode for open structures: print one way, move up, print back, move up, repeat.
-Here the nozzle snakes around the cup wall while its z zig-zags up to a spike and back down (`waves`
-spikes around the rim); the zig-zag amplitude is zero through the solid base and ramps in above it,
-so the wall is solid at the bottom and opens into a crown of vertical spikes at the top. The spikes
-stay angularly aligned course to course (vertical spikes, not a crossing lattice). Print it fast with
-fat lines (snake mode loves volumetric flow). One seamless, support-free bead.
+'Snake mode' is vase mode for *open* structures: print one way, step the nozzle up, print back,
+step up, repeat. The result here is a single corrugated wall - a sine-wave footprint of `waves`
+corrugations that snakes there-and-back, course by course, climbing in z. The wall's horizontal
+length swells from the base to mid-height and tapers again toward the top (a lens / leaf
+silhouette), and its baseline is gently bowed, so the soap rests in the wavy cradle and water drains
+through the corrugations.
+
+Print it with FAT layers - snake mode loves volumetric flow. The reference settings lay 1-mm-wide
+lines (nozzle 0.4-1 mm all work), about 0.33 mm tall, run hot (try +20 C) and fast (speed 200%);
+volumetric flow ~2.5 mm^3/s. One seamless, support-free, open bead.
+
+This reimplements the real FullControl model (an open corrugated wall) - NOT a closed cup; verified
+against the published g-code (60 mm wide x ~100 mm tall, 8 corrugations, lens silhouette).
 """
-from math import tau, sin, cos, floor
+from math import tau, sin, sqrt
 
 import fullcontrol as fc
 
 
-def snake_soapdish(radius: float = 24.0, height: float = 26.0, waves: int = 12,
-                   spike_height: float = 10.0, base_height: float = 4.0, layer_height: float = 0.4,
-                   points_per_wave: int = 14, extrusion_width: float = 1.0,
-                   centre=(50.0, 50.0), first_layer_gap: float = 0.8) -> list:
-    """Build a snake-mode soapdish.
+def _lens(u: float) -> float:
+    'Silhouette factor over normalised height u in [0, 1]: 0 at the ends, 1 at mid-height.'
+    return sqrt(max(0.0, 1.0 - (2.0 * u - 1.0) ** 2))
 
-    radius: cup wall radius (mm); waves: number of rim spikes; spike_height: how far the crown
-    spikes rise above the wall (mm); base_height: solid (un-spiked) wall height before the spikes
-    ramp in (mm); layer_height: vertical step between snake courses (also the bead height).
+
+def snake_soapdish(length: float = 60.0, height: float = 100.0, waves: int = 8,
+                   amplitude: float = 6.0, end_scale: float = 0.67, bow: float = 2.5,
+                   layer_height: float = 0.333, points_per_wave: int = 17,
+                   extrusion_width: float = 1.0, centre=(70.0, 48.6),
+                   first_layer_gap: float = 0.6) -> list:
+    """Build a snake-mode soapdish: a corrugated open wall with a lens silhouette.
+
+    length: horizontal span at mid-height (mm); waves: number of corrugations across the wall;
+    amplitude: corrugation depth at mid-height (mm); end_scale: span/amplitude at the top and bottom
+    as a fraction of mid-height (gives the lens / leaf silhouette); bow: how far the baseline arcs
+    (mm); layer_height: z-step between snake courses (also the fat bead height). Snake mode reverses
+    the traverse each course; z climbs monotonically (it does not zig-zag in z).
     """
     cx, cy = centre
     eh = layer_height
-    courses = max(1, int(round(height / eh)))
-    ramp = max(1e-6, height - base_height)
+    courses = max(2, int(round(height / eh)))
     per = waves * points_per_wave
     steps = [fc.ExtrusionGeometry(width=extrusion_width, height=eh)]
     for k in range(courses):
-        z0 = first_layer_gap + k * eh
-        amp = spike_height * max(0.0, (k * eh - base_height)) / ramp   # 0 over the base, ramps in
-        forward = (k % 2 == 0)                                          # the snake: reverse each course
+        z = first_layer_gap + k * eh
+        u = k / (courses - 1)
+        s = end_scale + (1.0 - end_scale) * _lens(u)            # lens: swell to mid, taper to ends
+        amp = amplitude * s
+        forward = (k % 2 == 0)                                  # the snake reverses each course
         for j in range(per + 1):
-            f = j / per
-            af = f if forward else 1.0 - f
-            phi = af * tau
-            ph = waves * af
-            tri = 1.0 - 2.0 * abs((ph - floor(ph)) - 0.5)              # 0..1 spike profile (aligned)
-            steps.append(fc.Point(x=cx + radius * cos(phi), y=cy + radius * sin(phi), z=z0 + amp * tri))
+            t = j / per
+            tt = t if forward else 1.0 - t
+            along = (tt - 0.5) * length * s                     # traverse across the wall
+            baseline = -bow * s * (1.0 - (2.0 * tt - 1.0) ** 2)  # gentle bow, dipping in the middle
+            wave = amp * sin(tau * waves * tt)                  # the corrugations
+            steps.append(fc.Point(x=cx + along, y=cy + baseline + wave, z=z))
     return steps
 
 
@@ -46,6 +62,7 @@ if __name__ == '__main__':
     steps = snake_soapdish()
     fc.transform(steps, 'gcode', fc.GcodeControls(
         printer_name='generic', save_as='snake_soapdish',
-        initialization_data={'nozzle_temp': 210, 'bed_temp': 40, 'primer': 'front_lines_then_y',
-                             'extrusion_width': 1.0, 'extrusion_height': 0.4}))
+        initialization_data={'nozzle_temp': 230, 'bed_temp': 50, 'primer': 'front_lines_then_y',
+                             'extrusion_width': 1.0, 'extrusion_height': 0.333,
+                             'print_speed': 4000}))   # fat, hot, fast - snake mode loves flow
     print('wrote snake_soapdish.gcode')

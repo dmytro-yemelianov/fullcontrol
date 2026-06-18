@@ -32,7 +32,7 @@ real print (time/material > 0), and validates with no errors against a 200³ bui
 | **mobius_band** *(new)* | parametric non-planar art | the classic Möbius surface (one half-twist, one side, one edge); a boustrophedon rasters the twisting ribbon as one continuous bead. *Needs support to print* — an art / visualisation piece | ~7k segs |
 | **trefoil_tube** *(new)* | swept knot tube | a single-wall tube spiralled along a trefoil-knot centre-line via a Z-up frame (no Frenet twist); one continuous helical bead that closes on itself. *Needs support* — an art piece | ~9.6k segs |
 | **towers_grid** *(new)* | travel-heavy multi-part print | a grid of separate square-wall towers with extruder-off hops between them and subdivided collinear edges — built to exercise the IR→IR **optimization passes** (see below) | varies |
-| **snake_soapdish** *(new)* | snake-mode open cup | a reimplementation of FullControl's *Snake-Mode Soapdish*: a cup with a solid base that opens into a crown of `waves` vertical z-spikes (the snake zig-zags up/down, amplitude ramping in above the base). One seamless, support-free bead | ~15k segs |
+| **snake_soapdish** *(new)* | snake-mode open corrugated wall | a faithful reimplementation of FullControl's *Snake-Mode Soapdish*: an **open** corrugated wall (not a cup) printed in snake mode — print one way, step z up, print back, step up — with a sine-wave footprint of `waves` corrugations and a lens silhouette (widest at mid-height). Fat 1mm lines, hot & fast. Verified against the published g-code (60mm × ~100mm, 8 corrugations) | ~15k segs |
 
 ### Export: self-contained 3D viewer (`result_type='3d_html'`)
 ```python
@@ -65,20 +65,22 @@ Passes are opt-in via `initialization_data={'optimize': [...]}`, so default outp
 ### Reverse-engineering — g-code → formula
 **`reverse_engineer(gcode)`** runs the pipeline *backwards*: it parses a g-code file to extruding
 points, decomposes them into cylindrical coordinates about an auto-detected axis, and least-squares-
-fits the modulation. The **dominant angular harmonic is the design's lobe / wave / spike count**, its
+fits the modulation. The **dominant angular harmonic is the design's lobe / wave count**, its
 amplitude the depth, and the radius-vs-z fit gives the cylinder/cone/taper profile. From g-code
-*alone* it recovers, e.g., a 5-lobe vase as `r(θ) ≈ 15 + 2·cos(5θ)`, a 12-spike Snake-Mode Soapdish as
-12 vertical (snake-mode) spikes, and a hexagonal vase as 6 lobes — exact counts, with `describe()`
-rendering the formula. Closed-form for the surface-of-revolution / vase family (most of the gallery);
-arbitrary 3-D toolpaths are out of scope (symbolic-regression territory).
+*alone* it recovers, e.g., a 5-lobe vase as `r(θ) ≈ 15 + 2·cos(5θ)` and a hexagonal vase as 6 lobes —
+exact counts, with `describe()` rendering the formula. Closed-form for the surface-of-revolution /
+vase family (most of the gallery); arbitrary 3-D toolpaths are out of scope (symbolic-regression
+territory).
 
 **`identify(gcode)`** goes further — it matches the recovered signature against the gallery's *forward*
 models and returns the named design + its parameters + a `fit_error` (chamfer mm to the regenerated
-design). It recovers the exact family and counts, exact radius/depth for the cosine vase, the polygon's
-circumradius (distinguishing a polygon from a sine-lobed vase by its higher harmonics), and the
-Snake-Mode Soapdish's `waves` exactly + `spike_height` via a forward fit to the z-distribution (~±25%,
-where the raw harmonic underreads). E.g. a 5-lobe vase -> `spiral_vase(radius=15, lobes=5, lobe_depth=2)`
-at 0.23 mm fit error.
+design). It recovers the exact family and counts, exact radius/depth for the cosine vase, and the
+polygon's circumradius (distinguishing a polygon from a sine-lobed vase by its higher harmonics). The
+**Snake-Mode Soapdish is an open corrugated wall, not a surface of revolution** — `identify` detects it
+because snake mode holds z constant within each course (vases spiral z continuously) and recovers its
+corrugation count, length and height directly. E.g. a 5-lobe vase ->
+`spiral_vase(radius=15, lobes=5, lobe_depth=2)` at 0.23 mm fit error; the published Snake-Mode Soapdish
+g-code -> `snake_soapdish(length=60, height=100, waves=8, …)` at ~3.8 mm.
 
 ### Validator showcase (not a printable design)
 **`validation_gauntlet()`** returns a `dict[str, list]` of twelve tiny designs, each crafted to trip
@@ -113,7 +115,7 @@ library gap worth closing first.
   depth/pitch/taper); the steeper the thread, the more overhang it tests.
 - ✅ **Möbius strip** — *done* (`mobius_band`): the classic one-half-twist ribbon, rastered as one continuous bead (see also `trefoil_tube`).
 - ✅ **Snake-mode open cup** — *done* (`snake_soapdish`): reimplements FullControl's Snake-Mode
-  Soapdish — a solid-based cup opening into a crown of z-spikes, support-free.
+  Soapdish — an open corrugated wall (sine-wave footprint, lens silhouette) printed in snake mode, support-free.
 - **Coaster / texture tile pack** — flat tiles with hilbert-curve, truchet, and concentric-wave fills
   — a quick way to show 2D infill patterns.
 - **Parametric funnel / nozzle adapter** — two different-diameter circular ports joined by a swept

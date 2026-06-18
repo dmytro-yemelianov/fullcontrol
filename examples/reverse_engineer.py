@@ -6,12 +6,13 @@ into cylindrical coordinates about an auto-detected axis, and least-squares-fit 
 
   - the base radius profile r0(z)  (constant = cylinder, sloped = cone/taper),
   - the angular harmonics of the radius  (the lobe / wave / ripple count and amplitude), and
-  - the angular harmonics of z when the print snakes up and down  (snake-mode spike count/height).
+  - the angular harmonics of z for non-planar surfaces  (z-undulation count/height).
 
 The dominant harmonic IS the design's `lobes` / `waves` / `star_tips`; its amplitude is the depth.
 `reverse_engineer(gcode)` returns a structured report; `describe(report)` renders the recovered
 formula. Closed-form for surfaces of revolution; arbitrary 3-D toolpaths are out of scope (that's
-symbolic-regression / point-cloud territory).
+symbolic-regression / point-cloud territory). `identify(gcode)` additionally handles the open
+corrugated *snake-mode* wall (the Snake-Mode Soapdish), which is not a surface of revolution.
 """
 import numpy as np
 
@@ -119,20 +120,38 @@ def _chamfer(a, b):
     return float(np.sqrt(d.min(1)).mean() + np.sqrt(d.min(0)).mean()) / 2
 
 
-def _golden(f, lo, hi, iters=16):
-    g = (5 ** 0.5 - 1) / 2
-    c, d = hi - g * (hi - lo), lo + g * (hi - lo)
-    fc_, fd = f(c), f(d)
-    for _ in range(iters):
-        if fc_ < fd:
-            hi, d, fd = d, c, fc_
-            c = hi - g * (hi - lo)
-            fc_ = f(c)
-        else:
-            lo, c, fc_ = c, d, fd
-            d = lo + g * (hi - lo)
-            fd = f(d)
-    return (lo + hi) / 2
+def _courses_by_z(p):
+    'Split a print-ordered point cloud into per-z-level courses (snake mode holds z within a course).'
+    zr = np.round(p[:, 2], 3)
+    breaks = np.where(np.diff(zr) != 0)[0] + 1
+    return [c for c in np.split(np.arange(len(p)), breaks) if len(c) >= 5]
+
+
+def _snake_wall_params(p):
+    '''Recover the open corrugated-wall parameters (the Snake-Mode Soapdish) from its point cloud:
+    long-axis length (max course span = mid-height), corrugation count + amplitude (dominant harmonic
+    of the across-axis deviation on the widest course), and height. Returns snake_soapdish kwargs.'''
+    along_axis = 0 if np.ptp(p[:, 0]) >= np.ptp(p[:, 1]) else 1  # the wall's long axis
+    across_axis = 1 - along_axis
+    courses = _courses_by_z(p)
+    courses.sort(key=lambda c: p[c, 2].mean())
+    cmid = courses[len(courses) // 2]              # median-height course (lens peak, primer-proof)
+
+    along, across = p[cmid, along_axis], p[cmid, across_axis]
+    length = float(np.ptp(along))
+    t = (along - along.min()) / max(np.ptp(along), 1e-9)        # normalised traverse 0..1
+    across = across - np.polyval(np.polyfit(t, across, 2), t)   # detrend the gentle bow
+    _, harm = _fit_harmonics(2 * np.pi * t, across, min(len(cmid) // 3, 40))
+    waves = harm[0][0]                                          # dominant corrugation frequency
+    # physical corrugation depth (robust to the harmonic splitting across k and k+1)
+    amplitude = float(np.percentile(across, 98) - np.percentile(across, 2)) / 2
+    height = float(p[:, 2].max() - p[:, 2].min())
+
+    cx = (p[cmid, along_axis].min() + p[cmid, along_axis].max()) / 2
+    cy = (p[cmid, across_axis].min() + p[cmid, across_axis].max()) / 2
+    return {'length': round(length, 1), 'height': round(height, 1), 'waves': waves,
+            'amplitude': round(float(amplitude), 2),
+            'centre': (round(float(cx), 1), round(float(cy), 1))}
 
 
 def identify(gcode: str) -> dict:
@@ -140,49 +159,36 @@ def identify(gcode: str) -> dict:
     matching the recovered signature against the gallery's forward models. Returns
     {'design', 'params', 'fit_error'} (fit_error = chamfer distance to the regenerated design, mm).
 
-    Recovers exact counts (lobes/sides/waves) and radius for every family; exact depth for the
-    cosine-lobed vase; the polygon's circumradius from the peak radius; and the soapdish's spike
-    height by a forward-model fit to the z-distribution (~±25%, vs the raw harmonic which underreads).
+    Surfaces of revolution (vases) are recovered from cylindrical harmonics: exact lobe/side counts,
+    radius, the cosine vase's depth, and the polygon's circumradius (a polygon carries strong energy
+    at twice its base harmonic). The Snake-Mode Soapdish is an *open corrugated wall*, not a surface
+    of revolution - it is detected because snake mode holds z constant within each course (vases
+    spiral z continuously); its corrugation count, length and height are recovered directly.
     '''
     from examples import spiral_vase, twisted_polygon_vase, snake_soapdish
-    rep = reverse_engineer(gcode)
     p = parse_gcode(gcode) if isinstance(gcode, str) else np.asarray(gcode)
-    (cx, cy), theta, z, r = _cylindrical(p)
-    height = rep['height']
 
-    if rep['modulation'] == 'vertical':
-        waves = rep['vertical_harmonic']['count']
-        radius = round(rep['base_radius'])
-        qs = [5, 15, 30, 50, 70, 85, 95, 99]
-        tq = np.percentile(z, qs)
-
-        def cost(bh, sh):
-            cand = snake_soapdish(waves=waves, radius=radius, height=max(2.0, bh),
-                                  spike_height=max(0.1, sh), base_height=min(4.0, bh * 0.3))
-            return float(np.abs(tq - np.percentile(_points(cand)[:, 2], qs)).sum())
-
-        bh, sh = height * 0.6, height * 0.4
-        for _ in range(4):
-            bh = _golden(lambda b: cost(b, sh), 5.0, height)
-            sh = _golden(lambda s: cost(bh, s), 0.5, height)
-        design, params = 'snake_soapdish', {'waves': waves, 'radius': radius,
-                                             'height': round(bh, 1), 'spike_height': round(sh, 1)}
+    # snake-mode wall vs surface of revolution: snake mode holds z within a course (few z-changes),
+    # a vase spirals z continuously (a z-change almost every point). Robust to primer/base contamination.
+    z_changes = int((np.diff(np.round(p[:, 2], 3)) != 0).sum())
+    if z_changes < 0.2 * len(p):
+        design, params = 'snake_soapdish', _snake_wall_params(p)
     else:
-        count = rep['radial_harmonic']['count']
-        base = round(float(rep['base_radius']), 1)
+        rep = reverse_engineer(gcode)
+        (cx, cy), theta, z, r = _cylindrical(p)
+        height, count = rep['height'], rep['radial_harmonic']['count']
         # polygon vs sine-lobe: a polygon carries strong energy at 2x/3x the base harmonic
         _, harm = _fit_harmonics(theta, r - np.polyval(np.polyfit(z, r, 1), z),
                                  min(3 * count + 1, len(p) // 4))
         amp = {k: a for k, a, _ in harm}
-        polygonal = amp.get(2 * count, 0.0) > 0.15 * amp.get(count, 1e9)
-        if polygonal:
+        if amp.get(2 * count, 0.0) > 0.15 * amp.get(count, 1e9):
             design = 'twisted_polygon_vase'
             params = {'sides': count, 'radius': round(float(r.max()), 1), 'height': round(height, 1),
                       'twist_turns': 0, 'morph_to_sides': 0}
         else:
             design = 'spiral_vase'
-            params = {'radius': base, 'height': round(height, 1), 'lobes': count,
-                      'lobe_depth': round(rep['radial_harmonic']['amplitude'], 2)}
+            params = {'radius': round(float(rep['base_radius']), 1), 'height': round(height, 1),
+                      'lobes': count, 'lobe_depth': round(rep['radial_harmonic']['amplitude'], 2)}
 
     gen = {'spiral_vase': spiral_vase, 'twisted_polygon_vase': twisted_polygon_vase,
            'snake_soapdish': snake_soapdish}[design]
