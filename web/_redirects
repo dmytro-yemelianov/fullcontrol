@@ -1,0 +1,7 @@
+# Cloudflare Pages redirects for the FullControl demo.
+# https://developers.cloudflare.com/pages/configuration/redirects/
+
+# Friendly aliases.
+/demo        /            301
+/playground  /playground/ 301
+/viewer      /viewer.html 301

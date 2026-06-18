@@ -1,0 +1,15 @@
+# Cloudflare Pages config for the FullControl client-side demo.
+#
+# This is a fully static site (no Worker, no server code): a parametric toolpath designer whose
+# geometry is authored in JavaScript and whose print engine is the FullControl Rust kernel compiled
+# to WebAssembly (web/pkg/). three.js is pulled from the unpkg CDN via an importmap.
+#
+# Deploy (after `npx wrangler login`):
+#   npx wrangler pages deploy web --project-name fullcontrol-demo
+#
+# Local preview:
+#   cd web && python3 -m http.server 8787    # then open http://localhost:8787
+
+name = "fullcontrol-demo"
+pages_build_output_dir = "web"
+compatibility_date = "2025-01-01"

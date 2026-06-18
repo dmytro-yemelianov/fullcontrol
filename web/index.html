@@ -3,69 +3,138 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FullControl &mdash; live WASM design viewer</title>
+<title>FullControl — algorithmic 3D-printing toolpaths, in your browser</title>
+<meta name="description" content="Author parametric 3D-printing toolpaths in code; the FullControl Rust engine runs in WebAssembly with zero server. Live metrics, native arcs, downloadable g-code.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230c0d12'/%3E%3Cpath d='M8 23 Q16 6 24 23' fill='none' stroke='%2349b0ff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
-  :root{color-scheme:dark}
-  html,body{margin:0;height:100%;background:#0e0e12;overflow:hidden;
-            font-family:system-ui,-apple-system,sans-serif;color:#d7dae4}
-  #ui{position:fixed;top:0;left:0;width:268px;padding:16px 18px;box-sizing:border-box;
-      background:linear-gradient(180deg,#15151c 0%,#15151ccc 100%);height:100%;overflow:auto;
-      backdrop-filter:blur(4px);border-right:1px solid #262631}
-  h1{font-size:15px;margin:0 0 2px}
-  .sub{font-size:11px;color:#7b8194;margin-bottom:16px}
-  label{display:block;font-size:12px;margin:14px 0 4px;color:#aeb3c2}
+  :root{
+    color-scheme:dark;
+    --bg:#0c0d12; --panel:#13141c; --panel2:#171926; --line:#242636;
+    --txt:#d8dbe6; --muted:#878da0; --dim:#5b6073;
+    --accent:#49b0ff; --accent2:#5fd08a; --warn:#ffb454; --bad:#ff6b6b;
+    --btn:#2563c9; --btn-h:#2f72e0;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--txt)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  #app{display:grid;grid-template-columns:312px 1fr;height:100%}
+
+  /* ---- sidebar ---- */
+  #side{background:linear-gradient(180deg,var(--panel) 0%,#11121b 100%);
+    border-right:1px solid var(--line);height:100%;overflow:auto;padding:18px 18px 28px}
+  header h1{font-size:16px;margin:0 0 4px;letter-spacing:.2px}
+  header h1 .mk{color:var(--accent)}
+  header .tag{font-size:11.5px;color:var(--muted);line-height:1.5;margin-bottom:14px}
+  .links{display:flex;gap:14px;font-size:11.5px;margin-bottom:16px}
+
+  .group{margin-top:18px}
+  .group .gh{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);
+    margin-bottom:8px;border-top:1px solid var(--line);padding-top:14px}
+  select{width:100%;padding:8px 9px;border-radius:7px;background:var(--panel2);
+    color:var(--txt);border:1px solid var(--line);font-size:13px;cursor:pointer}
+  .blurb{font-size:11.5px;color:var(--muted);line-height:1.5;margin:8px 2px 2px}
+
+  label{display:block;font-size:12px;margin:13px 0 4px;color:#aeb3c2}
   label .v{float:right;color:#fff;font-variant-numeric:tabular-nums}
-  input[type=range]{width:100%;accent-color:#49b0ff}
-  #stats{margin-top:20px;border-top:1px solid #262631;padding-top:14px;font-size:12px;line-height:1.7}
-  #stats .row{display:flex;justify-content:space-between}
-  #stats b{color:#fff;font-variant-numeric:tabular-nums}
-  #stats .k{color:#8b91a3}
-  #gcode-btn{margin-top:16px;width:100%;padding:8px;border:0;border-radius:6px;cursor:pointer;
-             background:#2563c9;color:#fff;font-size:13px}
-  #gcode-btn:disabled{background:#333;color:#888;cursor:default}
-  #engine{margin-top:14px;font-size:11px;color:#5fd08a}
-  #canvas-wrap{position:absolute;left:268px;top:0;right:0;bottom:0}
-  #hint{position:fixed;bottom:10px;right:14px;color:#5b6173;font-size:11px}
+  input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
+
+  /* ---- metrics ---- */
+  #metrics .row{display:flex;justify-content:space-between;font-size:12.5px;line-height:1.85}
+  #metrics .k{color:var(--muted)}
+  #metrics b{color:#fff;font-variant-numeric:tabular-nums}
+  #engine{margin-top:10px;font-size:11px;color:var(--accent2);min-height:14px;line-height:1.4}
+
+  /* ---- verify badge ---- */
+  #verify{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+  .inv{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted)}
+  .inv .ic{width:16px;height:16px;border-radius:50%;display:inline-grid;place-items:center;
+    font-size:11px;font-weight:700;flex:none}
+  .inv.ok .ic{background:rgba(95,208,138,.16);color:var(--accent2)}
+  .inv.bad .ic{background:rgba(255,107,107,.16);color:var(--bad)}
+
+  button{font-family:inherit}
+  #dl{margin-top:16px;width:100%;padding:10px;border:0;border-radius:8px;cursor:pointer;
+    background:var(--btn);color:#fff;font-size:13px;font-weight:600;transition:background .15s}
+  #dl:hover:not(:disabled){background:var(--btn-h)}
+  #dl:disabled{background:#2a2c3a;color:#6a6f80;cursor:default}
+
+  /* ---- viewer ---- */
+  #stage{position:relative;height:100%}
+  #canvas-wrap{position:absolute;inset:0}
+  #hud{position:absolute;left:16px;top:14px;font-size:11.5px;color:var(--muted);
+    background:rgba(12,13,18,.55);backdrop-filter:blur(3px);padding:6px 10px;border-radius:7px;
+    border:1px solid var(--line);pointer-events:none;max-width:60%}
+  #hud b{color:#fff}
+  #hint{position:absolute;bottom:12px;right:16px;color:var(--dim);font-size:11px}
+  #loading{position:absolute;inset:0;display:grid;place-items:center;background:var(--bg);z-index:5}
+  #loading .box{text-align:center;color:var(--muted);font-size:13px}
+  .spin{width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--accent);
+    border-radius:50%;margin:0 auto 12px;animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  #err{display:none;position:absolute;inset:0;place-items:center;background:var(--bg);z-index:6;padding:30px}
+  #err .box{max-width:480px;color:var(--bad);font-size:13px;line-height:1.6;text-align:center}
+
+  /* ---- responsive ---- */
+  @media (max-width:760px){
+    #app{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+    #side{height:auto;max-height:48vh;border-right:0;border-bottom:1px solid var(--line)}
+    #hud{max-width:80%}
+  }
 </style>
 </head>
 <body>
-<div id="ui">
-  <h1>FullControl &times; WASM</h1>
-  <div class="sub">twisted polygon vase &middot; geometry in JS, print metrics from the Rust kernel compiled to WebAssembly</div>
+<div id="app">
+  <aside id="side">
+    <header>
+      <h1><span class="mk">Full</span>Control</h1>
+      <div class="tag">Algorithmic 3D-printing toolpaths, in your browser. The design is authored in
+        code; the FullControl <b>Rust engine runs in WebAssembly</b> — zero server.</div>
+      <nav class="links">
+        <a href="https://github.com/FullControlXYZ/fullcontrol" target="_blank" rel="noopener">GitHub ↗</a>
+        <a href="./playground/" target="_blank" rel="noopener">Python playground ↗</a>
+        <a href="./viewer.html">Classic viewer ↗</a>
+      </nav>
+    </header>
 
-  <label>sides <span class="v" id="sides-v"></span></label>
-  <input type="range" id="sides" min="3" max="10" step="1" value="5">
+    <div class="group">
+      <div class="gh">Design</div>
+      <select id="design"></select>
+      <div class="blurb" id="blurb"></div>
+      <div id="sliders"></div>
+    </div>
 
-  <label>morph to sides <span class="v" id="morph-v"></span></label>
-  <input type="range" id="morph" min="3" max="12" step="1" value="8">
+    <div class="group">
+      <div class="gh">Live metrics · wasm kernel</div>
+      <div id="metrics"></div>
+      <div id="engine">● kernel: loading…</div>
+    </div>
 
-  <label>twist (turns) <span class="v" id="twist-v"></span></label>
-  <input type="range" id="twist" min="-2" max="2" step="0.05" value="0.75">
+    <div class="group">
+      <div class="gh">Invariants · verified in JS</div>
+      <div id="verify"></div>
+    </div>
 
-  <label>height (mm) <span class="v" id="height-v"></span></label>
-  <input type="range" id="height" min="10" max="80" step="1" value="40">
+    <div class="group">
+      <div class="gh">Printer & g-code</div>
+      <label>nozzle (°C) <span class="v" id="nozzle-v">210</span></label>
+      <input type="range" id="nozzle" min="180" max="250" step="5" value="210">
+      <label>bed (°C) <span class="v" id="bed-v">50</span></label>
+      <input type="range" id="bed" min="0" max="100" step="5" value="50">
+      <button id="dl" disabled>⤓ download printable g-code</button>
+    </div>
+  </aside>
 
-  <label>radius (mm) <span class="v" id="radius-v"></span></label>
-  <input type="range" id="radius" min="8" max="30" step="1" value="20">
-
-  <label>nozzle (&deg;C) <span class="v" id="nozzle-v"></span></label>
-  <input type="range" id="nozzle" min="180" max="250" step="5" value="210">
-
-  <label>bed (&deg;C) <span class="v" id="bed-v"></span></label>
-  <input type="range" id="bed" min="0" max="100" step="5" value="50">
-
-  <div id="stats"></div>
-  <button id="gcode-btn" disabled>&#10515; download printable g-code</button>
-
-  <label style="margin-top:18px">analyse an existing .gcode file</label>
-  <input type="file" id="gcode-file" accept=".gcode,.gco,.g,.nc,.txt"
-         style="width:100%;font-size:11px;color:#aeb3c2">
-  <div id="file-stats" style="margin-top:10px;font-size:12px;line-height:1.7"></div>
-
-  <div id="engine">&#9679; kernel: loading&hellip;</div>
+  <main id="stage">
+    <div id="canvas-wrap"></div>
+    <div id="hud"></div>
+    <div id="hint">drag to orbit · scroll to zoom · Z-up</div>
+    <div id="loading"><div class="box"><div class="spin"></div>loading the Rust kernel (WebAssembly)…</div></div>
+    <div id="err"><div class="box" id="err-msg"></div></div>
+  </main>
 </div>
-<div id="canvas-wrap"></div>
-<div id="hint">drag to orbit &middot; scroll to zoom</div>
 
 <script type="importmap">
 {"imports":{
@@ -76,210 +145,218 @@
 <script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import init, {simulate, emit_gcode, parse_gcode, simulate_from_ir} from './pkg/fullcontrol_kernel.js';
+import init, {simulate_from_ir, emit_gcode} from './pkg/fullcontrol_kernel.js';
+import {DESIGNS, toIRJSON, toFullPrintableIR, eventsToPolyline, CX, CY, FIRST_GAP} from './designs.js';
 
-// ---- printer assumptions (match a generic FFF setup) ----
-const EW = 0.8, EH = 0.3;                 // extrusion width / height (mm)
-const AREA = EW * EH;                      // rectangle cross-section
-const PRINT_SPEED = 1000, TRAVEL_SPEED = 8000;   // mm/min
-const FIL_AREA = Math.PI * (1.75/2)**2;    // 1.75 mm filament
-const VOL_TO_E = 1 / FIL_AREA;             // mm^3 deposited -> mm of feedstock
-const CX = 50, CY = 50, LAYER_H = 0.24, FIRST_GAP = 0.8, SEGS = 128;
+const $ = id => document.getElementById(id);
+const fmtTime = s => { const m = s/60; return m>=60 ? `${(m/60).toFixed(1)} h` : m>=1 ? `${Math.round(m)} min` : `${s.toFixed(0)} s`; };
 
-// ---- twisted polygon vase geometry (a JS port of examples/twisted_polygon_vase.py) ----
-function ngonRadius(angle, sides, R){
-  const sector = 2*Math.PI/sides, apothem = R*Math.cos(Math.PI/sides);
-  const a = ((angle % sector) + sector) % sector;
-  return apothem / Math.cos(a - sector/2);
-}
-function vasePoints(p){
-  const total = Math.max(1, Math.floor((p.height/LAYER_H) * SEGS));
-  const end = p.morph;
-  const pts = new Float32Array((total+1)*3);
-  for(let i=0;i<=total;i++){
-    const ft = i/SEGS, angle = ft*2*Math.PI, h = ft*LAYER_H, f = Math.min(1, h/p.height);
-    const twist = f*p.twist*2*Math.PI;
-    const rA = ngonRadius(angle-twist, p.sides, p.radius);
-    const r = end===p.sides ? rA : (1-f)*rA + f*ngonRadius(angle-twist, end, p.radius);
-    pts[i*3] = CX + r*Math.cos(angle);
-    pts[i*3+1] = CY + r*Math.sin(angle);
-    pts[i*3+2] = h + FIRST_GAP;
-  }
-  return pts;
-}
-
-// ---- three.js scene ----
-const wrap = document.getElementById('canvas-wrap');
-const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0e0e12);
-const renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setPixelRatio(devicePixelRatio); wrap.appendChild(renderer.domElement);
+// ---- three.js scene -----------------------------------------------------
+const wrap = $('canvas-wrap');
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0c0d12);
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({antialias:true});
+} catch(e){ fail('WebGL is not available in this browser. The 3D viewer needs WebGL.'); }
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+wrap.appendChild(renderer.domElement);
 const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100000); camera.up.set(0,0,1);
-const controls = new OrbitControls(camera, renderer.domElement); controls.enableDamping = true;
-const grid = new THREE.GridHelper(120, 24, 0x33384a, 0x222533);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+const grid = new THREE.GridHelper(200, 40, 0x33384a, 0x1d2030);
 grid.rotation.x = Math.PI/2; scene.add(grid);
-let lineObj = null;
+let printObj = null, travelObj = null;
 
-function fitView(height, radius){
-  const size = Math.max(height, radius*2, 1);
-  controls.target.set(CX, CY, height/2 + FIRST_GAP);
-  camera.position.set(CX + size*0.9, CY - size*1.4, height*0.7 + size*0.6);
-  grid.position.set(CX, CY, FIRST_GAP);
-}
 function resize(){
-  const w = wrap.clientWidth, h = wrap.clientHeight;
+  const w = wrap.clientWidth || 1, h = wrap.clientHeight || 1;
   renderer.setSize(w, h); camera.aspect = w/h; camera.updateProjectionMatrix();
 }
 addEventListener('resize', resize);
 
-function buildLine(pts, height){
-  if(lineObj){ scene.remove(lineObj); lineObj.geometry.dispose(); lineObj.material.dispose(); }
-  const n = pts.length/3;
-  const colors = new Float32Array(pts.length);
+function fitView(height, radius){
+  const size = Math.max(height, radius*2, 1);
+  controls.target.set(CX, CY, height/2 + FIRST_GAP);
+  camera.position.set(CX + size*0.95, CY - size*1.45, height*0.75 + size*0.6);
+  grid.position.set(CX, CY, FIRST_GAP);
+}
+
+function buildGeometry(poly, height){
+  for(const o of [printObj, travelObj]){ if(o){ scene.remove(o); o.geometry.dispose(); o.material.dispose(); } }
+  const {xyz, travel} = poly, n = xyz.length/3;
+  // print pass: a vertex-coloured line; travels drawn dimmed & separate
+  const colors = new Float32Array(xyz.length);
   for(let i=0;i<n;i++){
-    const f = (pts[i*3+2]-FIRST_GAP)/Math.max(height,1e-6);  // 0..1 up the height
-    colors[i*3] = 0.0; colors[i*3+1] = 0.25+0.7*f; colors[i*3+2] = 1.0;  // blue -> cyan
+    const f = (xyz[i*3+2]-FIRST_GAP)/Math.max(height,1e-6);  // 0..1 up the height
+    const t = Math.min(1, Math.max(0, f));
+    // viridis-ish: deep blue -> cyan -> green-gold
+    colors[i*3]   = 0.18 + 0.55*t;
+    colors[i*3+1] = 0.28 + 0.62*t;
+    colors[i*3+2] = 1.0  - 0.55*t;
   }
   const geom = new THREE.BufferGeometry();
-  geom.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+  geom.setAttribute('position', new THREE.BufferAttribute(xyz, 3));
   geom.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  lineObj = new THREE.Line(geom, new THREE.LineBasicMaterial({vertexColors:true}));
-  scene.add(lineObj);
-}
+  printObj = new THREE.Line(geom, new THREE.LineBasicMaterial({vertexColors:true}));
+  scene.add(printObj);
 
-// ---- call the WASM kernel for the print metrics ----
-function simMetrics(pts){
-  const n = pts.length/3;
-  const tag = new Int32Array(n).fill(0);          // all Point rows
-  const a = new Float64Array(n), b = new Float64Array(n), c = new Float64Array(n);
-  for(let i=0;i<n;i++){ a[i]=pts[i*3]; b[i]=pts[i*3+1]; c[i]=pts[i*3+2]; }
-  const d = new Float64Array(n);
-  // init context: [on, volume_to_e, print_speed, travel_speed, area, width, height, x, y, z]
-  const init = new Float64Array([1, VOL_TO_E, PRINT_SPEED, TRAVEL_SPEED, AREA, EW, EH, NaN, NaN, NaN]);
-  const m = simulate(tag, a, b, c, d, init);
-  const out = {time:m.total_time_s, filament:m.filament_length, volume:m.extruded_volume,
-               flow:m.max_flow_rate, segs:m.segment_count};
-  m.free();
-  return out;
-}
-
-const fmtTime = s => { const m = Math.round(s/60); return m>=60 ? `${(m/60).toFixed(1)} h` : `${m} min`; };
-
-// ---- build a FULL serialized IR (procedures + toolpath) and let the WASM engine emit a
-//      complete, printable g-code file (start gcode, heat-up, fan, toolpath, end gcode) ----
-let currentPts = null;
-const START_GCODE = '; FullControl design — full g-code generated in your browser by the Rust (WASM) engine\n'
-                  + 'G28 ; home all axes\nG90 ; absolute coordinates';
-const END_GCODE = 'M104 S0 ; hotend off\nM140 S0 ; bed off\nM107 ; fan off\nG28 X Y ; home x/y\nM84 ; motors off';
-
-function buildFullIR(pts, nozzle, bed){
-  const step = (type, data) => ({k:'step', type, data});
-  const events = [
-    step('ManualGcode', {text: START_GCODE}),
-    step('Buildplate', {temp: bed, wait: false}), step('Hotend', {temp: nozzle, wait: false}),
-    step('Buildplate', {temp: bed, wait: true}),  step('Hotend', {temp: nozzle, wait: true}),
-    step('Fan', {speed_percent: 100}),
-    step('Extruder', {relative_gcode: true}),
-    // travel to the first point, then the extruding toolpath
-    {k:'segment', start:[null,null,null], end:[pts[0],pts[1],pts[2]], travel:true,
-     speed:TRAVEL_SPEED, length:0, filament_length:0, kind:'line'},
-  ];
-  for(let i=1;i<pts.length/3;i++){
-    const sx=pts[(i-1)*3], sy=pts[(i-1)*3+1], sz=pts[(i-1)*3+2];
-    const ex=pts[i*3], ey=pts[i*3+1], ez=pts[i*3+2];
-    const len = Math.hypot(ex-sx, ey-sy, ez-sz);
-    events.push({k:'segment', start:[sx,sy,sz], end:[ex,ey,ez], travel:false,
-                 speed:PRINT_SPEED, length:len, filament_length:len*AREA*VOL_TO_E, kind:'line'});
+  // travels: build separate dimmed segments where travel flag is set
+  const tv = [];
+  for(let i=1;i<n;i++){ if(travel[i]){ tv.push(xyz[(i-1)*3],xyz[(i-1)*3+1],xyz[(i-1)*3+2], xyz[i*3],xyz[i*3+1],xyz[i*3+2]); } }
+  if(tv.length){
+    const tg = new THREE.BufferGeometry();
+    tg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(tv),3));
+    travelObj = new THREE.LineSegments(tg, new THREE.LineBasicMaterial({color:0x3a4055, transparent:true, opacity:0.5}));
+    scene.add(travelObj);
   }
-  events.push(step('ManualGcode', {text: END_GCODE}));
-  return JSON.stringify({version:1, events});
+  return n;
 }
 
-function downloadGcode(){
-  if(!currentPts) return;
-  const nozzle = +document.getElementById('nozzle').value, bed = +document.getElementById('bed').value;
-  const ir = buildFullIR(currentPts, nozzle, bed);
-  const params = JSON.stringify({relative_e:false, travel_g1_e0:false, flavor:'marlin',
-                                 retraction_distance:0, retraction_speed:0, command_list:{}});
+// ---- metrics (wasm) -----------------------------------------------------
+function renderMetrics(m, dt){
+  $('metrics').innerHTML =
+    `<div class="row"><span class="k">print time</span><b>${fmtTime(m.total_time_s)}</b></div>`+
+    `<div class="row"><span class="k">moving / travel</span><b>${fmtTime(m.print_time_s)} / ${fmtTime(m.travel_time_s)}</b></div>`+
+    `<div class="row"><span class="k">filament</span><b>${(m.filament_length/1000).toFixed(2)} m</b></div>`+
+    `<div class="row"><span class="k">material</span><b>${(m.extruded_volume/1000).toFixed(2)} cm³</b></div>`+
+    `<div class="row"><span class="k">peak flow</span><b>${m.max_flow_rate.toFixed(2)} mm³/s</b></div>`+
+    `<div class="row"><span class="k">segments</span><b>${m.segment_count.toLocaleString()}</b></div>`;
+  $('engine').innerHTML = `● Rust kernel (wasm) simulated ${m.segment_count.toLocaleString()} segments in ${dt} ms`;
+}
+
+// ---- invariant verification (in JS, over the IR) ------------------------
+function verify(events){
+  let monotonicZ = true, nonNegExtrusion = true;
+  let lastLayerZ = -Infinity, curMax = -Infinity;
+  for(const ev of events){
+    if(ev.k !== 'segment') continue;
+    if(!ev.travel && ev.deposited_volume < -1e-9) nonNegExtrusion = false;
+    // monotonic layer z: the running max end-z must never drop below an established layer.
+    // (vases climb continuously; snake-mode steps up — both keep peak z non-decreasing)
+    const ez = ev.end[2];
+    if(ez != null){
+      if(ez + 1e-6 < curMax - 0.5) monotonicZ = false; // tolerate within-layer wiggle
+      curMax = Math.max(curMax, ez);
+    }
+  }
+  const rows = [
+    ['monotonic layer-z', monotonicZ, 'z never drops below an established layer'],
+    ['non-negative extrusion', nonNegExtrusion, 'no extruding move removes material'],
+  ];
+  $('verify').innerHTML = rows.map(([name, ok, why]) =>
+    `<div class="inv ${ok?'ok':'bad'}" title="${why}"><span class="ic">${ok?'✓':'!'}</span>${name}</div>`).join('');
+}
+
+// ---- design state -------------------------------------------------------
+let currentEvents = null, currentParams = null, currentId = null;
+
+function buildSliders(id){
+  const d = DESIGNS[id];
+  $('blurb').textContent = d.blurb;
+  $('sliders').innerHTML = d.params.map(p =>
+    `<label>${p.label} <span class="v" id="v-${p.key}">${p.value}</span></label>`+
+    `<input type="range" id="p-${p.key}" min="${p.min}" max="${p.max}" step="${p.step}" value="${p.value}">`
+  ).join('');
+  for(const p of d.params){
+    $(`p-${p.key}`).addEventListener('input', () => { $(`v-${p.key}`).textContent = $(`p-${p.key}`).value; regenerate(); });
+  }
+}
+
+function readParams(id){
+  const p = {};
+  for(const pr of DESIGNS[id].params) p[pr.key] = +$(`p-${pr.key}`).value;
+  return p;
+}
+
+let regenScheduled = false;
+function regenerate(){
+  if(regenScheduled) return;
+  regenScheduled = true;
+  requestAnimationFrame(() => { regenScheduled = false; doRegenerate(); });
+}
+
+function doRegenerate(){
+  const id = currentId, d = DESIGNS[id], p = readParams(id);
+  currentParams = p;
+  let built;
+  try { built = d.build(p); }
+  catch(e){ $('engine').innerHTML = `<span style="color:var(--bad)">● geometry error: ${e.message||e}</span>`; return; }
+  const {events, height, radius} = built;
+  currentEvents = events;
+  const poly = eventsToPolyline(events);
+  const verts = buildGeometry(poly, height);
+  fitView(height, radius);
+  verify(events);
+  // wasm metrics
+  const ir = toIRJSON(events, {design:id, params:p});
   const t0 = performance.now();
-  const lines = emit_gcode(ir, params);                 // full file, in Rust/wasm
+  let m;
+  try { m = simulate_from_ir(ir); }
+  catch(e){ $('engine').innerHTML = `<span style="color:var(--bad)">● kernel error: ${e.message||e}</span>`; return; }
+  const dt = (performance.now()-t0).toFixed(2);
+  renderMetrics(m, dt);
+  m.free();
+  $('hud').innerHTML = `<b>${d.name}</b> · ${d.technique} · <b>${(poly.xyz.length/3).toLocaleString()}</b> vertices drawn`;
+}
+
+// ---- g-code download ----------------------------------------------------
+function downloadGcode(){
+  if(!currentEvents) return;
+  const nozzle = +$('nozzle').value, bed = +$('bed').value;
+  const ir = toFullPrintableIR(currentEvents, nozzle, bed);
+  const params = JSON.stringify({relative_e:true, travel_g1_e0:false, flavor:'marlin',
+    retraction_distance:0, retraction_speed:0, command_list:{}});
+  const t0 = performance.now();
+  let lines;
+  try { lines = emit_gcode(ir, params); }
+  catch(e){ $('engine').innerHTML = `<span style="color:var(--bad)">● emit error: ${e.message||e}</span>`; return; }
   const dt = (performance.now()-t0).toFixed(1);
   const file = lines.join('\n') + '\n';
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([file], {type:'text/plain'}));
-  a.download = 'design.gcode'; a.click(); URL.revokeObjectURL(a.href);
-  document.getElementById('engine').innerHTML =
-    `&#9679; Rust engine (wasm) emitted a ${(file.length/1024|0).toLocaleString()} KB printable file in ${dt} ms`;
+  a.download = `${currentId}.gcode`; a.click(); URL.revokeObjectURL(a.href);
+  $('engine').innerHTML = `● Rust engine (wasm) emitted a ${(file.length/1024).toFixed(0)} KB printable file (${lines.length.toLocaleString()} lines) in ${dt} ms`;
 }
 
-// ---- load & analyse an existing .gcode file: parse -> simulate, entirely client-side ----
-async function analyseFile(file){
-  const fileStats = document.getElementById('file-stats');
-  fileStats.innerHTML = `<span class="k">reading ${file.name}&hellip;</span>`;
-  const text = await file.text();
-  // ParseParams JSON (the same shape the Python ParseParams produces); marlin/mm defaults.
-  const params = JSON.stringify({flavor:'marlin', relative_e:false, e_units:'mm',
-                                 dia_feed:1.75, travel_g1_e0:false});
-  const t0 = performance.now();
-  const ir = parse_gcode(text, params);          // g-code text -> IR JSON, in Rust/wasm
-  const m = simulate_from_ir(ir);                 // IR JSON -> the nine metrics, in Rust/wasm
-  const dt = (performance.now()-t0).toFixed(1);
-  const out = {time:m.total_time_s, print:m.print_time_s, travel:m.travel_time_s,
-               filament:m.filament_length, volume:m.extruded_volume, flow:m.max_flow_rate,
-               segs:m.segment_count};
-  m.free();
-  fileStats.innerHTML =
-    `<div class="row"><span class="k">file</span><b>${file.name}</b></div>`+
-    `<div class="row"><span class="k">print time</span><b>${fmtTime(out.time)}</b></div>`+
-    `<div class="row"><span class="k">moving</span><b>${fmtTime(out.print)} / ${fmtTime(out.travel)} travel</b></div>`+
-    `<div class="row"><span class="k">filament</span><b>${out.filament.toFixed(0)} mm</b></div>`+
-    `<div class="row"><span class="k">material</span><b>${(out.volume/1000).toFixed(1)} cm&sup3;</b></div>`+
-    `<div class="row"><span class="k">peak flow</span><b>${out.flow.toFixed(2)} mm&sup3;/s</b></div>`+
-    `<div class="row"><span class="k">segments</span><b>${out.segs.toLocaleString()}</b></div>`;
-  document.getElementById('engine').innerHTML =
-    `&#9679; Rust engine (wasm) parsed + simulated ${out.segs.toLocaleString()} segments in ${dt} ms`;
+// ---- error UI -----------------------------------------------------------
+function fail(msg){
+  const el = $('err'); el.style.display = 'grid';
+  $('err-msg').textContent = msg;
+  $('loading').style.display = 'none';
 }
 
-function update(){
-  const p = {
-    sides:+sides.value, morph:+morph.value, twist:+twist.value,
-    height:+height.value, radius:+radius.value
-  };
-  for(const k of ['sides','morph','twist','height','radius','nozzle','bed'])
-    document.getElementById(k+'-v').textContent = document.getElementById(k).value;
-  const pts = vasePoints(p);
-  currentPts = pts;
-  buildLine(pts, p.height);
-  fitView(p.height, p.radius);
-  const t0 = performance.now();
-  const m = simMetrics(pts);
-  const dt = (performance.now()-t0).toFixed(2);
-  document.getElementById('stats').innerHTML =
-    `<div class="row"><span class="k">print time</span><b>${fmtTime(m.time)}</b></div>`+
-    `<div class="row"><span class="k">filament</span><b>${m.filament.toFixed(0)} mm</b></div>`+
-    `<div class="row"><span class="k">material</span><b>${(m.volume/1000).toFixed(1)} cm&sup3;</b></div>`+
-    `<div class="row"><span class="k">peak flow</span><b>${m.flow.toFixed(2)} mm&sup3;/s</b></div>`+
-    `<div class="row"><span class="k">segments</span><b>${m.segs.toLocaleString()}</b></div>`;
-  document.getElementById('engine').innerHTML =
-    `&#9679; Rust kernel (wasm) simulated ${m.segs.toLocaleString()} segments in ${dt} ms`;
-}
-
+// ---- boot ---------------------------------------------------------------
 (async function main(){
-  await init();                       // load the wasm module
-  for(const id of ['sides','morph','twist','height','radius'])
-    document.getElementById(id).addEventListener('input', update);
+  try {
+    await init();
+  } catch(e){
+    fail('Failed to load the WebAssembly kernel: ' + (e.message||e) +
+      '. Make sure the page is served over HTTP (not file://) with the correct wasm MIME type.');
+    return;
+  }
+  // populate design picker
+  const sel = $('design');
+  sel.innerHTML = Object.entries(DESIGNS).map(([id,d]) => `<option value="${id}">${d.name}</option>`).join('');
+  currentId = sel.value;
+  sel.addEventListener('change', () => { currentId = sel.value; buildSliders(currentId); regenerate(); });
+  buildSliders(currentId);
+
   for(const id of ['nozzle','bed'])
-    document.getElementById(id).addEventListener('input',
-      e => document.getElementById(id+'-v').textContent = e.target.value);
-  const btn = document.getElementById('gcode-btn');
-  btn.disabled = false; btn.addEventListener('click', downloadGcode);
-  document.getElementById('gcode-file').addEventListener('change', e => {
-    const f = e.target.files && e.target.files[0];
-    if(f) analyseFile(f).catch(err =>
-      document.getElementById('file-stats').innerHTML = `<span class="k">error: ${err}</span>`);
-  });
-  resize(); update();
+    $(id).addEventListener('input', e => $(id+'-v').textContent = e.target.value);
+  const dl = $('dl'); dl.disabled = false; dl.addEventListener('click', downloadGcode);
+
+  resize();
+  doRegenerate();
+  $('loading').style.display = 'none';
+
   (function loop(){ requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); })();
 })();
+
+// expose a tiny hook for headless verification
+window.__fc = {
+  vertexCount: () => printObj ? printObj.geometry.getAttribute('position').count : 0,
+  ready: () => !!currentEvents,
+  segCount: () => currentEvents ? currentEvents.filter(e=>e.k==='segment').length : 0,
+};
 </script>
 </body>
 </html>
