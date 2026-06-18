@@ -62,6 +62,16 @@ inserts a retraction around each long inter-tower hop (**0 → 6 retractions**),
 time/material is **unchanged** — the passes shrink the g-code without altering the physical print.
 Passes are opt-in via `initialization_data={'optimize': [...]}`, so default output is never changed.
 
+### Reverse-engineering — g-code → formula
+**`reverse_engineer(gcode)`** runs the pipeline *backwards*: it parses a g-code file to extruding
+points, decomposes them into cylindrical coordinates about an auto-detected axis, and least-squares-
+fits the modulation. The **dominant angular harmonic is the design's lobe / wave / spike count**, its
+amplitude the depth, and the radius-vs-z fit gives the cylinder/cone/taper profile. From g-code
+*alone* it recovers, e.g., a 5-lobe vase as `r(θ) ≈ 15 + 2·cos(5θ)`, a 12-spike Snake-Mode Soapdish as
+12 vertical (snake-mode) spikes, and a hexagonal vase as 6 lobes — exact counts, with `describe()`
+rendering the formula. Closed-form for the surface-of-revolution / vase family (most of the gallery);
+arbitrary 3-D toolpaths are out of scope (symbolic-regression territory).
+
 ### Validator showcase (not a printable design)
 **`validation_gauntlet()`** returns a `dict[str, list]` of twelve tiny designs, each crafted to trip
 exactly one pre-flight validation rule (out-of-bounds, negative-z, cold-extrusion, nozzle/bed temp,

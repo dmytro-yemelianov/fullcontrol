@@ -62,6 +62,41 @@ def test_design_validates_without_errors(name):
     assert r.ok, [e['message'] for e in r.errors]
 
 
+def _gcode(steps):
+    return fc.transform(steps, 'gcode', fc.GcodeControls(
+        printer_name='generic', initialization_data={'nozzle_temp': 210}), show_tips=False)
+
+
+def test_reverse_engineer_recovers_vase_lobes_from_gcode():
+    'From g-code alone, recover the lobe count, base radius and depth of a fluted vase.'
+    from examples.reverse_engineer import reverse_engineer
+    rep = reverse_engineer(_gcode(spiral_vase(radius=15, height=20, lobes=5, lobe_depth=2)))
+    assert rep['modulation'] == 'radial'
+    assert rep['radial_harmonic']['count'] == 5                 # exact lobe count
+    assert abs(rep['base_radius'] - 15) < 0.5
+    assert abs(rep['radial_harmonic']['amplitude'] - 2) < 0.3   # depth (cosine approx)
+    assert rep['profile'] == 'cylinder'
+
+
+def test_reverse_engineer_recovers_snake_spikes_and_polygon_sides():
+    from examples.reverse_engineer import reverse_engineer
+    snake = reverse_engineer(_gcode(snake_soapdish(waves=9, spike_height=10)))
+    assert snake['modulation'] == 'vertical'                    # snake-mode (z spikes)
+    assert snake['vertical_harmonic']['count'] == 9
+    poly = reverse_engineer(_gcode(twisted_polygon_vase(sides=6, morph_to_sides=0, twist_turns=0,
+                                                        radius=18)))
+    assert poly['radial_harmonic']['count'] == 6                # the hexagon
+
+
+def test_reverse_engineer_recovers_cone_taper():
+    'A plain tapering cone is recovered as a cone profile from base to top radius.'
+    from examples.reverse_engineer import reverse_engineer
+    rep = reverse_engineer(_gcode(textured_cone(base_radius=24, top_radius=8, height=20,
+                                                texture_depth=0)))
+    assert rep['profile'] == 'cone/taper'
+    assert abs(rep['base_radius'] - 24) < 1.0 and abs(rep['top_radius'] - 8) < 1.0
+
+
 def test_gallery_registry_matches_callables():
     assert set(GALLERY) == {'spiral_vase', 'ripple_vase', 'nonplanar_spacer', 'wave_bowl',
                             'gyroid_infill', 'twisted_polygon_vase', 'helical_screw', 'textured_cone',
