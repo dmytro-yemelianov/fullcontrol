@@ -30,6 +30,9 @@ from examples.hex_adapter import hex_adapter
 from examples.lampshade import lampshade
 from examples.nuts_and_bolts import nuts_and_bolts
 from examples.star_polygon_lattice import star_polygon_lattice
+from examples.phone_stand import phone_stand
+from examples.pin_support_challenge import pin_support_challenge
+from examples.overhang_challenge import overhang_challenge
 from examples.reverse_engineer import reverse_engineer, describe, identify
 from examples.validation_gauntlet import validation_gauntlet
 
@@ -53,10 +56,14 @@ GALLERY = {
     'lampshade': lampshade,
     'nuts_and_bolts': nuts_and_bolts,
     'star_polygon_lattice': star_polygon_lattice,
+    'phone_stand': phone_stand,
+    'pin_support_challenge': pin_support_challenge,
+    'overhang_challenge': overhang_challenge,
 }
 
 __all__ = ['spiral_vase', 'ripple_vase', 'nonplanar_spacer', 'wave_bowl', 'gyroid_infill',
            'twisted_polygon_vase', 'helical_screw', 'textured_cone', 'revolve', 'mobius_band',
            'trefoil_tube', 'towers_grid', 'snake_soapdish', 'hex_adapter', 'lampshade',
-           'nuts_and_bolts', 'star_polygon_lattice', 'optimization_report', 'reverse_engineer',
-           'describe', 'identify', 'validation_gauntlet', 'GALLERY']
+           'nuts_and_bolts', 'star_polygon_lattice', 'phone_stand', 'pin_support_challenge',
+           'overhang_challenge', 'optimization_report', 'reverse_engineer', 'describe', 'identify',
+           'validation_gauntlet', 'GALLERY']
