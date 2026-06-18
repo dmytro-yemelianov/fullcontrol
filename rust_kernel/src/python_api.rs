@@ -14,6 +14,7 @@ use pyo3::prelude::*;
 
 use crate::gcode;
 use crate::metrics;
+use crate::parser;
 use crate::walk::{walk, Ctx, ResolveOut, Steps};
 
 /// The four f64 step columns (a, b, c, d), passed from Python as one tuple.
@@ -133,11 +134,20 @@ fn emit_gcode(ir_json: &str, params_json: &str) -> PyResult<Vec<String>> {
     Ok(gcode::emit_gcode(&parse_ir(ir_json)?, &params))
 }
 
+/// Parse g-code text into the serialized Toolpath IR JSON (the inverse of `emit_gcode`). `params_json`
+/// is a JSON object {flavor, relative_e, e_units, dia_feed, travel_g1_e0}.
+#[pyfunction]
+fn parse_gcode(text: &str, params_json: &str) -> PyResult<String> {
+    let params = parser::ParseParams::from_json(&parse_ir(params_json)?);
+    Ok(parser::parse_gcode(text, &params).to_string())
+}
+
 #[pymodule]
 fn fullcontrol_kernel(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(resolve_columnar, m)?)?;
     m.add_function(wrap_pyfunction!(simulate, m)?)?;
     m.add_function(wrap_pyfunction!(emit_gcode_moves, m)?)?;
     m.add_function(wrap_pyfunction!(emit_gcode, m)?)?;
+    m.add_function(wrap_pyfunction!(parse_gcode, m)?)?;
     Ok(())
 }

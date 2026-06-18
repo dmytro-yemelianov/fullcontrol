@@ -205,6 +205,27 @@ def emit_gcode_rust(toolpath, state):
     return list(_kernel.emit_gcode(to_json(toolpath), json.dumps(params)))
 
 
+def parse_gcode_rust(text, params):
+    '''Rust-backed g-code parse: hand the text + a JSON `ParseParams` to the Rust engine, which
+    returns the serialized Toolpath IR; `from_json` rebuilds an identical `Toolpath`. Returns the
+    `Toolpath`, or None if the extension is unavailable so the caller can fall back to the pure-Python
+    `parse_gcode`. The Rust parser is a field-by-field port of `fullcontrol.gcode_engine.parser` and
+    produces the SAME IR.
+    '''
+    if _kernel is None:
+        return None
+    import json
+    from fullcontrol.ir.serialize import from_json
+    params_json = json.dumps({
+        'flavor': params.flavor,
+        'relative_e': params.relative_e,
+        'e_units': params.e_units,
+        'dia_feed': params.dia_feed,
+        'travel_g1_e0': params.travel_g1_e0,
+    })
+    return from_json(_kernel.parse_gcode(text, params_json))
+
+
 def simulate_rust(steps, controls, include_procedures=True, initial_extruder_on=None, state=None):
     '''Rust-backed simulation: one Rust pass walks the design and folds it straight into the nine
     SimulationResult metrics (no per-move arrays cross back to Python). Returns a SimulationResult,

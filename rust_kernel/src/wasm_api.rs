@@ -9,6 +9,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::gcode;
 use crate::metrics;
+use crate::parser;
 use crate::walk::{walk, Ctx, Steps};
 
 /// The nine simulation metrics, exposed to JS as readonly fields.
@@ -78,4 +79,13 @@ pub fn emit_gcode(ir_json: &str, params_json: &str) -> Result<Vec<String>, JsErr
     let params: serde_json::Value = serde_json::from_str(params_json)
         .map_err(|e| JsError::new(&format!("invalid params JSON: {e}")))?;
     Ok(gcode::emit_gcode(&ir, &gcode::Params::from_json(&params)))
+}
+
+/// Parse g-code text into the serialized Toolpath IR JSON (the same engine the Python build uses).
+/// `params_json` is a JSON object {flavor, relative_e, e_units, dia_feed, travel_g1_e0}.
+#[wasm_bindgen]
+pub fn parse_gcode(text: &str, params_json: &str) -> Result<String, JsError> {
+    let params: serde_json::Value = serde_json::from_str(params_json)
+        .map_err(|e| JsError::new(&format!("invalid params JSON: {e}")))?;
+    Ok(parser::parse_gcode(text, &parser::ParseParams::from_json(&params)).to_string())
 }
