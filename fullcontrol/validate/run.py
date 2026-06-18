@@ -45,14 +45,46 @@ def validate(steps, controls, show_tips=True) -> ValidationResult:
     # still walk the resolved step list
     col = resolve_columnar(steps, controls, state=state)
     result = ValidationResult()
+    _validate_columnar_and_steps(col, state.steps, init, result)
+    return result
+
+
+def _validate_columnar_and_steps(col, steps, init, result, check_geometry=True):
+    '''Run the 8 validation rules given an already-built columnar view and step list.
+
+    Extracted so the g-code verification engine can reuse the exact same rules over a g-code that
+    was parsed back into a Toolpath, without re-resolving from a design's steps. `col` is a
+    `ColumnarToolpath`; `steps` is the resolved step/event list (for config/ordering checks - on a
+    parsed external g-code many of these arrive as pass-through `ManualGcode` and so naturally
+    no-op). The public `validate(steps, controls)` is unchanged - it still builds State internally
+    and calls this with the State's columnar + resolved step list.'''
     _check_bounds(col, init, result)
     _check_first_layer(col, result)
-    _check_extrusion_geometry(col, result)
-    _check_cold_extrusion(state.steps, init, result)
-    _check_temperatures(state.steps, result)
-    _check_speeds(state.steps, init, result)
-    _check_retraction_balance(state.steps, init, result)
-    _check_stringing(state.steps, result)
+    if check_geometry:
+        _check_extrusion_geometry(col, result)
+    _check_cold_extrusion(steps, init, result)
+    _check_temperatures(steps, result)
+    _check_speeds(steps, init, result)
+    _check_retraction_balance(steps, init, result)
+    _check_stringing(steps, result)
+
+
+def validate_toolpath(toolpath, init, result) -> ValidationResult:
+    '''Run the existing validation rules over an already-parsed `Toolpath` (the inner reusable
+    entry point for the g-code verification engine).
+
+    `toolpath` is an object `Toolpath` (e.g. from `parse_gcode`); `init` is a
+    resolved-initialization-data dict (build volume, speeds, retraction default, start_gcode...);
+    `result` is the `ValidationResult` to append to. Geometric checks fold over a columnar view of
+    the toolpath; config/ordering checks walk `toolpath.events`.'''
+    from fullcontrol.ir.columnar import ColumnarToolpath
+    col = ColumnarToolpath.from_toolpath(toolpath)
+    # the parser cannot recover width/height from E alone, so on bare external g-code every
+    # segment's geometry is NaN. Skip the zero-geometry check in that case - it would otherwise
+    # fire on *every* parsed g-code (a parser limitation, not a real defect). When at least one
+    # segment carries geometry (from slicer ;WIDTH:/;HEIGHT: comments) the check still runs.
+    check_geometry = bool(col.width.size) and not np.all(np.isnan(col.width))
+    _validate_columnar_and_steps(col, toolpath.events, init, result, check_geometry=check_geometry)
     return result
 
 

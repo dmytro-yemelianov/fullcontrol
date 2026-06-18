@@ -7,5 +7,7 @@ verification rules, optimisation passes, Rust parser and CLI are later phases.
 """
 from fullcontrol.gcode_engine.detector import ParseParams
 from fullcontrol.gcode_engine.parser import parse_gcode
+from fullcontrol.gcode_engine.verification import Issue, VerificationReport
+from fullcontrol.gcode_engine.public import verify_gcode
 
-__all__ = ['parse_gcode', 'ParseParams']
+__all__ = ['parse_gcode', 'ParseParams', 'verify_gcode', 'VerificationReport', 'Issue']
