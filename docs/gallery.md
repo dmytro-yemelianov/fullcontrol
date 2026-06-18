@@ -32,7 +32,7 @@ real print (time/material > 0), and validates with no errors against a 200³ bui
 | **mobius_band** *(new)* | parametric non-planar art | the classic Möbius surface (one half-twist, one side, one edge); a boustrophedon rasters the twisting ribbon as one continuous bead. *Needs support to print* — an art / visualisation piece | ~7k segs |
 | **trefoil_tube** *(new)* | swept knot tube | a single-wall tube spiralled along a trefoil-knot centre-line via a Z-up frame (no Frenet twist); one continuous helical bead that closes on itself. *Needs support* — an art piece | ~9.6k segs |
 | **towers_grid** *(new)* | travel-heavy multi-part print | a grid of separate square-wall towers with extruder-off hops between them and subdivided collinear edges — built to exercise the IR→IR **optimization passes** (see below) | varies |
-| **snake_lattice** *(new)* | snake-mode open mesh | a support-free open-lattice tube — serpentine courses with an in-course z zig-zag, phase-offset so feet land on the prior course's peaks (open triangular holes). Inspired by FullControl's Snake-Mode Soapdish; one seamless bead | ~5k segs @40mm |
+| **snake_soapdish** *(new)* | snake-mode open cup | a reimplementation of FullControl's *Snake-Mode Soapdish*: a cup with a solid base that opens into a crown of `waves` vertical z-spikes (the snake zig-zags up/down, amplitude ramping in above the base). One seamless, support-free bead | ~15k segs |
 
 ### Export: self-contained 3D viewer (`result_type='3d_html'`)
 ```python
@@ -94,8 +94,8 @@ library gap worth closing first.
 - ✅ **Helical screw / auger** — *done* (`helical_screw`): a helical thread (screw → auger via
   depth/pitch/taper); the steeper the thread, the more overhang it tests.
 - ✅ **Möbius strip** — *done* (`mobius_band`): the classic one-half-twist ribbon, rastered as one continuous bead (see also `trefoil_tube`).
-- ✅ **Open lattice cylinder** — *done* (`snake_lattice`): snake-mode (serpentine + in-course z
-  zig-zag) builds a support-free open diamond mesh as one bead.
+- ✅ **Snake-mode open cup** — *done* (`snake_soapdish`): reimplements FullControl's Snake-Mode
+  Soapdish — a solid-based cup opening into a crown of z-spikes, support-free.
 - **Coaster / texture tile pack** — flat tiles with hilbert-curve, truchet, and concentric-wave fills
   — a quick way to show 2D infill patterns.
 - **Parametric funnel / nozzle adapter** — two different-diameter circular ports joined by a swept
