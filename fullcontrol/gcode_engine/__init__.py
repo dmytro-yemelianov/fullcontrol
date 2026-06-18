@@ -8,6 +8,9 @@ verification rules, optimisation passes, Rust parser and CLI are later phases.
 from fullcontrol.gcode_engine.detector import ParseParams
 from fullcontrol.gcode_engine.parser import parse_gcode
 from fullcontrol.gcode_engine.verification import Issue, VerificationReport
-from fullcontrol.gcode_engine.public import verify_gcode
+from fullcontrol.gcode_engine.public import verify_gcode, optimise_gcode
+from fullcontrol.gcode_engine.optimiser import OptimisationReport, PassResult
+from fullcontrol.gcode_engine import passes  # noqa: F401 - registers the Phase-4 optimisation passes
 
-__all__ = ['parse_gcode', 'ParseParams', 'verify_gcode', 'VerificationReport', 'Issue']
+__all__ = ['parse_gcode', 'ParseParams', 'verify_gcode', 'VerificationReport', 'Issue',
+           'optimise_gcode', 'OptimisationReport', 'PassResult']

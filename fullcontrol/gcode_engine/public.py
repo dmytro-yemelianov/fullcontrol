@@ -76,6 +76,68 @@ def verify_gcode(text, *, params=None, rules=None, simulate=True, build_volume=N
     return report
 
 
+def optimise_gcode(text, passes=None, *, params=None, return_report=True):
+    '''Optimise arbitrary g-code: parse -> IR optimisation passes -> re-emit improved g-code.
+
+    Parses ``text`` to the Toolpath IR, simulates it (before), applies the optimisation passes,
+    simulates again (after), and re-emits the optimised Toolpath to g-code through the same
+    pure-Python dialect the round-trip uses.
+
+    Args:
+        text: the g-code as a single string.
+        passes: a list in the ``[name | (name, params)]`` format ``apply_passes`` accepts (the
+            same as ``initialization_data['optimize']``). ``None`` (default) applies a safe,
+            material-conserving set: ``simplify``, ``arc_fit``, ``travel_reorder``. Pass an
+            explicit list (e.g. ``['arc_fit', ('adaptive_speed', {'corner_factor': 0.6})]``)
+            to control which passes run and in what order.
+        params: a ``ParseParams`` for parsing/re-emission; detected from the text when omitted.
+        return_report: when True (default) return ``(gcode_text, OptimisationReport)``; when
+            False return just ``gcode_text``.
+
+    Returns:
+        ``gcode_text`` (``return_report=False``) or ``(gcode_text, OptimisationReport)``.
+    '''
+    from fullcontrol.gcode_engine import passes as _passes_pkg  # noqa: F401 - registers new passes
+    from fullcontrol.gcode_engine.optimiser import (
+        DEFAULT_PASSES, optimise_toolpath, resolve_specs)
+
+    if params is None:
+        params = ParseParams.detect(text)
+    specs = list(DEFAULT_PASSES if passes is None else passes)
+    resolve_specs(specs)
+
+    toolpath = parse_gcode(text, params)
+    optimised, report = optimise_toolpath(toolpath, specs)
+    out_text = _reemit_gcode(optimised, params)
+    return (out_text, report) if return_report else out_text
+
+
+def _reemit_gcode(toolpath, params) -> str:
+    'Re-emit an optimised Toolpath to g-code text via the pure-Python dialect (no Rust).'
+    import fullcontrol as fc
+    from fullcontrol.gcode.state import State
+    from fullcontrol.gcode.dialect import gcode_from_ir
+
+    init = {
+        'primer': 'no_primer',
+        'relative_e': params.relative_e,
+        'e_units': params.e_units,
+        'dia_feed': params.dia_feed,
+        'travel_format': 'G1_E0' if params.travel_g1_e0 else 'G0',
+        'gcode_flavor': params.flavor,
+    }
+    controls = fc.GcodeControls(printer_name='generic', initialization_data=init)
+    controls.initialize()
+    dstate = State([], controls, procedures=False)
+    # `procedures=False` skips the starting procedure that would otherwise set the extruder's
+    # relative-E flag, so apply the parsed E-mode directly - this keeps the re-emitted E words in
+    # the same (relative vs cumulative-absolute) convention the input used, so the output re-parses
+    # to the same physical material under the same ParseParams.
+    dstate.extruder.relative_gcode = params.relative_e
+    gcode_from_ir(toolpath, dstate)
+    return '\n'.join(dstate.gcode)
+
+
 def _first_extruding_z(toolpath):
     '''The z of the lowest extruding move - the first-layer height that anchors layer bucketing
     (layer 0 = base_z). Defaults to 0.0 when nothing extrudes.'''
