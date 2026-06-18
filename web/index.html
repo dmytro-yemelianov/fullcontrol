@@ -172,7 +172,7 @@ import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {SSAOPass} from 'three/addons/postprocessing/SSAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import init, {simulate_from_ir, emit_gcode} from './pkg/fullcontrol_kernel.js';
-import {DESIGNS, toIRJSON, toFullPrintableIR, eventsToPolyline, eventsToSegments, CX, CY, FIRST_GAP} from './designs.js';
+import {DESIGNS, toIRJSON, toFullPrintableIR, eventsToPolyline, eventsToSegments, CX, CY, FIRST_GAP} from './designs.js?v=2';
 
 const $ = id => document.getElementById(id);
 const fmtTime = s => { const m = s/60; return m>=60 ? `${(m/60).toFixed(1)} h` : m>=1 ? `${Math.round(m)} min` : `${s.toFixed(0)} s`; };
