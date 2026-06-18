@@ -26,6 +26,10 @@ from examples.mobius_band import mobius_band
 from examples.trefoil_tube import trefoil_tube
 from examples.optimization_demo import towers_grid, optimization_report
 from examples.snake_soapdish import snake_soapdish
+from examples.hex_adapter import hex_adapter
+from examples.lampshade import lampshade
+from examples.nuts_and_bolts import nuts_and_bolts
+from examples.star_polygon_lattice import star_polygon_lattice
 from examples.reverse_engineer import reverse_engineer, describe, identify
 from examples.validation_gauntlet import validation_gauntlet
 
@@ -45,8 +49,14 @@ GALLERY = {
     'trefoil_tube': trefoil_tube,
     'towers_grid': towers_grid,
     'snake_soapdish': snake_soapdish,
+    'hex_adapter': hex_adapter,
+    'lampshade': lampshade,
+    'nuts_and_bolts': nuts_and_bolts,
+    'star_polygon_lattice': star_polygon_lattice,
 }
 
 __all__ = ['spiral_vase', 'ripple_vase', 'nonplanar_spacer', 'wave_bowl', 'gyroid_infill',
            'twisted_polygon_vase', 'helical_screw', 'textured_cone', 'revolve', 'mobius_band',
-           'trefoil_tube', 'towers_grid', 'snake_soapdish', 'optimization_report', 'reverse_engineer', 'describe', 'identify', 'validation_gauntlet', 'GALLERY']
+           'trefoil_tube', 'towers_grid', 'snake_soapdish', 'hex_adapter', 'lampshade',
+           'nuts_and_bolts', 'star_polygon_lattice', 'optimization_report', 'reverse_engineer',
+           'describe', 'identify', 'validation_gauntlet', 'GALLERY']
