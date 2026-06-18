@@ -72,6 +72,14 @@ amplitude the depth, and the radius-vs-z fit gives the cylinder/cone/taper profi
 rendering the formula. Closed-form for the surface-of-revolution / vase family (most of the gallery);
 arbitrary 3-D toolpaths are out of scope (symbolic-regression territory).
 
+**`identify(gcode)`** goes further — it matches the recovered signature against the gallery's *forward*
+models and returns the named design + its parameters + a `fit_error` (chamfer mm to the regenerated
+design). It recovers the exact family and counts, exact radius/depth for the cosine vase, the polygon's
+circumradius (distinguishing a polygon from a sine-lobed vase by its higher harmonics), and the
+Snake-Mode Soapdish's `waves` exactly + `spike_height` via a forward fit to the z-distribution (~±25%,
+where the raw harmonic underreads). E.g. a 5-lobe vase -> `spiral_vase(radius=15, lobes=5, lobe_depth=2)`
+at 0.23 mm fit error.
+
 ### Validator showcase (not a printable design)
 **`validation_gauntlet()`** returns a `dict[str, list]` of twelve tiny designs, each crafted to trip
 exactly one pre-flight validation rule (out-of-bounds, negative-z, cold-extrusion, nozzle/bed temp,

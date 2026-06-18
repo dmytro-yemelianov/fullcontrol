@@ -104,6 +104,92 @@ def reverse_engineer(gcode: str, max_harmonic: int = 60) -> dict:
     }
 
 
+def _points(steps):
+    return np.array([(p.x, p.y, p.z) for p in steps if getattr(p, 'x', None) is not None])
+
+
+def _subsample(p, n=500):
+    return p if len(p) <= n else p[np.linspace(0, len(p) - 1, n).astype(int)]
+
+
+def _chamfer(a, b):
+    'Symmetric mean nearest-neighbour distance between two point clouds (a fit-quality score, mm).'
+    a, b = _subsample(a), _subsample(b)
+    d = ((a[:, None, :] - b[None, :, :]) ** 2).sum(-1)
+    return float(np.sqrt(d.min(1)).mean() + np.sqrt(d.min(0)).mean()) / 2
+
+
+def _golden(f, lo, hi, iters=16):
+    g = (5 ** 0.5 - 1) / 2
+    c, d = hi - g * (hi - lo), lo + g * (hi - lo)
+    fc_, fd = f(c), f(d)
+    for _ in range(iters):
+        if fc_ < fd:
+            hi, d, fd = d, c, fc_
+            c = hi - g * (hi - lo)
+            fc_ = f(c)
+        else:
+            lo, c, fc_ = c, d, fd
+            d = lo + g * (hi - lo)
+            fd = f(d)
+    return (lo + hi) / 2
+
+
+def identify(gcode: str) -> dict:
+    '''Identify which gallery design (and what parameters) most likely produced the g-code, by
+    matching the recovered signature against the gallery's forward models. Returns
+    {'design', 'params', 'fit_error'} (fit_error = chamfer distance to the regenerated design, mm).
+
+    Recovers exact counts (lobes/sides/waves) and radius for every family; exact depth for the
+    cosine-lobed vase; the polygon's circumradius from the peak radius; and the soapdish's spike
+    height by a forward-model fit to the z-distribution (~±25%, vs the raw harmonic which underreads).
+    '''
+    from examples import spiral_vase, twisted_polygon_vase, snake_soapdish
+    rep = reverse_engineer(gcode)
+    p = parse_gcode(gcode) if isinstance(gcode, str) else np.asarray(gcode)
+    (cx, cy), theta, z, r = _cylindrical(p)
+    height = rep['height']
+
+    if rep['modulation'] == 'vertical':
+        waves = rep['vertical_harmonic']['count']
+        radius = round(rep['base_radius'])
+        qs = [5, 15, 30, 50, 70, 85, 95, 99]
+        tq = np.percentile(z, qs)
+
+        def cost(bh, sh):
+            cand = snake_soapdish(waves=waves, radius=radius, height=max(2.0, bh),
+                                  spike_height=max(0.1, sh), base_height=min(4.0, bh * 0.3))
+            return float(np.abs(tq - np.percentile(_points(cand)[:, 2], qs)).sum())
+
+        bh, sh = height * 0.6, height * 0.4
+        for _ in range(4):
+            bh = _golden(lambda b: cost(b, sh), 5.0, height)
+            sh = _golden(lambda s: cost(bh, s), 0.5, height)
+        design, params = 'snake_soapdish', {'waves': waves, 'radius': radius,
+                                             'height': round(bh, 1), 'spike_height': round(sh, 1)}
+    else:
+        count = rep['radial_harmonic']['count']
+        base = round(float(rep['base_radius']), 1)
+        # polygon vs sine-lobe: a polygon carries strong energy at 2x/3x the base harmonic
+        _, harm = _fit_harmonics(theta, r - np.polyval(np.polyfit(z, r, 1), z),
+                                 min(3 * count + 1, len(p) // 4))
+        amp = {k: a for k, a, _ in harm}
+        polygonal = amp.get(2 * count, 0.0) > 0.15 * amp.get(count, 1e9)
+        if polygonal:
+            design = 'twisted_polygon_vase'
+            params = {'sides': count, 'radius': round(float(r.max()), 1), 'height': round(height, 1),
+                      'twist_turns': 0, 'morph_to_sides': 0}
+        else:
+            design = 'spiral_vase'
+            params = {'radius': base, 'height': round(height, 1), 'lobes': count,
+                      'lobe_depth': round(rep['radial_harmonic']['amplitude'], 2)}
+
+    gen = {'spiral_vase': spiral_vase, 'twisted_polygon_vase': twisted_polygon_vase,
+           'snake_soapdish': snake_soapdish}[design]
+    fit_error = round(_chamfer(p, _points(gen(**params))), 3)
+    return {'design': design, 'params': params, 'fit_error': fit_error}
+
+
 def describe(report: dict) -> str:
     'Render the recovered formula and parameters as human-readable text.'
     c = report['centre']
