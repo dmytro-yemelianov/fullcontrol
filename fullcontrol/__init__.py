@@ -1,3 +1,4 @@
 from fullcontrol.combinations.gcode_and_visualize.common import *
 from fullcontrol.gcode_engine import (parse_gcode, ParseParams, verify_gcode, VerificationReport,
                                       Issue, optimise_gcode, OptimisationReport, PassResult)
+from fullcontrol.ir import to_3mf, from_3mf  # experimental 3MF Toolpath interop

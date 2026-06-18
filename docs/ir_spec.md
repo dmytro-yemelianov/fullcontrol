@@ -161,6 +161,59 @@ the **performance form of the same IR**; the JSON above is the **interchange for
 the columnar layout as a spec'd, language-neutral binary encoding alongside the JSON — see prior-art's
 Apache Arrow recommendation.)
 
+### 4.1 Binary encoding (the spec'd columnar form)
+
+`fullcontrol/ir/binary.py` — `to_bytes(tp, *, provenance=None, invariants=None) -> bytes`,
+`from_bytes(data) -> Toolpath`, `read_header(data) -> dict`. A compact, little-endian, self-describing
+container that round-trips the **same** `Toolpath` as the JSON (segments + material events + pass-through
+steps) but stores the hot numeric columns as raw Arrow-shaped arrays instead of per-event JSON objects.
+For a several-thousand-segment design it is **~3.8× smaller** than the v2 JSON (measured on a 6000-segment
+spiral vase: 661 KB vs 2.54 MB) — no key names, no decimal text, raw `float64` columns.
+
+**Layout** (all multi-byte values little-endian):
+
+```
+magic        4 B     b'FCIR'
+format_ver   uint16  binary container format version (1)
+flags        uint16  reserved, 0
+meta_len     uint32  byte length of the metadata block
+meta         JSON    UTF-8 metadata (below)
+<columns>            contiguous arrays in meta['columns'] order, at meta['offsets'][name]
+```
+
+The metadata block (JSON) carries the **v2 header** (`units` / `generator` / `provenance` / `invariants`),
+the `schema_version`, per-event-kind counts, and — crucially — the layout: `columns` (names, in order),
+`offsets`/`nbytes` (byte position + size of each column), `event_order` (one tag per event — `s`egment,
+`m`aterial, `p`ass-through-step — so the print-order interleaving is reconstructed exactly), plus the JSON
+*tail* for the rare/ragged data: `steps` (pass-through steps by `{type,data}`) and `seg_extra` (per-arc
+`centre`/`clockwise`/`arc_points` and per-move `color`, keyed by segment row index).
+
+**Columns**, packed back-to-back after the metadata, one contiguous block each:
+
+| column | dtype | per row | null encoding |
+|--------|-------|---------|---------------|
+| `start`, `end` | float64 | 3 (x,y,z) | a `None` axis → `NaN` |
+| `travel` | uint8 | 1 | — (1/0) |
+| `speed`, `length`, `deposited_volume`, `filament_length`, `width`, `height` | float64 | 1 | `None` → `NaN` (width/height) |
+| `source_index` | int64 | 1 | — |
+| `kind` | uint8 | 1 | 0 = line, 1 = arc |
+| `material` | float64 | 4 (`deposited_volume`, `filament_length`, `source_index`, `speed`) | speed `None` → `NaN` |
+
+**Design rationale.** This is the Apache-Arrow recommendation from `docs/ir_prior_art.md` made concrete:
+the numeric heart of the segment stream — exactly the struct-of-arrays of `columnar.ColumnarToolpath` —
+is written with `numpy.tobytes()` and read with `numpy.frombuffer` (near-zero-copy on read, no per-value
+parsing). `NaN` marks a null axis or undefined width/height, mirroring `columnar.py`, and `from_bytes`
+maps `NaN` back to `None` so `(None, None, None)` round-trips. The **rare and irregular** fields (pass-through
+steps, arc geometry, colours) go in the JSON tail rather than as sparse fixed columns — keeping the hot,
+uniform columns binary while preserving full JSON-equivalent fidelity (pass-through steps rebuild into their
+`fc.*` class, unknown classes kept as the raw dict). The header's `columns`/`offsets`/`nbytes`/counts make
+the layout fully recoverable by any reader, in any language.
+
+**Caveats.** The format is fixed little-endian (`to_bytes` forces it; `from_bytes` byte-swaps on a
+big-endian host, so cross-endian round-trips are correct). Material `source_index` is stored via `float64`
+(exact for indices `< 2^53`); segment `source_index` is `int64`. Pass-through-step handling is identical to
+the JSON form, so binary and JSON share the same fidelity and the same unknown-class behaviour.
+
 ## 5. Versioning & compatibility policy
 
 - **Additive, backward-compatible by default.** New optional fields/headers do not bump the major
@@ -176,12 +229,53 @@ The IR is the internal representation; it *lowers to* and *lifts from* external 
 
 - **G-code** — the primary backend (lower) and, via `fc.parse_gcode`, the lift (g-code → IR). Native arcs
   lower to `G2`/`G3`. This is the universal transport.
-- **3MF Toolpath extension** *(roadmap)* — the strategic interchange/archive target as it matures (it is
-  currently unreleased and linear-only; FullControl's arc-native algorithmic layer is positioned as the
-  design front-end that lowers into 3MF Toolpath). Push for arc primitives there.
+- **3MF Toolpath extension** *(experimental — implemented; see §6.1)* — the strategic interchange/archive
+  target as it matures (it is currently unreleased and linear-only; FullControl's arc-native algorithmic
+  layer is positioned as the design front-end that lowers into 3MF Toolpath). Push for arc primitives there.
 - **STEP-NC (ISO 14649)** *(philosophical alignment only)* — carry intent + working-step structure; do
   not adopt the wire format.
 - **Mesh/geometry in** (STL / 3MF / AMF) *(roadmap)* — geometry-in, toolpath-out hybrid design.
+
+### 6.1 3MF Toolpath interop *(experimental)*
+
+`fullcontrol/ir/threemf.py` implements a **best-effort** export/import against the 3MF
+Toolpath / Laser-Toolpath extension **draft** (namespace
+`http://schemas.microsoft.com/3dmanufacturing/toolpath/2019/05`,
+<https://github.com/3MFConsortium/spec_lasertoolpath>). The draft is unreleased and its OPC packaging
+is under-specified, so this is a *tracking* implementation, not a ratified format — the element/
+attribute **names** follow the draft; the exact container bytes are a clean, documented approximation.
+Exported as `fc.to_3mf` / `fc.from_3mf` (also `fullcontrol.ir.to_3mf` / `from_3mf`). Stdlib only
+(`zipfile` + `xml.etree.ElementTree`).
+
+```python
+to_3mf(toolpath, path, *, layer_height=None) -> None    # export to an OPC ZIP .3mf
+from_3mf(path) -> Toolpath                               # import back to IR Segments
+```
+
+**Parts written** (the OPC/ZIP container):
+
+| part | content |
+|------|---------|
+| `[Content_Types].xml` | OPC content-type map (model + toolpath-layer + rels) |
+| `_rels/.rels` | package root → the 3D model part (3MF startpart relationship) |
+| `3D/3dmodel.model` | 3MF core `<model>` (minimal valid build) **+** `<tp:toolpathresource>` with `<tp:toolpathprofiles>` and `<tp:toolpathlayers>` |
+| `3D/_rels/3dmodel.model.rels` | model → each layer part (`…/2019/05/toolpath` relationship type) |
+| `3D/toolpath/layer_NNNNN.xml` | one per Z layer: `<layer>` → `<parts>`/`<profiles>`/`<data>`/`<segments>` of `<segment type="polyline">` holding `<point x= y=>` device-unit coords |
+
+Bead geometry and speed ride on `<toolpathprofile>` via the draft's `beadwidth` / `beadheight` /
+`depositionspeed` attributes; each segment references its profile by id (one profile per distinct
+`(width, height, speed)`). Coordinates are stored as **integer device units**; `unitfactor` (default
+`1e-3` mm/unit) converts to mm. Layers are bucketed by end-Z (rounded to `layer_height` if given).
+
+**Round-trip fidelity** (`from_3mf(to_3mf(tp))`):
+
+- *Preserved* — the **extruding XYZ path** within device-unit tolerance (X/Y from the points, Z from
+  the layer's `ztop`), per-layer segment counts, bead width/height, and speed.
+- *Lossy / dropped* — **3MF Toolpath is linear-only, so native arcs are tessellated to line
+  segments** (centre/clockwise lost; path *length* preserved); **travel** (non-extruding) moves are
+  not written; pass-through steps (temperature/fan/manual g-code) and `StationaryExtrusion` material
+  events are dropped; `deposited_volume`/`filament_length` are recomputed from geometry × bead on
+  read, not stored. Non-planar designs get **approximate** layering (one Z per bucket).
 
 ## 7. Consumers
 
