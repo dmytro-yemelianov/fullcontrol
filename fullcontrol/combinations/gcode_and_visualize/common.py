@@ -65,4 +65,35 @@ def transform(steps: list, result_type: str, controls: GcodeControls | PlotContr
     if controls is None:
         controls = controls_class()
     steps = fix(steps, result_type, controls)
+    _self_verify(steps, controls)
     return runner(steps, controls, show_tips)
+
+
+def _self_verify(steps, controls):
+    '''Opt-in pre-flight: if `initialization_data` declares `invariants`, resolve the design once and
+    check them (the IR-level fullcontrol.ir.check_invariants), so every backend's output is guarded.
+    `invariant_mode` (default 'raise') -> raise on violation; 'warn' -> print and continue. Off by
+    default (no `invariants` key -> no-op), so existing output is unchanged.'''
+    init_data = getattr(controls, 'initialization_data', None) or {}
+    names = init_data.get('invariants')
+    if not names:
+        return
+    from fullcontrol.ir import resolve, check_invariants
+    toolpath = resolve(steps, controls)
+    build_volume = None
+    try:
+        from fullcontrol.gcode.import_printer import resolve_initialization_data
+        init = resolve_initialization_data(getattr(controls, 'printer_name', None), init_data)
+        bx, by, bz = (init.get('build_volume_x'), init.get('build_volume_y'),
+                      init.get('build_volume_z'))
+        if None not in (bx, by, bz):
+            build_volume = (bx, by, bz)
+    except Exception:
+        pass                                   # build-volume optional; within_build_volume just skips
+    report = check_invariants(toolpath, names, build_volume=build_volume,
+                              max_flow=init_data.get('max_flow'))
+    if init_data.get('invariant_mode', 'raise') == 'warn':
+        if not report.ok:
+            print(f'invariant warning(s):\n{report.summary()}')
+    else:
+        report.raise_if_violated()
