@@ -69,6 +69,20 @@
     border:1px solid var(--line);pointer-events:none;max-width:60%}
   #hud b{color:#fff}
   #hint{position:absolute;bottom:12px;right:16px;color:var(--dim);font-size:11px}
+
+  /* ---- render-mode toggle + reveal ---- */
+  #viewctl{position:absolute;right:16px;top:14px;display:flex;gap:8px;align-items:center}
+  .seg{display:inline-flex;background:rgba(12,13,18,.62);backdrop-filter:blur(3px);
+    border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .seg button{background:transparent;border:0;color:var(--muted);font-size:12px;
+    padding:6px 12px;cursor:pointer;transition:background .12s,color .12s}
+  .seg button:hover{color:var(--txt)}
+  .seg button.on{background:var(--btn);color:#fff;font-weight:600}
+  #reveal{display:none;background:rgba(12,13,18,.62);backdrop-filter:blur(3px);
+    border:1px solid var(--line);border-radius:8px;color:var(--txt);font-size:12px;
+    padding:6px 12px;cursor:pointer}
+  #reveal:hover{color:#fff;border-color:var(--accent)}
+  #reveal.live{color:var(--accent);border-color:var(--accent)}
   #loading{position:absolute;inset:0;display:grid;place-items:center;background:var(--bg);z-index:5}
   #loading .box{text-align:center;color:var(--muted);font-size:13px}
   .spin{width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--accent);
@@ -130,6 +144,13 @@
   <main id="stage">
     <div id="canvas-wrap"></div>
     <div id="hud"></div>
+    <div id="viewctl">
+      <button id="reveal" title="Grow the beads in deposition order">▶ Print</button>
+      <div class="seg" role="group" aria-label="Render mode">
+        <button id="mode-lines" class="on" data-mode="lines">Lines</button>
+        <button id="mode-real" data-mode="real">Realistic</button>
+      </div>
+    </div>
     <div id="hint">drag to orbit · scroll to zoom · Z-up</div>
     <div id="loading"><div class="box"><div class="spin"></div>loading the Rust kernel (WebAssembly)…</div></div>
     <div id="err"><div class="box" id="err-msg"></div></div>
@@ -145,8 +166,13 @@
 <script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {SSAOPass} from 'three/addons/postprocessing/SSAOPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import init, {simulate_from_ir, emit_gcode} from './pkg/fullcontrol_kernel.js';
-import {DESIGNS, toIRJSON, toFullPrintableIR, eventsToPolyline, CX, CY, FIRST_GAP} from './designs.js';
+import {DESIGNS, toIRJSON, toFullPrintableIR, eventsToPolyline, eventsToSegments, CX, CY, FIRST_GAP} from './designs.js';
 
 const $ = id => document.getElementById(id);
 const fmtTime = s => { const m = s/60; return m>=60 ? `${(m/60).toFixed(1)} h` : m>=1 ? `${Math.round(m)} min` : `${s.toFixed(0)} s`; };
@@ -160,16 +186,77 @@ try {
 } catch(e){ fail('WebGL is not available in this browser. The 3D viewer needs WebGL.'); }
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 wrap.appendChild(renderer.domElement);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.5;
 const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100000); camera.up.set(0,0,1);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 const grid = new THREE.GridHelper(200, 40, 0x33384a, 0x1d2030);
 grid.rotation.x = Math.PI/2; scene.add(grid);
-let printObj = null, travelObj = null;
+
+// Render mode: 'lines' (fast, default) | 'real' (as-printed solid beads)
+let renderMode = 'lines';
+let printObj = null, travelObj = null;   // line-mode objects
+let beadObj = null;                       // realistic InstancedMesh
+let bedPlane = null;                      // soft bed under realistic model
+let currentHeight = 1, currentSegs = null;
+
+// ---- realistic-mode scene props (lazy: only added when first used) -------
+const FILAMENT_COLOR = 0x8ccbff;
+let envMade = false, ssaoEnabled = false;
+let dirLight = null, hemiLight = null, ambLight = null, composer = null, ssaoPass = null, renderPass = null;
+
+function ensureRealisticProps(){
+  if(envMade) return;
+  envMade = true;
+  // image-based lighting for a subtle plastic sheen
+  try {
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  } catch(e){ /* IBL optional */ }
+  hemiLight = new THREE.HemisphereLight(0xdfe9ff, 0x4a4f60, 1.1); scene.add(hemiLight);
+  ambLight = new THREE.AmbientLight(0xffffff, 0.45); scene.add(ambLight);
+  dirLight = new THREE.DirectionalLight(0xffffff, 2.4);
+  dirLight.castShadow = true;
+  dirLight.shadow.mapSize.set(1024,1024);
+  dirLight.shadow.bias = -0.0008;
+  const sc = dirLight.shadow.camera; sc.near = 1; sc.far = 600;
+  sc.left=-160; sc.right=160; sc.top=160; sc.bottom=-160;
+  scene.add(dirLight); scene.add(dirLight.target);
+  // soft fill from the opposite side so the shadowed face still reads
+  const fill = new THREE.DirectionalLight(0x9fb8ff, 0.7);
+  fill.position.set(-1, 1, 0.6);
+  scene.add(fill);
+}
+
+function buildComposer(){
+  // EffectComposer + SSAO for inter-bead groove definition. Guarded: if anything
+  // throws on this CDN/importmap, we silently fall back to plain lighting.
+  try {
+    const w = wrap.clientWidth || 1, h = wrap.clientHeight || 1;
+    composer = new EffectComposer(renderer);
+    renderPass = new RenderPass(scene, camera);
+    composer.addPass(renderPass);
+    ssaoPass = new SSAOPass(scene, camera, w, h);
+    ssaoPass.kernelRadius = 0.55;
+    ssaoPass.minDistance = 0.0006;
+    ssaoPass.maxDistance = 0.04;
+    composer.addPass(ssaoPass);
+    composer.addPass(new OutputPass());
+    composer.setPixelRatio(Math.min(devicePixelRatio,2));
+    composer.setSize(w, h);
+    ssaoEnabled = true;
+  } catch(e){
+    console.warn('SSAO unavailable, falling back to lighting only:', e);
+    composer = null; ssaoEnabled = false;
+  }
+}
 
 function resize(){
   const w = wrap.clientWidth || 1, h = wrap.clientHeight || 1;
   renderer.setSize(w, h); camera.aspect = w/h; camera.updateProjectionMatrix();
+  if(composer) composer.setSize(w, h);
 }
 addEventListener('resize', resize);
 
@@ -180,8 +267,19 @@ function fitView(height, radius){
   grid.position.set(CX, CY, FIRST_GAP);
 }
 
-function buildGeometry(poly, height){
+function disposeLines(){
   for(const o of [printObj, travelObj]){ if(o){ scene.remove(o); o.geometry.dispose(); o.material.dispose(); } }
+  printObj = null; travelObj = null;
+}
+function disposeBeads(){
+  // NB: geometry (_boxGeo) is shared and reused, so we only dispose the InstancedMesh
+  // material + the mesh itself, never the shared box geometry.
+  if(beadObj){ scene.remove(beadObj); beadObj.dispose(); beadObj.material.dispose(); beadObj = null; }
+  if(bedPlane){ scene.remove(bedPlane); bedPlane.geometry.dispose(); bedPlane.material.dispose(); bedPlane = null; }
+}
+
+function buildLines(poly, height){
+  disposeLines();
   const {xyz, travel} = poly, n = xyz.length/3;
   // print pass: a vertex-coloured line; travels drawn dimmed & separate
   const colors = new Float32Array(xyz.length);
@@ -209,6 +307,124 @@ function buildGeometry(poly, height){
     scene.add(travelObj);
   }
   return n;
+}
+
+// ---- realistic (as-printed) beads ---------------------------------------
+// Each extruding move is one instance of a unit box (1×1×1, centred), oriented
+// along the move and scaled to (width × height × length). A stadium/oval read
+// comes from a slightly over-tall, over-wide scale plus the contact shadow +
+// SSAO grooves. Beads overlap a touch end-to-end so consecutive moves fuse.
+// One InstancedMesh = one draw call → ~17k segments stays interactive.
+const _boxGeo = new THREE.BoxGeometry(1,1,1);     // shared unit cube
+const _scl = new THREE.Vector3();
+const _pos = new THREE.Vector3();
+const _mat = new THREE.Matrix4();
+// per-bead orthonormal basis: ax=width (≈horizontal ⟂ move), ay=length (move dir), az=height (≈up)
+const _ax = new THREE.Vector3();
+const _ay = new THREE.Vector3();
+const _az = new THREE.Vector3();
+const _worldUp = new THREE.Vector3(0,0,1);
+
+function buildRealistic(segs, height){
+  disposeBeads();
+  ensureRealisticProps();
+  const n = segs.length;
+
+  const geo = _boxGeo;
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0xffffff, roughness: 0.62, metalness: 0.0,
+    envMapIntensity: 0.9,
+  });
+  beadObj = new THREE.InstancedMesh(geo, mat, n);
+  beadObj.castShadow = true; beadObj.receiveShadow = true;
+  beadObj.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  const colors = new Float32Array(n*3);
+  const base = new THREE.Color(FILAMENT_COLOR);
+
+  // Each box: local X = bead width (kept ≈horizontal & ⟂ to the move), local Y =
+  // move direction (length), local Z = bead height (kept ≈vertical). Building the
+  // basis explicitly (instead of a single setFromUnitVectors) keeps the wide/flat
+  // faces oriented up & outward, so the FFF stadium reads correctly under lighting.
+  for(let i=0;i<n;i++){
+    const s = segs[i], a = s.a, b = s.b;
+    const dx=b[0]-a[0], dy=b[1]-a[1], dz=b[2]-a[2];
+    let len = Math.hypot(dx,dy,dz); if(len < 1e-6) len = 1e-6;
+    _ay.set(dx/len, dy/len, dz/len);                    // length axis = move dir
+    // width axis ⟂ to move and to world-up; falls back if move is near-vertical
+    _ax.crossVectors(_ay, _worldUp);
+    if(_ax.lengthSq() < 1e-8) _ax.set(1,0,0);
+    _ax.normalize();
+    _az.crossVectors(_ax, _ay).normalize();             // height axis (≈up)
+    // overlap consecutive beads ~ one bead-width so layers/segments fuse
+    const overlap = Math.min(s.w*0.6, len*0.5);
+    // FFF bead: wider than tall, flat-ish — widen X a touch, full height in Z
+    _scl.set(s.w*1.08, len + overlap, s.h*1.04);
+    _pos.set((a[0]+b[0])/2, (a[1]+b[1])/2, (a[2]+b[2])/2);
+    _mat.makeBasis(_ax, _ay, _az);
+    _mat.scale(_scl);
+    _mat.setPosition(_pos);
+    beadObj.setMatrixAt(i, _mat);
+    // optional gentle height-gradient tint over the filament base colour (kept bright)
+    const f = Math.min(1, Math.max(0, (_pos.z - FIRST_GAP)/Math.max(height,1e-6)));
+    const c = base.clone().offsetHSL(0.0, 0.0, -0.02 + 0.08*f);
+    colors[i*3]=c.r; colors[i*3+1]=c.g; colors[i*3+2]=c.b;
+  }
+  beadObj.instanceMatrix.needsUpdate = true;
+  beadObj.instanceColor = new THREE.InstancedBufferAttribute(colors, 3);
+  beadObj.instanceColor.needsUpdate = true;
+  beadObj.count = n;            // full by default (reveal animation may shrink it)
+  beadObj.computeBoundingSphere();
+  scene.add(beadObj);
+
+  // a soft bed plane that catches the contact shadow
+  const bedMat = new THREE.MeshStandardMaterial({color:0x14161f, roughness:0.95, metalness:0.0});
+  bedPlane = new THREE.Mesh(new THREE.PlaneGeometry(400,400), bedMat);
+  bedPlane.position.set(CX, CY, FIRST_GAP - 0.01);
+  bedPlane.receiveShadow = true;
+  scene.add(bedPlane);
+
+  // aim the key light at the model centre (position is refreshed per-frame so it
+  // acts as a head-light that follows the orbit — the near wall always reads lit)
+  if(dirLight){
+    dirLight.target.position.set(CX, CY, height*0.45 + FIRST_GAP);
+    dirLight.target.updateMatrixWorld();
+  }
+  if(!composer) buildComposer();
+  return n;
+}
+
+// keep the key light on the camera side of the model so the visible wall is lit
+const _lightTmp = new THREE.Vector3();
+function updateKeyLight(){
+  if(renderMode!=='real' || !dirLight) return;
+  const tgt = dirLight.target.position;
+  // camera→target direction, lifted up, pushed out: a 3/4 front-top key light
+  _lightTmp.copy(camera.position).sub(tgt).normalize();
+  // mostly from the camera direction (so the visible wall is lit head-on),
+  // nudged up and to one side for form-revealing shading on the vertical walls
+  dirLight.position.set(
+    tgt.x + _lightTmp.x*260 + 70,
+    tgt.y + _lightTmp.y*260 + 50,
+    tgt.z + 130
+  );
+}
+
+// ---- view dispatcher: build whichever mode is active --------------------
+function rebuildView(){
+  if(renderMode === 'real'){
+    disposeLines();
+    grid.visible = false;
+    renderer.shadowMap.enabled = true;
+    buildRealistic(currentSegs, currentHeight);
+    $('reveal').style.display = '';
+  } else {
+    stopReveal();
+    disposeBeads();
+    grid.visible = true;
+    renderer.shadowMap.enabled = false;
+    buildLines(currentPoly, currentHeight);
+    $('reveal').style.display = 'none';
+  }
 }
 
 // ---- metrics (wasm) -----------------------------------------------------
@@ -248,6 +464,7 @@ function verify(events){
 
 // ---- design state -------------------------------------------------------
 let currentEvents = null, currentParams = null, currentId = null;
+let currentPoly = null;
 
 function buildSliders(id){
   const d = DESIGNS[id];
@@ -283,7 +500,9 @@ function doRegenerate(){
   const {events, height, radius} = built;
   currentEvents = events;
   const poly = eventsToPolyline(events);
-  const verts = buildGeometry(poly, height);
+  currentPoly = poly; currentHeight = height;
+  currentSegs = eventsToSegments(events);
+  rebuildView();
   fitView(height, radius);
   verify(events);
   // wasm metrics
@@ -295,7 +514,38 @@ function doRegenerate(){
   const dt = (performance.now()-t0).toFixed(2);
   renderMetrics(m, dt);
   m.free();
-  $('hud').innerHTML = `<b>${d.name}</b> · ${d.technique} · <b>${(poly.xyz.length/3).toLocaleString()}</b> vertices drawn`;
+  updateHud();
+}
+
+function updateHud(){
+  const d = DESIGNS[currentId];
+  if(!d) return;
+  const tail = renderMode === 'real'
+    ? `<b>${currentSegs.length.toLocaleString()}</b> beads · as-printed${ssaoEnabled?' · SSAO':''}`
+    : `<b>${(currentPoly.xyz.length/3).toLocaleString()}</b> vertices drawn`;
+  $('hud').innerHTML = `<b>${d.name}</b> · ${d.technique} · ${tail}`;
+}
+
+// ---- print-order reveal animation ---------------------------------------
+let revealRAF = 0, revealStart = 0, revealDur = 4000;
+function startReveal(){
+  if(renderMode !== 'real' || !beadObj) return;
+  stopReveal();
+  $('reveal').classList.add('live');
+  revealStart = performance.now();
+  const total = currentSegs.length;
+  const step = () => {
+    const t = Math.min(1, (performance.now()-revealStart)/revealDur);
+    beadObj.count = Math.max(1, Math.floor(t*total));
+    if(t < 1){ revealRAF = requestAnimationFrame(step); }
+    else { beadObj.count = total; revealRAF = 0; $('reveal').classList.remove('live'); }
+  };
+  revealRAF = requestAnimationFrame(step);
+}
+function stopReveal(){
+  if(revealRAF){ cancelAnimationFrame(revealRAF); revealRAF = 0; }
+  if(beadObj) beadObj.count = currentSegs ? currentSegs.length : beadObj.count;
+  $('reveal').classList.remove('live');
 }
 
 // ---- g-code download ----------------------------------------------------
@@ -344,19 +594,31 @@ function fail(msg){
     $(id).addEventListener('input', e => $(id+'-v').textContent = e.target.value);
   const dl = $('dl'); dl.disabled = false; dl.addEventListener('click', downloadGcode);
 
+  // render-mode toggle
+  const setMode = (mode) => {
+    if(mode === renderMode) return;
+    renderMode = mode;
+    $('mode-lines').classList.toggle('on', mode==='lines');
+    $('mode-real').classList.toggle('on', mode==='real');
+    rebuildView();
+    updateHud();
+  };
+  $('mode-lines').addEventListener('click', () => setMode('lines'));
+  $('mode-real').addEventListener('click', () => setMode('real'));
+  $('reveal').addEventListener('click', startReveal);
+
   resize();
   doRegenerate();
   $('loading').style.display = 'none';
 
-  (function loop(){ requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); })();
+  (function loop(){
+    requestAnimationFrame(loop);
+    controls.update();
+    updateKeyLight();
+    if(renderMode === 'real' && composer && ssaoEnabled) composer.render();
+    else renderer.render(scene, camera);
+  })();
 })();
-
-// expose a tiny hook for headless verification
-window.__fc = {
-  vertexCount: () => printObj ? printObj.geometry.getAttribute('position').count : 0,
-  ready: () => !!currentEvents,
-  segCount: () => currentEvents ? currentEvents.filter(e=>e.k==='segment').length : 0,
-};
 </script>
 </body>
 </html>

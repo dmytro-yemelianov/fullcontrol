@@ -350,6 +350,41 @@ export function eventsToPolyline(events) {
   return { xyz: new Float32Array(xyz), travel: travelFlags };
 }
 
+/**
+ * Flatten a v2 event list into the list of EXTRUDING segments the realistic (as-printed) renderer
+ * meshes. Travels are skipped. Arcs are expanded into their tessellated sub-segments so every entry
+ * is a straight bead with explicit start/end and per-segment width/height (mm). Returned in
+ * deposition order, so the print-reveal animation can grow them one by one.
+ *
+ * @returns {Array<{a:[number,number,number], b:[number,number,number], w:number, h:number}>}
+ */
+export function eventsToSegments(events) {
+  const segs = [];
+  let cur = null; // running [x,y,z] so segments with null start/end inherit the previous point
+  for (const ev of events) {
+    if (ev.k !== 'segment') continue;
+    const s = ev.start, e = ev.end;
+    const sx = s[0] == null ? (cur ? cur[0] : 0) : s[0];
+    const sy = s[1] == null ? (cur ? cur[1] : 0) : s[1];
+    const sz = s[2] == null ? (cur ? cur[2] : 0) : s[2];
+    const w = ev.width != null ? ev.width : EW, h = ev.height != null ? ev.height : EH;
+    if (ev.kind === 'arc' && ev.arc_points) {
+      let px = sx, py = sy, pz = sz;
+      for (const ap of ev.arc_points) {
+        const ax = ap[0] == null ? px : ap[0], ay = ap[1] == null ? py : ap[1], az = ap[2] == null ? pz : ap[2];
+        if (!ev.travel) segs.push({ a: [px, py, pz], b: [ax, ay, az], w, h });
+        px = ax; py = ay; pz = az;
+      }
+      cur = [px, py, pz];
+    } else {
+      const ex = e[0] == null ? sx : e[0], ey = e[1] == null ? sy : e[1], ez = e[2] == null ? sz : e[2];
+      if (!ev.travel) segs.push({ a: [sx, sy, sz], b: [ex, ey, ez], w, h });
+      cur = [ex, ey, ez];
+    }
+  }
+  return segs;
+}
+
 /** Build the serialized v2 IR JSON string (header + events) for the wasm kernel. */
 export function toIRJSON(events, provenance) {
   return JSON.stringify({

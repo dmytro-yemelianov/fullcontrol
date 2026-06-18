@@ -39,6 +39,28 @@ fan/end procedures and lets `emit_gcode` produce a complete printable file (nati
 G2/G3). Two invariants (monotonic layer-z, non-negative extrusion) are checked in JS and shown as a
 ✓/⚠ badge.
 
+#### Render modes — Lines | Realistic
+
+A **Render** toggle (top-right of the viewer) switches between two views of the same toolpath:
+
+- **Lines** (default, fast) — the existing vertex-coloured polyline: travels dimmed, height-ramp
+  colour. Instant; best for reading the path.
+- **Realistic / as-printed** — each *extruding* segment is rendered as a solid deposited bead, like a
+  slicer preview. Built as a single **`InstancedMesh`** of oriented boxes (one instance per move,
+  scaled `width × height × length`, slightly wider-than-tall for the FFF stadium read, overlapped a
+  touch end-to-end so consecutive beads/layers fuse). One draw call keeps the default vase's ~17k
+  segments fully interactive (120 fps in testing). Lighting is a camera-following key
+  `DirectionalLight` (with a soft contact shadow onto a bed plane) + `HemisphereLight` + ambient +
+  a subtle `RoomEnvironment` IBL via `PMREMGenerator` for plastic sheen; ACES tone mapping. Layer
+  grooves are accented with **SSAO** (`EffectComposer` + `SSAOPass` + `OutputPass`); if that ever
+  fails to load over the CDN importmap it falls back silently to lighting + bead overlap only.
+  Switching modes (or designs) disposes the old geometry/material — no leaks. A **▶ Print** button
+  grows the beads in deposition order over a few seconds.
+
+This adds these `three/addons/...` modules to the importmap: `environments/RoomEnvironment.js`,
+`postprocessing/EffectComposer.js`, `postprocessing/RenderPass.js`, `postprocessing/SSAOPass.js`,
+`postprocessing/OutputPass.js` — all still CDN-loaded (no build step).
+
 ### Deploy to Cloudflare Pages
 
 After a one-time `npx wrangler login`, one command publishes the static site:
