@@ -152,6 +152,23 @@ report.raise_if_violated()
 The same checks remain reachable via `fc.verify_gcode` on lowered g-code; `check_invariants` is the
 IR-level counterpart.
 
+**`transform` self-verifies on request.** Declaring `invariants` in `initialization_data` makes
+`fc.transform` resolve the design once and check them before running *any* backend, so a design guards
+itself:
+
+```python
+fc.transform(steps, 'gcode', fc.GcodeControls(
+    printer_name='generic',
+    initialization_data={'nozzle_temp': 210, 'build_volume_x': 200, 'build_volume_y': 200,
+                         'build_volume_z': 200,
+                         'invariants': ['monotonic_layer_z', 'within_build_volume'],
+                         'invariant_mode': 'raise'}))   # 'raise' (default) | 'warn'
+```
+
+It is off by default (no `invariants` key → no-op, output unchanged), mirroring the
+`initialization_data['optimize']` opt-in. `build_volume` (for `within_build_volume`) and `max_flow`
+(for `bounded_flow`) come from `initialization_data`; an invariant whose parameter is absent is skipped.
+
 ## 4. Columnar form (the binary/zero-copy ABI)
 
 `fullcontrol/ir/columnar.py` is a struct-of-arrays (`numpy`) view of the segment stream — start/end as
