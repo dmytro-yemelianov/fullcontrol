@@ -7,11 +7,13 @@
   Content-Type: application/wasm
   Cache-Control: public, max-age=31536000, immutable
 
-# The generated wasm JS glue and design module are stable per deploy.
+# The wasm JS glue is stable per build.
 /pkg/*.js
   Cache-Control: public, max-age=86400
+# designs.js is a mutable, non-hashed module that changes between deploys - it MUST revalidate so a
+# redeploy is picked up immediately (a long cache here serves a stale module against a fresh index.html).
 /designs.js
-  Cache-Control: public, max-age=86400
+  Cache-Control: public, max-age=0, must-revalidate
 
 # The Pyodide playground ships a committed wheel; cache it hard.
 /playground/*.whl
