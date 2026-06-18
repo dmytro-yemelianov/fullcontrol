@@ -88,6 +88,33 @@ def test_reverse_engineer_recovers_snake_spikes_and_polygon_sides():
     assert poly['radial_harmonic']['count'] == 6                # the hexagon
 
 
+def test_identify_names_the_design_and_recovers_parameters():
+    'Template-fit against the gallery: name the design + recover params (exact for the cosine vase).'
+    from examples.reverse_engineer import identify
+    r = identify(_gcode(spiral_vase(radius=15, height=20, lobes=5, lobe_depth=2)))
+    assert r['design'] == 'spiral_vase'
+    assert r['params']['lobes'] == 5
+    assert abs(r['params']['radius'] - 15) < 0.5 and abs(r['params']['lobe_depth'] - 2) < 0.3
+    assert r['fit_error'] < 1.0                       # regenerates close to the original
+
+
+def test_identify_distinguishes_polygon_from_lobed_vase():
+    from examples.reverse_engineer import identify
+    poly = identify(_gcode(twisted_polygon_vase(sides=6, radius=18, twist_turns=0, morph_to_sides=0)))
+    assert poly['design'] == 'twisted_polygon_vase' and poly['params']['sides'] == 6
+    lobed = identify(_gcode(spiral_vase(lobes=6, lobe_depth=2)))
+    assert lobed['design'] == 'spiral_vase'           # same count, but sine lobes -> not a polygon
+
+
+def test_identify_recovers_soapdish_waves_and_spike_height():
+    'The soapdish: waves exact, spike_height via forward fit (~true, vs the harmonic which underreads).'
+    from examples.reverse_engineer import identify
+    r = identify(_gcode(snake_soapdish(waves=12, spike_height=10, radius=24, height=26)))
+    assert r['design'] == 'snake_soapdish'
+    assert r['params']['waves'] == 12
+    assert 7.0 < r['params']['spike_height'] < 14.0   # near the true 10 (harmonic alone gave ~1.7)
+
+
 def test_reverse_engineer_recovers_cone_taper():
     'A plain tapering cone is recovered as a cone profile from base to top radius.'
     from examples.reverse_engineer import reverse_engineer
